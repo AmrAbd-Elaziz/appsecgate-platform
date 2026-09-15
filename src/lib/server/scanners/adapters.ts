@@ -8,6 +8,7 @@ import type {
 import { realGitleaksAdapter } from "./gitleaks-adapter";
 import { realSemgrepAdapter } from "./semgrep-adapter";
 import { realTrivyFsAdapter } from "./trivy-fs-adapter";
+import { realCheckovAdapter } from "./checkov-adapter";
 
 function execution(
   category: string,
@@ -169,6 +170,6 @@ export const scannerAdapters: ScannerAdapter[] = [
   zapAdapter,
   realGitleaksAdapter,
   realTrivyFsAdapter,
-  checkovAdapter,
+  realCheckovAdapter,
   containerAdapter,
 ];
