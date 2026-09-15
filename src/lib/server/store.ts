@@ -6,7 +6,6 @@ import { initialAssets } from "../../data/appsecgate";
 import type {
   ControlLifecycle,
   FindingLifecycle,
-  RemediationProof,
 } from "../../data/appsecgate";
 import type { PersistedAssessment } from "./assessment-engine";
 
@@ -15,7 +14,6 @@ type AppSecGateStore = {
   assessments: PersistedAssessment[];
   findingLifecycles: FindingLifecycle[];
   controlLifecycles: ControlLifecycle[];
-  remediationProofs: RemediationProof[];
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -32,7 +30,6 @@ async function ensureStore(): Promise<void> {
       assessments: [],
       findingLifecycles: [],
       controlLifecycles: [],
-      remediationProofs: [],
     };
 
     await fs.writeFile(
@@ -69,11 +66,6 @@ async function readStore(): Promise<AppSecGateStore> {
       parsed.controlLifecycles
     )
       ? parsed.controlLifecycles
-      : [],
-    remediationProofs: Array.isArray(
-      parsed.remediationProofs
-    )
-      ? parsed.remediationProofs
       : [],
   };
 }
@@ -336,85 +328,6 @@ export async function reconcileFindingLifecycles(
 }
 
 
-export async function listRemediationProofs(
-  assetId?: number
-): Promise<RemediationProof[]> {
-  const store = await readStore();
-
-  if (assetId === undefined) {
-    return store.remediationProofs;
-  }
-
-  return store.remediationProofs.filter(
-    (proof) => proof.assetId === assetId
-  );
-}
-
-export async function saveRemediationProof(
-  proof: RemediationProof
-): Promise<RemediationProof> {
-  const store = await readStore();
-
-  const existingIndex =
-    store.remediationProofs.findIndex(
-      (item) => item.id === proof.id
-    );
-
-  if (existingIndex >= 0) {
-    store.remediationProofs[existingIndex] =
-      proof;
-  } else {
-    store.remediationProofs.unshift(proof);
-  }
-
-  /*
-   * A control becomes Implemented only when a
-   * Remediation Proof has itself been Verified.
-   *
-   * Scanner Output evidence MUST NOT trigger this.
-   */
-  if (proof.status === "Verified") {
-    const controlIndex =
-      store.controlLifecycles.findIndex(
-        (lifecycle) =>
-          lifecycle.assetId ===
-            proof.assetId &&
-          lifecycle.findingId ===
-            proof.findingId
-      );
-
-    if (controlIndex >= 0) {
-      const lifecycle =
-        store.controlLifecycles[
-          controlIndex
-        ];
-
-      if (
-        lifecycle.status === "Required"
-      ) {
-        const now =
-          proof.verifiedAt ??
-          new Date().toISOString();
-
-        store.controlLifecycles[
-          controlIndex
-        ] = {
-          ...lifecycle,
-          status: "Implemented",
-          lastUpdatedAt: now,
-          statusChangedAt: now,
-          implementedAt: now,
-          verifiedAt: undefined,
-        };
-      }
-    }
-  }
-
-  await writeStore(store);
-
-  return proof;
-}
-
 export async function listControlLifecycles(
   assetId?: number
 ): Promise<ControlLifecycle[]> {
@@ -562,17 +475,8 @@ export async function reconcileControlLifecycles(
 
     if (
       findingLifecycle.status === "Closed" &&
-      lifecycle.status === "Implemented"
+      lifecycle.status !== "Verified"
     ) {
-      /*
-       * Verification requires BOTH:
-       *
-       * 1. verified remediation proof -> Implemented
-       * 2. successful scanner retest -> Finding Closed
-       *
-       * A clean scanner result alone must not skip
-       * the Implemented lifecycle stage.
-       */
       store.controlLifecycles[index] = {
         ...lifecycle,
         status: "Verified",
