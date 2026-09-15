@@ -805,7 +805,6 @@ export default function Home() {
           <Reports
             run={latestRun}
             assessment={latestAssessment}
-            onGoToEvidence={() => setView("evidence")}
           />
         ) : (
           <Placeholder

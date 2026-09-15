@@ -5039,3 +5039,543 @@ h3 { margin: 0; font-size: 14px; }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ==========================================
+   Reports V2 — Assessment Intelligence
+========================================== */
+
+.report-decision-card.decision-pass {
+  border-color: rgba(99, 216, 176, 0.38);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 74, 62, 0.38),
+      rgba(20, 25, 38, 0.96)
+    );
+}
+
+.report-decision-card.decision-block {
+  border-color: #6d3044;
+}
+
+.report-decision-card.decision-incomplete {
+  border-color: rgba(249, 215, 124, 0.38);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(85, 68, 28, 0.38),
+      rgba(20, 25, 38, 0.96)
+    );
+}
+
+.report-decision-card.decision-pass h2,
+.report-decision-card.decision-pass
+  .report-score b,
+.decision-pass {
+  color: #63d8b0;
+}
+
+.report-decision-card.decision-block h2,
+.report-decision-card.decision-block
+  .report-score b,
+.decision-block {
+  color: #ff7187;
+}
+
+.report-decision-card.decision-incomplete h2,
+.report-decision-card.decision-incomplete
+  .report-score b,
+.decision-incomplete {
+  color: #f9d77c;
+}
+
+.report-scanner-grid {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.report-scanner-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid #29364d;
+  border-radius: 6px;
+  background: #0e1520;
+}
+
+.report-scanner-item > div {
+  min-width: 0;
+}
+
+.report-scanner-item b,
+.report-scanner-item small {
+  display: block;
+}
+
+.report-scanner-item b {
+  color: #dce5f4;
+  font-size: 9px;
+}
+
+.report-scanner-item small {
+  color: #7184a3;
+  font-size: 8px;
+}
+
+.report-scanner-complete,
+.report-scanner-failed {
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.report-scanner-complete {
+  color: #63d8b0;
+}
+
+.report-scanner-failed {
+  color: #ff7187;
+}
+
+.report-severity-grid,
+.report-assurance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 13px;
+}
+
+.report-severity-grid > div,
+.report-assurance-grid > div {
+  padding: 10px;
+  border: 1px solid #29364d;
+  border-radius: 6px;
+  background: #0e1520;
+}
+
+.report-severity-grid small,
+.report-severity-grid b,
+.report-assurance-grid small,
+.report-assurance-grid b,
+.report-assurance-grid span {
+  display: block;
+}
+
+.report-severity-grid small,
+.report-assurance-grid small {
+  color: #7184a3;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.report-severity-grid b,
+.report-assurance-grid b {
+  margin-top: 5px;
+  color: #e7edf8;
+  font-size: 16px;
+}
+
+.report-assurance-grid span {
+  margin-top: 4px;
+  color: #7184a3;
+  font-size: 8px;
+}
+
+@media (max-width: 900px) {
+  .report-severity-grid,
+  .report-assurance-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .report-scanner-item {
+    grid-template-columns: 1fr auto;
+  }
+
+  .report-scanner-item > small {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ==========================================
+   AppSecGate Printable Assessment Report
+========================================== */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  body.appsecgate-report-print {
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body.appsecgate-report-print .app-shell {
+    display: block !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+  }
+
+  body.appsecgate-report-print .sidebar {
+    display: none !important;
+  }
+
+  body.appsecgate-report-print .main-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  body.appsecgate-report-print
+    .reports-page-header {
+    margin-bottom: 12px !important;
+    break-after: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .report-decision-card {
+    margin-bottom: 10px !important;
+    break-inside: avoid-page;
+    break-after: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    margin: 10px 0 !important;
+    break-inside: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis article {
+    padding: 10px !important;
+  }
+
+  /*
+   * Important:
+   * Do NOT keep the whole report-layout together.
+   * It is taller than one A4 page.
+   */
+  body.appsecgate-report-print
+    .report-layout {
+    display: block !important;
+  }
+
+  body.appsecgate-report-print
+    .report-main {
+    display: block !important;
+  }
+
+  body.appsecgate-report-print
+    .report-section {
+    margin: 0 0 10px !important;
+    padding: 12px !important;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  body.appsecgate-report-print
+    .report-detail-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-detail-grid > span {
+    padding: 7px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-scanner-grid {
+    gap: 4px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-scanner-item {
+    padding: 6px 8px !important;
+    break-inside: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .report-severity-grid,
+  body.appsecgate-report-print
+    .report-assurance-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-risk-list > div {
+    padding: 6px 3px !important;
+    break-inside: avoid-page;
+  }
+
+  /*
+   * Sidebar becomes a normal full-width report section
+   * after the main assessment intelligence.
+   */
+  body.appsecgate-report-print
+    .report-sidebar {
+    width: 100% !important;
+    margin: 0 0 10px !important;
+    padding: 12px !important;
+    break-inside: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .report-footer-card {
+    margin-top: 10px !important;
+    padding: 12px !important;
+    break-inside: avoid-page;
+  }
+
+  body.appsecgate-report-print
+    .run-assessment-button {
+    display: none !important;
+  }
+
+  body.appsecgate-report-print
+    .report-section-heading {
+    margin-bottom: 9px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-progress-row {
+    padding: 5px 0 !important;
+  }
+
+  body.appsecgate-report-print * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+}
+
+/* ==========================================
+   Reports V2 — Professional PDF Theme
+========================================== */
+
+@media print {
+  body.appsecgate-report-print {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .reports-page-header h1 {
+    color: #172033 !important;
+    font-size: 26px !important;
+    margin: 4px 0 6px !important;
+  }
+
+  body.appsecgate-report-print
+    .reports-page-header
+    .page-description {
+    color: #56647a !important;
+    max-width: 620px !important;
+  }
+
+  body.appsecgate-report-print
+    .eyebrow {
+    color: #4968b2 !important;
+  }
+
+  body.appsecgate-report-print
+    .findings-run-context {
+    background: #f5f7fb !important;
+    border: 1px solid #d9e0eb !important;
+  }
+
+  body.appsecgate-report-print
+    .findings-run-context b {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .findings-run-context span,
+  body.appsecgate-report-print
+    .findings-run-context small {
+    color: #66758c !important;
+  }
+
+  body.appsecgate-report-print
+    .report-decision-card {
+    min-height: auto !important;
+    padding: 14px 18px !important;
+    background: #f5f8f7 !important;
+    border: 1px solid #cfded8 !important;
+    box-shadow: none !important;
+  }
+
+  body.appsecgate-report-print
+    .report-decision-card h2 {
+    margin: 3px 0 !important;
+    font-size: 22px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-decision-card p {
+    color: #5d697b !important;
+  }
+
+  body.appsecgate-report-print
+    .report-score {
+    border-left-color: #d5dce7 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis article,
+  body.appsecgate-report-print
+    .panel,
+  body.appsecgate-report-print
+    .report-footer-card {
+    background: #ffffff !important;
+    border: 1px solid #d9e0eb !important;
+    box-shadow: none !important;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis article {
+    min-height: auto !important;
+    padding: 9px 11px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis small,
+  body.appsecgate-report-print
+    .report-kpis span {
+    color: #66758c !important;
+  }
+
+  body.appsecgate-report-print
+    .report-kpis b {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-section {
+    padding: 11px !important;
+  }
+
+  body.appsecgate-report-print
+    .report-section-heading h3,
+  body.appsecgate-report-print
+    .report-sidebar h3,
+  body.appsecgate-report-print
+    .report-footer-card h3 {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-section-heading > span {
+    background: #eef2fb !important;
+    border-color: #cbd6ee !important;
+    color: #4968b2 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-detail-grid > span,
+  body.appsecgate-report-print
+    .report-scanner-item,
+  body.appsecgate-report-print
+    .report-severity-grid > div,
+  body.appsecgate-report-print
+    .report-assurance-grid > div {
+    background: #f8fafc !important;
+    border-color: #d9e0eb !important;
+  }
+
+  body.appsecgate-report-print
+    .report-detail-grid small,
+  body.appsecgate-report-print
+    .report-scanner-item small,
+  body.appsecgate-report-print
+    .report-severity-grid small,
+  body.appsecgate-report-print
+    .report-assurance-grid small,
+  body.appsecgate-report-print
+    .report-assurance-grid span {
+    color: #66758c !important;
+  }
+
+  body.appsecgate-report-print
+    .report-detail-grid b,
+  body.appsecgate-report-print
+    .report-scanner-item b,
+  body.appsecgate-report-print
+    .report-severity-grid b,
+  body.appsecgate-report-print
+    .report-assurance-grid b {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-risk-list > div {
+    border-color: #e0e5ed !important;
+  }
+
+  body.appsecgate-report-print
+    .report-risk-list b {
+    color: #202a3a !important;
+  }
+
+  body.appsecgate-report-print
+    .report-risk-list small,
+  body.appsecgate-report-print
+    .muted {
+    color: #66758c !important;
+  }
+
+  body.appsecgate-report-print
+    .report-progress {
+    background: #e5e9f0 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-sidebar {
+    background: #f8fafc !important;
+  }
+
+  body.appsecgate-report-print
+    .report-decision-reasons span {
+    color: #445268 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-required-action {
+    background: #f5f7fb !important;
+    border-color: #d9e0eb !important;
+  }
+
+  body.appsecgate-report-print
+    .report-required-action b {
+    color: #172033 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-trace span {
+    background: #f5f7fb !important;
+    border-color: #d9e0eb !important;
+    color: #344157 !important;
+  }
+
+  body.appsecgate-report-print
+    .report-trace b {
+    color: #8995a8 !important;
+  }
+}
