@@ -64,14 +64,14 @@ function FindingRows({
           </span>
 
           <span className="overview-risk-score">
-            <b>{finding.riskScore}</b>
+            <b>{finding.riskScore ?? 0}</b>
             <small>/100</small>
           </span>
 
           <span
-            className={`badge ${finding.riskLevel.toLowerCase()}`}
+            className={`badge ${(finding.riskLevel ?? "Low").toLowerCase()}`}
           >
-            {finding.riskLevel.toUpperCase()}
+            {(finding.riskLevel ?? "Low").toUpperCase()}
           </span>
 
           <span className="finding-status">
@@ -237,7 +237,7 @@ export default function Home() {
 
   const highestRiskLevel =
     overviewRisks.length > 0
-      ? overviewRisks[0].riskLevel
+      ? overviewRisks[0]?.riskLevel ?? "Low"
       : "Low";
 
   const confirmedRisks =
