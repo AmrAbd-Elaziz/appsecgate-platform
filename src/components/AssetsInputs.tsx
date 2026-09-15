@@ -139,7 +139,18 @@ export default function AssetsInputs({ onRunAssessment }: Props) {
   }
 
   function handleRunAssessment() {
+    console.log(
+      "[AppSecGate UI] Run button clicked",
+      {
+        selectedAssetId,
+        selectedAsset,
+      }
+    );
+
     if (!selectedAsset) {
+      console.error(
+        "[AppSecGate UI] No asset selected"
+      );
       return;
     }
 

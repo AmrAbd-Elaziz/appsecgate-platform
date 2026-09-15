@@ -87,6 +87,11 @@ export default function Home() {
     : null;
 
   async function handleRunAssessment(asset: Asset) {
+    console.log(
+      "[AppSecGate UI] Starting assessment",
+      asset
+    );
+
     try {
       const response = await fetch("/api/assessments", {
         method: "POST",
@@ -108,8 +113,7 @@ export default function Home() {
 
       const assessment =
         payload.data as PersistedAssessment;
-
-      setLatestAssessment(assessment);
+setLatestAssessment(assessment);
       setView("assessments");
     } catch (error) {
       console.error("Assessment execution failed:", error);
