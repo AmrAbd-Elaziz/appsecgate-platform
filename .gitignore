@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local development backups
+*.bak
+*.pre-model
+*.pre-central-data
+*.before-assessments
