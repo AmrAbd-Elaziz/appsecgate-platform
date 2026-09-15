@@ -280,9 +280,16 @@ export default function Home() {
       : "Run an assessment to calculate contextual application risk.";
 
   const decisionMessage = latestAssessment
-    ? overviewBlockers > 0
-      ? `${overviewBlockers} confirmed critical finding(s) require action before production release.`
-      : "No confirmed critical blockers are preventing release."
+    ? overviewDecision === "INCOMPLETE"
+      ? `${
+          overviewScanners.filter(
+            (scanner) =>
+              scanner.status === "Completed"
+          ).length
+        }/${overviewScanners.length} required scanners completed. Security gate cannot make a reliable release decision until scanner coverage is complete.`
+      : overviewBlockers > 0
+        ? `${overviewBlockers} confirmed critical finding(s) require action before production release.`
+        : "No confirmed critical blockers are preventing release."
     : "Run an assessment to calculate the release decision.";
 
   return (
@@ -385,7 +392,9 @@ export default function Home() {
                       ? "decision-block"
                       : overviewDecision === "PASS"
                         ? "decision-pass"
-                        : ""
+                        : overviewDecision === "INCOMPLETE"
+                          ? "decision-incomplete"
+                          : ""
                   }
                 >
                   {overviewLoading

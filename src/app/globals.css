@@ -2192,6 +2192,11 @@ h3 { margin: 0; font-size: 14px; }
   color: #ff7187;
 }
 
+.executive-kpi-card .decision-incomplete {
+  color: #f9d77c;
+}
+
+
 .risk-distribution-panel {
   padding: 16px 18px;
   margin-bottom: 14px;

@@ -157,12 +157,33 @@ export async function executeAssessment(
     asset
   );
 
+  /*
+   * Assessment integrity gate.
+   *
+   * A security verdict is only reliable when all
+   * required scanners complete successfully.
+   *
+   * Scanner failures do not abort the assessment,
+   * but they prevent a PASS/BLOCK release verdict
+   * from being treated as complete.
+   */
+  const failedScanners =
+    scannerExecutions.filter(
+      (scanner) =>
+        scanner.status === "Failed"
+    );
+
+  const assessmentDecision =
+    failedScanners.length > 0
+      ? "INCOMPLETE"
+      : policy.decision;
+
   return {
     id,
     assetId: asset.id,
     asset,
     status: "Completed",
-    decision: policy.decision,
+    decision: assessmentDecision,
     startedAt,
     completedAt: new Date().toISOString(),
 

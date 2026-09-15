@@ -48,7 +48,7 @@ export type AssessmentRun = {
   id: string;
   asset: Asset;
   status: "Running" | "Completed";
-  decision: "PENDING" | "BLOCK" | "PASS";
+  decision: "PENDING" | "BLOCK" | "PASS" | "INCOMPLETE";
   startedAt: string;
   scanners: ScannerResult[];
 };
@@ -555,7 +555,7 @@ export type PersistedAssessment = {
   assetId: number;
   asset: Asset;
   status: "Completed";
-  decision: "BLOCK" | "PASS";
+  decision: "BLOCK" | "PASS" | "INCOMPLETE";
   startedAt: string;
   completedAt: string;
 
