@@ -14,6 +14,8 @@ import {
   runCommand,
 } from "./command-runner";
 
+import type { Asset } from "../../../data/appsecgate";
+
 import type {
   RawFinding,
   ScannerAdapter,
@@ -175,13 +177,17 @@ ScannerAdapter = {
   category:
     "Container",
 
-  async scan():
+  async scan(
+    asset: Asset
+  ):
   Promise<ScannerExecution> {
     /*
-     * The image name is server-controlled configuration.
-     * It is never interpolated into a shell command.
+     * Prefer the persisted asset scan profile.
+     * The image value is passed as a process argument,
+     * never interpolated into a shell command.
      */
     const image =
+      asset.scanProfile?.containerImage ??
       process.env
         .APPSECGATE_CONTAINER_IMAGE ??
       "appsecgate-vulnerable-test:latest";

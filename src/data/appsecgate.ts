@@ -27,12 +27,20 @@ export type Severity =
   | "MEDIUM"
   | "LOW";
 
+export type AssetScanProfile = {
+  sourcePath?: string;
+  iacPath?: string;
+  dastUrl?: string;
+  containerImage?: string;
+};
+
 export type Asset = {
   id: number;
   name: string;
   type: AssetType;
   environment: Environment;
   criticality: Criticality;
+  scanProfile?: AssetScanProfile;
 };
 
 export type ScannerResult = {

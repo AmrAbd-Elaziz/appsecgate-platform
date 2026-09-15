@@ -141,14 +141,15 @@ export const realZapAdapter: ScannerAdapter = {
   category: "DAST",
 
   async scan(
-    _asset: Asset
+    asset: Asset
   ): Promise<ScannerExecution> {
     /*
-     * Server-controlled target.
-     * Never accept the DAST URL directly
-     * from the browser request.
+     * Prefer the persisted asset scan profile.
+     * API validation remains responsible for deciding
+     * which DAST destinations are allowed.
      */
     const target =
+      asset.scanProfile?.dastUrl ||
       process.env.APPSECGATE_DAST_TARGET ||
       "http://appsecgate-zap-target:5000";
 

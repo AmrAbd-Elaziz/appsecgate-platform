@@ -64,9 +64,10 @@ export const realGitleaksAdapter: ScannerAdapter = {
   category: "Secrets",
 
   async scan(
-    _asset: Asset
+    asset: Asset
   ): Promise<ScannerExecution> {
     const workspace =
+      asset.scanProfile?.sourcePath ||
       process.env.APPSECGATE_SCAN_TARGET ||
       process.cwd();
 

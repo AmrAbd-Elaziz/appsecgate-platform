@@ -8,6 +8,10 @@ import type {
   Criticality,
   Environment,
 } from "../../../data/appsecgate";
+import {
+  ScanProfileValidationError,
+  validateScanProfile,
+} from "../../../lib/server/scan-profile-validator";
 
 const assetTypes: AssetType[] = [
   "Web Application",
@@ -76,18 +80,71 @@ export async function POST(request: Request) {
       );
     }
 
+    const scanProfileInput =
+      body.scanProfile &&
+      typeof body.scanProfile === "object"
+        ? body.scanProfile
+        : {};
+
+    const cleanOptionalString = (
+      value: unknown
+    ): string | undefined => {
+      if (typeof value !== "string") {
+        return undefined;
+      }
+
+      const cleaned = value.trim();
+      return cleaned || undefined;
+    };
+
+    const scanProfile = {
+      sourcePath: cleanOptionalString(
+        scanProfileInput.sourcePath
+      ),
+      iacPath: cleanOptionalString(
+        scanProfileInput.iacPath
+      ),
+      dastUrl: cleanOptionalString(
+        scanProfileInput.dastUrl
+      ),
+      containerImage: cleanOptionalString(
+        scanProfileInput.containerImage
+      ),
+    };
+
+    const hasScanProfile =
+      Object.values(scanProfile).some(Boolean);
+
+    const validatedScanProfile =
+      hasScanProfile
+        ? validateScanProfile(scanProfile)
+        : undefined;
+
     const asset = await createAsset({
       name,
       type: body.type,
       environment: body.environment,
       criticality: body.criticality,
+      ...(validatedScanProfile
+        ? { scanProfile: validatedScanProfile }
+        : {}),
     });
 
     return NextResponse.json(
       { data: asset },
       { status: 201 }
     );
-  } catch {
+  } catch (error) {
+    if (
+      error instanceof
+      ScanProfileValidationError
+    ) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Invalid request body." },
       { status: 400 }

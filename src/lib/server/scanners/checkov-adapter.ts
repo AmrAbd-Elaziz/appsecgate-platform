@@ -87,9 +87,11 @@ export const realCheckovAdapter: ScannerAdapter = {
   category: "IaC",
 
   async scan(
-    _asset: Asset
+    asset: Asset
   ): Promise<ScannerExecution> {
     const workspace =
+      asset.scanProfile?.iacPath ||
+      asset.scanProfile?.sourcePath ||
       process.env.APPSECGATE_SCAN_TARGET ||
       process.cwd();
 
