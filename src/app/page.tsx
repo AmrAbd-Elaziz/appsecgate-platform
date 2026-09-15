@@ -463,29 +463,116 @@ export default function Home() {
                 <FindingRows assessment={latestAssessment} />
               </article>
 
-              <article className="panel">
-                <div className="panel-title">
-                  <h3>Assessment coverage</h3>
-                  <span>{assessmentCount} completed run(s)</span>
-                </div>
+              <article className="panel scanner-health-panel">
+                <div className="scanner-health-header">
+                  <div>
+                    <small>SCANNER HEALTH</small>
+                    <h3>Assessment coverage</h3>
+                  </div>
 
-                <div className="coverage">
                   {overviewScanners.length > 0 ? (
-                    overviewScanners.map((scanner) => (
-                      <span
-                        key={`${scanner.category}-${scanner.tool}`}
-                      >
-                        ✓ {scanner.tool}
+                    <div
+                      className={`scanner-health-summary ${
+                        overviewScanners.some(
+                          (scanner) => scanner.status === "Failed"
+                        )
+                          ? "degraded"
+                          : "healthy"
+                      }`}
+                    >
+                      <b>
+                        {
+                          overviewScanners.filter(
+                            (scanner) =>
+                              scanner.status === "Completed"
+                          ).length
+                        }
+                        /{overviewScanners.length}
+                      </b>
+
+                      <span>
+                        {overviewScanners.some(
+                          (scanner) => scanner.status === "Failed"
+                        )
+                          ? "DEGRADED"
+                          : "HEALTHY"}
                       </span>
-                    ))
+                    </div>
                   ) : (
-                    <span>No scanner execution yet</span>
+                    <div className="scanner-health-summary">
+                      <b>0/0</b>
+                      <span>NO DATA</span>
+                    </div>
                   )}
                 </div>
 
-                <p className="muted">
-                  Scanner evidence is normalized before the release decision is calculated.
-                </p>
+                <div className="scanner-health-list">
+                  {overviewScanners.length > 0 ? (
+                    overviewScanners.map((scanner) => {
+                      const failed =
+                        scanner.status === "Failed";
+
+                      const duration =
+                        typeof scanner.durationMs === "number"
+                          ? scanner.durationMs >= 1000
+                            ? `${(
+                                scanner.durationMs / 1000
+                              ).toFixed(1)}s`
+                            : `${scanner.durationMs}ms`
+                          : "—";
+
+                      return (
+                        <div
+                          className={`scanner-health-row ${
+                            failed ? "failed" : "completed"
+                          }`}
+                          key={`${scanner.category}-${scanner.tool}`}
+                        >
+                          <span className="scanner-health-icon">
+                            {failed ? "×" : "✓"}
+                          </span>
+
+                          <div className="scanner-health-name">
+                            <b>{scanner.tool}</b>
+                            <small>{scanner.category}</small>
+
+                            {failed && scanner.error ? (
+                              <em title={scanner.error}>
+                                {scanner.error}
+                              </em>
+                            ) : null}
+                          </div>
+
+                          <span className="scanner-health-status">
+                            {scanner.status}
+                          </span>
+
+                          <div className="scanner-health-metrics">
+                            <b>{scanner.findings}</b>
+                            <small>findings</small>
+                          </div>
+
+                          <time>{duration}</time>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="scanner-health-empty">
+                      No scanner execution yet
+                    </div>
+                  )}
+                </div>
+
+                <div className="scanner-health-footer">
+                  <span>
+                    {assessmentCount} completed run(s)
+                  </span>
+
+                  <span>
+                    Scanner evidence is normalized before the
+                    release decision is calculated.
+                  </span>
+                </div>
               </article>
             </section>
           </>

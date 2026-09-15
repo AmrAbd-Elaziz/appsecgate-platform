@@ -251,6 +251,212 @@ h3 { margin: 0; font-size: 14px; }
 .coverage span { color: #d3ddf4; font-size: 12px; }
 .coverage span::first-letter { color: var(--success); }
 
+/* ==========================================
+   Scanner Health / Assessment Coverage
+========================================== */
+
+.scanner-health-panel {
+  overflow: hidden;
+}
+
+.scanner-health-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.scanner-health-header small {
+  color: #6f83a6;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.scanner-health-header h3 {
+  margin: 4px 0 0;
+}
+
+.scanner-health-summary {
+  min-width: 84px;
+  text-align: right;
+}
+
+.scanner-health-summary b,
+.scanner-health-summary span {
+  display: block;
+}
+
+.scanner-health-summary b {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.scanner-health-summary span {
+  margin-top: 5px;
+  color: #8294b2;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.scanner-health-summary.healthy span {
+  color: #8edbb5;
+}
+
+.scanner-health-summary.degraded span {
+  color: #ff9aaa;
+}
+
+.scanner-health-list {
+  border-top: 1px solid #253149;
+}
+
+.scanner-health-row {
+  display: grid;
+  grid-template-columns: 20px minmax(100px, 1fr) auto 48px 50px;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 8px 2px;
+  border-bottom: 1px solid #253149;
+}
+
+.scanner-health-icon {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #8edbb5;
+  background: #193a2e;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.scanner-health-row.failed .scanner-health-icon {
+  color: #ff9aaa;
+  background: #512333;
+}
+
+.scanner-health-name {
+  min-width: 0;
+}
+
+.scanner-health-name b,
+.scanner-health-name small,
+.scanner-health-name em {
+  display: block;
+}
+
+.scanner-health-name b {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scanner-health-name small {
+  margin-top: 2px;
+  color: #7f92b1;
+  font-size: 8px;
+}
+
+.scanner-health-name em {
+  overflow: hidden;
+  max-width: 220px;
+  margin-top: 4px;
+  color: #ff9aaa;
+  font-size: 8px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scanner-health-status {
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #8dd8b3;
+  background: #19372c;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.scanner-health-row.failed .scanner-health-status {
+  color: #ff9aaa;
+  background: #512333;
+}
+
+.scanner-health-metrics {
+  text-align: right;
+}
+
+.scanner-health-metrics b,
+.scanner-health-metrics small {
+  display: block;
+}
+
+.scanner-health-metrics b {
+  font-size: 11px;
+}
+
+.scanner-health-metrics small {
+  color: #788ba9;
+  font-size: 7px;
+}
+
+.scanner-health-row time {
+  color: #8fa2c0;
+  font-size: 9px;
+  text-align: right;
+}
+
+.scanner-health-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  color: #7386a5;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.scanner-health-footer span:last-child {
+  max-width: 290px;
+  text-align: right;
+}
+
+.scanner-health-empty {
+  padding: 18px 2px;
+  color: #788ba9;
+  font-size: 10px;
+}
+
+@media (max-width: 800px) {
+  .scanner-health-row {
+    grid-template-columns: 20px 1fr auto;
+  }
+
+  .scanner-health-metrics,
+  .scanner-health-row time {
+    display: none;
+  }
+
+  .scanner-health-footer {
+    display: block;
+  }
+
+  .scanner-health-footer span {
+    display: block;
+  }
+
+  .scanner-health-footer span:last-child {
+    margin-top: 5px;
+    text-align: left;
+  }
+}
+
 .muted,
 .placeholder p {
   color: var(--muted);
