@@ -166,6 +166,24 @@ export type ControlIntelligenceRecord = {
   completedAt: string;
 };
 
+export type EvidenceLocation = {
+  raw: string;
+  kind:
+    | "Source Code"
+    | "Dependency"
+    | "Infrastructure as Code"
+    | "Container"
+    | "Web Endpoint"
+    | "Unknown";
+  file?: string;
+  line?: number;
+  package?: string;
+  version?: string;
+  resource?: string;
+  url?: string;
+  parameter?: string;
+};
+
 export type EvidenceRecord = {
   id: string;
   runId: string;
@@ -177,6 +195,13 @@ export type EvidenceRecord = {
   source: string;
   status: "Verified" | "Pending Review";
   integrity: string;
+
+  /*
+   * Scanner provenance snapshot used by Evidence Vault V2.
+   * Never persist secret values or scanner evidence payloads here.
+   */
+  location?: EvidenceLocation;
+  cwe?: string;
 };
 
 /* ==========================================

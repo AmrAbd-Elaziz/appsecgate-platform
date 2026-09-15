@@ -159,7 +159,8 @@ export async function executeAssessment(
 
   const evidence = buildEvidence(
     findings,
-    controls
+    controls,
+    rawFindings
   );
 
   const policy = evaluatePolicy(
