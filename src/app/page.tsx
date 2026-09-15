@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AssetsInputs from "../components/AssetsInputs";
 import AssessmentRuns from "../components/AssessmentRuns";
 import {
@@ -31,25 +31,48 @@ const navigation: Array<[View, string]> = [
   ["reports", "Reports"],
 ];
 
-const findings = [
-  ["Hardcoded application secret", "ASG-1042 · Gitleaks · Platform API", "CRITICAL", "Confirmed"],
-  ["SQL injection on user search", "ASG-1038 · Semgrep + OWASP ZAP · Customer Portal", "CRITICAL", "Confirmed"],
-  ["Vulnerable OpenSSL base image", "ASG-1029 · Trivy + pip-audit · Retail API Container", "HIGH", "Validated"],
-  ["S3 public access block missing", "ASG-1017 · Checkov · Retail Cloud Storage", "MEDIUM", "Validated"],
-];
+function FindingRows({
+  assessment,
+}: {
+  assessment: PersistedAssessment | null;
+}) {
+  if (!assessment || assessment.findings.length === 0) {
+    return (
+      <p className="muted">
+        No persisted assessment findings are available yet.
+      </p>
+    );
+  }
 
-function FindingRows() {
   return (
     <div className="finding-list">
-      {findings.map(([title, meta, severity, status]) => (
-        <button className="finding-row" key={meta}>
-          <span className={`risk-dot ${severity.toLowerCase()}`} />
+      {assessment.findings.map((finding) => (
+        <button
+          className="finding-row"
+          key={finding.id}
+          onClick={() => undefined}
+        >
+          <span
+            className={`risk-dot ${finding.severity.toLowerCase()}`}
+          />
+
           <span className="finding-copy">
-            <b>{title}</b>
-            <small>{meta}</small>
+            <b>{finding.title}</b>
+            <small>
+              {finding.id} · {finding.source} · {assessment.asset.name}
+            </small>
           </span>
-          <span className={`badge ${severity.toLowerCase()}`}>{severity}</span>
-          <span className="finding-status">{status}</span>
+
+          <span
+            className={`badge ${finding.severity.toLowerCase()}`}
+          >
+            {finding.severity}
+          </span>
+
+          <span className="finding-status">
+            {finding.status}
+          </span>
+
           <span>›</span>
         </button>
       ))}
@@ -75,6 +98,69 @@ export default function Home() {
   const [latestAssessment, setLatestAssessment] =
     useState<PersistedAssessment | null>(null);
 
+  const [assetCount, setAssetCount] = useState(0);
+  const [assessmentCount, setAssessmentCount] = useState(0);
+  const [overviewLoading, setOverviewLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function hydrateDashboard() {
+      try {
+        setOverviewLoading(true);
+
+        const [assetsResponse, assessmentsResponse] =
+          await Promise.all([
+            fetch("/api/assets", {
+              cache: "no-store",
+            }),
+            fetch("/api/assessments", {
+              cache: "no-store",
+            }),
+          ]);
+
+        if (!assetsResponse.ok || !assessmentsResponse.ok) {
+          throw new Error(
+            "Unable to hydrate persisted AppSecGate state."
+          );
+        }
+
+        const assetsPayload = await assetsResponse.json();
+        const assessmentsPayload =
+          await assessmentsResponse.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        setAssetCount(assetsPayload.count ?? 0);
+        setAssessmentCount(assessmentsPayload.count ?? 0);
+
+        const latest =
+          assessmentsPayload.data?.[0] ?? null;
+
+        setLatestAssessment(
+          latest as PersistedAssessment | null
+        );
+      } catch (error) {
+        console.error(
+          "Dashboard hydration failed:",
+          error
+        );
+      } finally {
+        if (!cancelled) {
+          setOverviewLoading(false);
+        }
+      }
+    }
+
+    hydrateDashboard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const latestRun = latestAssessment
     ? {
         id: latestAssessment.id,
@@ -87,11 +173,6 @@ export default function Home() {
     : null;
 
   async function handleRunAssessment(asset: Asset) {
-    console.log(
-      "[AppSecGate UI] Starting assessment",
-      asset
-    );
-
     try {
       const response = await fetch("/api/assessments", {
         method: "POST",
@@ -113,12 +194,35 @@ export default function Home() {
 
       const assessment =
         payload.data as PersistedAssessment;
-setLatestAssessment(assessment);
+
+      setLatestAssessment(assessment);
+      setAssessmentCount((current) => current + 1);
       setView("assessments");
     } catch (error) {
       console.error("Assessment execution failed:", error);
     }
   }
+
+  const overviewDecision =
+    latestAssessment?.decision ?? "NO RUN";
+
+  const overviewBlockers =
+    latestAssessment?.blockers.length ?? 0;
+
+  const overviewFindings =
+    latestAssessment?.findings.length ?? 0;
+
+  const overviewEvidence =
+    latestAssessment?.evidence.length ?? 0;
+
+  const overviewScanners =
+    latestAssessment?.scannerExecutions ?? [];
+
+  const decisionMessage = latestAssessment
+    ? overviewBlockers > 0
+      ? `${overviewBlockers} confirmed critical finding(s) require action before production release.`
+      : "No confirmed critical blockers are preventing release."
+    : "Run an assessment to calculate the release decision.";
 
   return (
     <div className="app-shell">
@@ -163,27 +267,53 @@ setLatestAssessment(assessment);
               </div>
 
               <div className="gate-mini">
-                <b>BLOCK</b>
-                <span>
-                  2 confirmed critical finding(s) require action before production release.
-                </span>
+                <b>{overviewLoading ? "LOADING" : overviewDecision}</b>
+                <span>{decisionMessage}</span>
               </div>
             </header>
 
             <section className="decision-card">
-              <p className="eyebrow">RELEASE DECISION · LATEST ASSESSMENT</p>
-              <h2>BLOCK</h2>
-              <p>2 confirmed critical finding(s) require action before production release.</p>
+              <p className="eyebrow">
+                RELEASE DECISION · LATEST ASSESSMENT
+              </p>
+
+              <h2>
+                {overviewLoading
+                  ? "LOADING"
+                  : overviewDecision}
+              </h2>
+
+              <p>{decisionMessage}</p>
+
               <button onClick={() => setView("assessments")}>
                 View assessment runs →
               </button>
             </section>
 
             <section className="kpi-grid">
-              <article><small>Managed assets</small><b>4</b><span>In active assessment scope</span></article>
-              <article><small>Normalized findings</small><b>4</b><span>Across scanner sources</span></article>
-              <article><small>Confirmed blockers</small><b>2</b><span>Release decision drivers</span></article>
-              <article><small>Evidence records</small><b>3</b><span>Auditable assessment proof</span></article>
+              <article>
+                <small>Managed assets</small>
+                <b>{assetCount}</b>
+                <span>In active assessment scope</span>
+              </article>
+
+              <article>
+                <small>Normalized findings</small>
+                <b>{overviewFindings}</b>
+                <span>Across scanner sources</span>
+              </article>
+
+              <article>
+                <small>Confirmed blockers</small>
+                <b>{overviewBlockers}</b>
+                <span>Release decision drivers</span>
+              </article>
+
+              <article>
+                <small>Evidence records</small>
+                <b>{overviewEvidence}</b>
+                <span>Auditable assessment proof</span>
+              </article>
             </section>
 
             <section className="content-grid">
@@ -192,19 +322,27 @@ setLatestAssessment(assessment);
                   <h3>Prioritized findings</h3>
                   <button onClick={() => setView("findings")}>View all →</button>
                 </div>
-                <FindingRows />
+                <FindingRows assessment={latestAssessment} />
               </article>
 
               <article className="panel">
                 <div className="panel-title">
                   <h3>Assessment coverage</h3>
-                  <span>1 completed run(s)</span>
+                  <span>{assessmentCount} completed run(s)</span>
                 </div>
 
                 <div className="coverage">
-                  {["Semgrep", "OWASP ZAP", "Gitleaks", "Trivy", "pip-audit", "Checkov"].map((tool) => (
-                    <span key={tool}>✓ {tool}</span>
-                  ))}
+                  {overviewScanners.length > 0 ? (
+                    overviewScanners.map((scanner) => (
+                      <span
+                        key={`${scanner.category}-${scanner.tool}`}
+                      >
+                        ✓ {scanner.tool}
+                      </span>
+                    ))
+                  ) : (
+                    <span>No scanner execution yet</span>
+                  )}
                 </div>
 
                 <p className="muted">
