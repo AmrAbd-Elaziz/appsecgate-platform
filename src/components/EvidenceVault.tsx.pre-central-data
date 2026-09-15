@@ -1,0 +1,259 @@
+"use client";
+
+import type { AssessmentRun } from "../data/appsecgate";
+
+type EvidenceStatus = "Verified" | "Pending Review";
+type EvidenceType = "Scanner Output" | "Remediation Proof" | "Retest";
+
+type EvidenceRecord = {
+  id: string;
+  title: string;
+  type: EvidenceType;
+  source: string;
+  relatedControl: string;
+  relatedFinding: string;
+  status: EvidenceStatus;
+  integrity: string;
+};
+
+type Props = {
+  run: AssessmentRun | null;
+  onGoToControls: () => void;
+  onViewReports: () => void;
+};
+
+const evidenceRecords: EvidenceRecord[] = [
+  {
+    id: "EVD-001",
+    title: "Gitleaks secret detection result",
+    type: "Scanner Output",
+    source: "Gitleaks",
+    relatedControl: "CTRL-001 · Secret Management",
+    relatedFinding: "ASG-1042",
+    status: "Verified",
+    integrity: "SHA-256 recorded",
+  },
+  {
+    id: "EVD-002",
+    title: "SQL injection validation evidence",
+    type: "Scanner Output",
+    source: "Semgrep + OWASP ZAP",
+    relatedControl: "CTRL-002 · Input Validation",
+    relatedFinding: "ASG-1038",
+    status: "Verified",
+    integrity: "Correlated evidence",
+  },
+  {
+    id: "EVD-003",
+    title: "Container dependency scan",
+    type: "Scanner Output",
+    source: "Trivy",
+    relatedControl: "CTRL-003 · Dependency Security",
+    relatedFinding: "ASG-1029",
+    status: "Verified",
+    integrity: "SHA-256 recorded",
+  },
+  {
+    id: "EVD-004",
+    title: "S3 public access remediation",
+    type: "Retest",
+    source: "Checkov",
+    relatedControl: "CTRL-004 · Cloud Configuration",
+    relatedFinding: "ASG-1017",
+    status: "Verified",
+    integrity: "Retest validated",
+  },
+  {
+    id: "EVD-005",
+    title: "Secret rotation confirmation",
+    type: "Remediation Proof",
+    source: "Application Team",
+    relatedControl: "CTRL-001 · Secret Management",
+    relatedFinding: "ASG-1042",
+    status: "Pending Review",
+    integrity: "Awaiting validation",
+  },
+];
+
+export default function EvidenceVault({
+  run,
+  onGoToControls,
+  onViewReports,
+}: Props) {
+  if (!run) {
+    return (
+      <>
+        <header className="page-header">
+          <div>
+            <p className="eyebrow">AUDITABLE SECURITY ASSURANCE</p>
+            <h1>Evidence Vault</h1>
+            <p className="page-description">
+              Preserve scanner output, remediation proof, and retest evidence.
+            </p>
+          </div>
+        </header>
+
+        <section className="panel empty-assessment">
+          <div className="empty-icon">◇</div>
+          <h2>No assessment evidence available</h2>
+          <p className="muted">
+            Run an assessment before reviewing assurance evidence.
+          </p>
+          <button className="primary-button" onClick={onGoToControls}>
+            View security controls →
+          </button>
+        </section>
+      </>
+    );
+  }
+
+  const verified = evidenceRecords.filter(
+    (record) => record.status === "Verified"
+  ).length;
+
+  const pending = evidenceRecords.filter(
+    (record) => record.status === "Pending Review"
+  ).length;
+
+  const scannerEvidence = evidenceRecords.filter(
+    (record) => record.type === "Scanner Output"
+  ).length;
+
+  return (
+    <>
+      <header className="page-header evidence-page-header">
+        <div>
+          <p className="eyebrow">AUDITABLE SECURITY ASSURANCE</p>
+          <h1>Evidence Vault</h1>
+          <p className="page-description">
+            Trace assessment decisions back to scanner output, remediation
+            proof, and validated retest evidence.
+          </p>
+        </div>
+
+        <div className="findings-run-context">
+          <small>ASSESSMENT RUN</small>
+          <b>{run.id}</b>
+          <span>{run.asset.name}</span>
+        </div>
+      </header>
+
+      <section className="evidence-kpis">
+        <article>
+          <small>Evidence records</small>
+          <b>{evidenceRecords.length}</b>
+          <span>Linked assurance records</span>
+        </article>
+
+        <article>
+          <small>Verified</small>
+          <b className="evidence-success">{verified}</b>
+          <span>Integrity validated</span>
+        </article>
+
+        <article>
+          <small>Pending review</small>
+          <b className="evidence-warning">{pending}</b>
+          <span>Requires validation</span>
+        </article>
+
+        <article>
+          <small>Scanner evidence</small>
+          <b>{scannerEvidence}</b>
+          <span>Machine-generated records</span>
+        </article>
+      </section>
+
+      <section className="panel evidence-panel">
+        <div className="panel-title">
+          <div>
+            <h3>Assessment evidence</h3>
+            <span className="panel-subtitle">
+              Finding → control → evidence → verification
+            </span>
+          </div>
+          <span>{evidenceRecords.length} records</span>
+        </div>
+
+        <div className="evidence-table">
+          <div className="evidence-table-header">
+            <span>EVIDENCE</span>
+            <span>TYPE / SOURCE</span>
+            <span>CONTROL</span>
+            <span>STATUS</span>
+          </div>
+
+          {evidenceRecords.map((record) => (
+            <article className="evidence-row" key={record.id}>
+              <div className="evidence-title">
+                <span className="evidence-icon">✓</span>
+                <div>
+                  <small>{record.id}</small>
+                  <b>{record.title}</b>
+                  <span>
+                    Finding {record.relatedFinding} · {record.integrity}
+                  </span>
+                </div>
+              </div>
+
+              <div className="evidence-source">
+                <b>{record.type}</b>
+                <span>{record.source}</span>
+              </div>
+
+              <div className="evidence-control">
+                {record.relatedControl}
+              </div>
+
+              <div>
+                <span
+                  className={`evidence-status ${record.status
+                    .toLowerCase()
+                    .replaceAll(" ", "-")}`}
+                >
+                  {record.status}
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="evidence-trace panel">
+        <div>
+          <p className="eyebrow">DECISION TRACEABILITY</p>
+          <h3>Assessment evidence chain</h3>
+        </div>
+
+        <div className="trace-chain">
+          <span>Asset</span>
+          <b>→</b>
+          <span>Assessment</span>
+          <b>→</b>
+          <span>Finding</span>
+          <b>→</b>
+          <span>Control</span>
+          <b>→</b>
+          <span>Evidence</span>
+          <b>→</b>
+          <span>Release Decision</span>
+        </div>
+      </section>
+
+      <section className="evidence-next-step">
+        <div>
+          <p className="eyebrow">SECURITY REPORTING</p>
+          <h3>Generate the assessment decision report</h3>
+          <p className="muted">
+            Consolidate assessment scope, findings, controls, evidence, and
+            release decision into one report.
+          </p>
+        </div>
+
+        <button className="primary-button" onClick={onViewReports}>
+          Open reports →
+        </button>
+      </section>
+    </>
+  );
+}

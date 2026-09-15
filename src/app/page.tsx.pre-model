@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import AssetsInputs from "../components/AssetsInputs";
-import AssessmentRuns from "../components/AssessmentRuns";
-import {
-  createAssessmentRun,
-  type Asset,
-  type AssessmentRun,
-} from "../data/appsecgate";
+import AssessmentRuns, {
+  AssessmentAsset,
+  AssessmentRun,
+} from "../components/AssessmentRuns";
 import FindingIntelligence from "../components/FindingIntelligence";
 import SecurityControls from "../components/SecurityControls";
 import EvidenceVault from "../components/EvidenceVault";
@@ -75,8 +73,14 @@ export default function Home() {
   const [view, setView] = useState<View>("overview");
   const [latestRun, setLatestRun] = useState<AssessmentRun | null>(null);
 
-  function handleRunAssessment(asset: Asset) {
-    const run = createAssessmentRun(asset);
+  function handleRunAssessment(asset: AssessmentAsset) {
+    const run: AssessmentRun = {
+      id: `ASG-RUN-${String(Date.now()).slice(-6)}`,
+      asset,
+      status: "Completed",
+      decision: "BLOCK",
+      startedAt: new Date().toISOString(),
+    };
 
     setLatestRun(run);
     setView("assessments");

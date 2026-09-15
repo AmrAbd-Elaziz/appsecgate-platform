@@ -2,16 +2,6 @@
 
 import { useState } from "react";
 import AssetsInputs from "../components/AssetsInputs";
-import AssessmentRuns from "../components/AssessmentRuns";
-import {
-  createAssessmentRun,
-  type Asset,
-  type AssessmentRun,
-} from "../data/appsecgate";
-import FindingIntelligence from "../components/FindingIntelligence";
-import SecurityControls from "../components/SecurityControls";
-import EvidenceVault from "../components/EvidenceVault";
-import Reports from "../components/Reports";
 
 type View =
   | "overview"
@@ -73,14 +63,6 @@ function Placeholder({ title }: { title: string }) {
 
 export default function Home() {
   const [view, setView] = useState<View>("overview");
-  const [latestRun, setLatestRun] = useState<AssessmentRun | null>(null);
-
-  function handleRunAssessment(asset: Asset) {
-    const run = createAssessmentRun(asset);
-
-    setLatestRun(run);
-    setView("assessments");
-  }
 
   return (
     <div className="app-shell">
@@ -177,36 +159,10 @@ export default function Home() {
           </>
         ) : view === "assets" ? (
           <AssetsInputs
-            onRunAssessment={handleRunAssessment}
-          />
-        ) : view === "assessments" ? (
-          <AssessmentRuns
-            run={latestRun}
-            onGoToAssets={() => setView("assets")}
-            onViewFindings={() => setView("findings")}
-          />
-        ) : view === "findings" ? (
-          <FindingIntelligence
-            run={latestRun}
-            onGoToAssessment={() => setView("assessments")}
-            onViewControls={() => setView("controls")}
-          />
-        ) : view === "controls" ? (
-          <SecurityControls
-            run={latestRun}
-            onGoToFindings={() => setView("findings")}
-            onViewEvidence={() => setView("evidence")}
-          />
-        ) : view === "evidence" ? (
-          <EvidenceVault
-            run={latestRun}
-            onGoToControls={() => setView("controls")}
-            onViewReports={() => setView("reports")}
-          />
-        ) : view === "reports" ? (
-          <Reports
-            run={latestRun}
-            onGoToEvidence={() => setView("evidence")}
+            onRunAssessment={(asset) => {
+              console.log("Assessment target:", asset);
+              setView("assessments");
+            }}
           />
         ) : (
           <Placeholder
