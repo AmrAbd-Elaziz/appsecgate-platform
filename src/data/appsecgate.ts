@@ -38,8 +38,10 @@ export type Asset = {
 export type ScannerResult = {
   category: string;
   tool: string;
-  status: "Completed";
+  status: "Completed" | "Failed";
   findings: number;
+  durationMs?: number;
+  error?: string;
 };
 
 export type AssessmentRun = {

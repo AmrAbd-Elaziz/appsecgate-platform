@@ -11,6 +11,8 @@ import type {
 import { scannerAdapters } from "./scanners/adapters";
 import type {
   RawFinding,
+  ScannerAdapter,
+  ScannerExecution,
 } from "./scanners/types";
 
 import {
@@ -50,6 +52,42 @@ function createRunId(): string {
   return `ASG-RUN-${timestamp}-${random}`;
 }
 
+async function runScannerSafely(
+  adapter: ScannerAdapter,
+  asset: Asset
+): Promise<ScannerExecution> {
+  const started = Date.now();
+
+  try {
+    const result = await adapter.scan(asset);
+
+    return {
+      ...result,
+      durationMs: Date.now() - started,
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
+    console.error(
+      `[AppSecGate] Scanner failed: ${adapter.name}`,
+      message
+    );
+
+    return {
+      category: adapter.category,
+      tool: adapter.name,
+      status: "Failed",
+      findings: 0,
+      rawFindings: [],
+      durationMs: Date.now() - started,
+      error: message,
+    };
+  }
+}
+
 export async function executeAssessment(
   asset: Asset
 ): Promise<PersistedAssessment> {
@@ -61,7 +99,7 @@ export async function executeAssessment(
    */
   const executions = await Promise.all(
     scannerAdapters.map(
-      (adapter) => adapter.scan(asset)
+      (adapter) => runScannerSafely(adapter, asset)
     )
   );
 
@@ -79,6 +117,8 @@ export async function executeAssessment(
       tool: execution.tool,
       status: execution.status,
       findings: execution.findings,
+      durationMs: execution.durationMs,
+      error: execution.error,
     }));
 
   const baseRun: AssessmentRun = {

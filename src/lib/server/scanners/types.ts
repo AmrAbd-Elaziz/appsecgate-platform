@@ -18,9 +18,11 @@ export type RawFinding = {
 export type ScannerExecution = {
   category: string;
   tool: string;
-  status: "Completed";
+  status: "Completed" | "Failed";
   findings: number;
   rawFindings: RawFinding[];
+  durationMs?: number;
+  error?: string;
 };
 
 export interface ScannerAdapter {
