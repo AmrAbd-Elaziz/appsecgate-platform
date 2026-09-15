@@ -12,6 +12,10 @@ import {
   ScanProfileValidationError,
   validateScanProfile,
 } from "../../../lib/server/scan-profile-validator";
+import {
+  DastTargetPolicyError,
+  validateDastTarget,
+} from "../../../lib/server/dast-target-policy";
 
 const assetTypes: AssetType[] = [
   "Web Application",
@@ -107,6 +111,9 @@ export async function POST(request: Request) {
       dastUrl: cleanOptionalString(
         scanProfileInput.dastUrl
       ),
+      dastOpenApiPath: cleanOptionalString(
+        scanProfileInput.dastOpenApiPath
+      ),
       containerImage: cleanOptionalString(
         scanProfileInput.containerImage
       ),
@@ -122,6 +129,16 @@ export async function POST(request: Request) {
       hasScanProfile
         ? validateScanProfile(scanProfile)
         : undefined;
+
+    if (validatedScanProfile?.dastUrl) {
+      const validatedDastTarget =
+        await validateDastTarget(
+          validatedScanProfile.dastUrl
+        );
+
+      validatedScanProfile.dastUrl =
+        validatedDastTarget.dastUrl;
+    }
 
     const asset = await createAsset({
       name,
@@ -140,7 +157,9 @@ export async function POST(request: Request) {
   } catch (error) {
     if (
       error instanceof
-      ScanProfileValidationError
+        ScanProfileValidationError ||
+      error instanceof
+        DastTargetPolicyError
     ) {
       return NextResponse.json(
         { error: error.message },

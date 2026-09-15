@@ -142,6 +142,41 @@ export default function AssetsInputs({
   >("");
 
   const [
+    dastMode,
+    setDastMode,
+  ] = useState<"web" | "openapi">("web");
+
+  const [
+    dastOpenApiPath,
+    setDastOpenApiPath,
+  ] = useState("");
+
+  const [
+    dastOpenApiName,
+    setDastOpenApiName,
+  ] = useState("");
+
+  const [
+    dastOpenApiSize,
+    setDastOpenApiSize,
+  ] = useState(0);
+
+  const [
+    dastOpenApiVersion,
+    setDastOpenApiVersion,
+  ] = useState("");
+
+  const [
+    dastOpenApiSpecification,
+    setDastOpenApiSpecification,
+  ] = useState("");
+
+  const [
+    uploadingOpenApi,
+    setUploadingOpenApi,
+  ] = useState(false);
+
+  const [
     containerImage,
     setContainerImage,
   ] = useState("");
@@ -263,9 +298,22 @@ export default function AssetsInputs({
 
   const configuredTargets =
     selectedProfile
-      ? Object.values(
-          selectedProfile
-        ).filter(Boolean).length
+      ? (
+          (selectedProfile.sourcePath ? 1 : 0) +
+          (selectedProfile.iacPath ? 1 : 0) +
+          (
+            selectedProfile.dastUrl ||
+            selectedProfile.dastOpenApiPath
+              ? 1
+              : 0
+          ) +
+          (
+            selectedProfile.containerImage ||
+            selectedProfile.containerArchivePath
+              ? 1
+              : 0
+          )
+        )
       : 0;
 
   const profileConfigured =
@@ -281,7 +329,12 @@ export default function AssetsInputs({
               ? 1
               : 0
         ) +
-        (selectedProfile.dastUrl ? 1 : 0) +
+        (
+          selectedProfile.dastUrl ||
+          selectedProfile.dastOpenApiPath
+            ? 1
+            : 0
+        ) +
         (
           selectedProfile.containerImage ||
           selectedProfile.containerArchivePath
@@ -400,6 +453,92 @@ export default function AssetsInputs({
       );
     } finally {
       setUploadingSource(false);
+    }
+  }
+
+  async function handleOpenApiUpload(
+    file: File
+  ) {
+    const extension =
+      file.name
+        .toLowerCase()
+        .split(".")
+        .pop();
+
+    if (
+      !extension ||
+      !["json", "yaml", "yml"].includes(
+        extension
+      )
+    ) {
+      setAssetError(
+        "OpenAPI definition must be JSON, YAML, or YML."
+      );
+      return;
+    }
+
+    try {
+      setUploadingOpenApi(true);
+      setAssetError("");
+
+      const formData =
+        new FormData();
+
+      formData.append("file", file);
+
+      const response =
+        await fetch(
+          "/api/uploads/openapi",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to upload OpenAPI definition."
+        );
+      }
+
+      const upload =
+        payload.data;
+
+      setDastOpenApiPath(
+        upload.dastOpenApiPath
+      );
+      setDastOpenApiName(
+        upload.originalName
+      );
+      setDastOpenApiSize(
+        upload.uploadSize
+      );
+      setDastOpenApiVersion(
+        upload.version || ""
+      );
+      setDastOpenApiSpecification(
+        upload.specification || "OpenAPI"
+      );
+
+      setDastMode("openapi");
+    } catch (error) {
+      setDastOpenApiPath("");
+      setDastOpenApiName("");
+      setDastOpenApiSize(0);
+      setDastOpenApiVersion("");
+      setDastOpenApiSpecification("");
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload OpenAPI definition."
+      );
+    } finally {
+      setUploadingOpenApi(false);
     }
   }
 
@@ -872,6 +1011,29 @@ export default function AssetsInputs({
     }
 
     if (
+      dastMode === "openapi" &&
+      !dastOpenApiPath.trim()
+    ) {
+      setAssetError(
+        "Upload an OpenAPI definition before creating the asset."
+      );
+      return;
+    }
+
+    if (
+      dastMode === "openapi" &&
+      (
+        !dastUrl.trim() ||
+        !dastValidated
+      )
+    ) {
+      setAssetError(
+        "OpenAPI DAST requires a validated target URL."
+      );
+      return;
+    }
+
+    if (
       containerImage.trim() &&
       !containerValidated
     ) {
@@ -894,6 +1056,10 @@ export default function AssetsInputs({
 
         dastUrl:
           dastUrl.trim() || undefined,
+
+        dastOpenApiPath:
+          dastOpenApiPath.trim() ||
+          undefined,
 
         containerImage:
           containerImage.trim() ||
@@ -1520,11 +1686,11 @@ export default function AssetsInputs({
               <div className="security-input-source-head">
                 <div>
                   <span className="security-input-label">
-                    DAST TARGET
+                    DAST SECURITY INPUT
                   </span>
 
                   <b>
-                    Dynamic application target
+                    Dynamic application assessment
                   </b>
                 </div>
 
@@ -1533,98 +1699,316 @@ export default function AssetsInputs({
                 </span>
               </div>
 
-              {dastValidated ? (
-                <div className="container-input-result">
-                  <div>
-                    <span className="source-upload-success">
-                      ✓
+              <div className="dast-mode-switch">
+                <button
+                  type="button"
+                  className={
+                    dastMode === "web"
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() => {
+                    setDastMode("web");
+
+                    setDastOpenApiPath("");
+                    setDastOpenApiName("");
+                    setDastOpenApiSize(0);
+                    setDastOpenApiVersion("");
+                    setDastOpenApiSpecification("");
+                  }}
+                >
+                  Web Target
+                </button>
+
+                <button
+                  type="button"
+                  className={
+                    dastMode === "openapi"
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() => {
+                    setDastMode("openapi");
+                  }}
+                >
+                  OpenAPI
+                </button>
+              </div>
+
+              {dastMode === "web" ? (
+                dastValidated ? (
+                  <div className="container-input-result">
+                    <div>
+                      <span className="source-upload-success">
+                        ✓
+                      </span>
+
+                      <div>
+                        <b>
+                          {dastHostname ||
+                            dastUrl}
+                        </b>
+
+                        <span>
+                          Target validated · Ready for
+                          OWASP ZAP
+                        </span>
+
+                        <code>
+                          {dastUrl}
+                        </code>
+
+                        <span>
+                          {dastAllowedBy ===
+                          "explicit-allowlist"
+                            ? "Explicitly allowlisted target"
+                            : "Public network target"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="source-upload-replace"
+                      onClick={() => {
+                        setDastValidated(false);
+                        setDastHostname("");
+                        setDastAllowedBy("");
+                      }}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div className="container-input-controls">
+                    <input
+                      value={dastUrl}
+                      disabled={
+                        validatingDast ||
+                        creatingAsset
+                      }
+                      onChange={(event) => {
+                        setDastUrl(
+                          event.target.value
+                        );
+
+                        setDastValidated(false);
+                        setDastHostname("");
+                        setDastAllowedBy("");
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter"
+                        ) {
+                          event.preventDefault();
+                          void handleDastValidation();
+                        }
+                      }}
+                      placeholder="https://staging.example.com"
+                    />
+
+                    <button
+                      type="button"
+                      disabled={
+                        validatingDast ||
+                        !dastUrl.trim()
+                      }
+                      onClick={() =>
+                        void handleDastValidation()
+                      }
+                    >
+                      {validatingDast
+                        ? "Validating..."
+                        : "Validate target"}
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="openapi-dast-stack">
+                  <div className="openapi-target-section">
+                    <span className="security-input-label">
+                      TARGET URL
                     </span>
 
-                    <div>
-                      <b>
-                        {dastHostname ||
-                          dastUrl}
-                      </b>
+                    {dastValidated ? (
+                      <div className="container-input-result">
+                        <div>
+                          <span className="source-upload-success">
+                            ✓
+                          </span>
 
-                      <span>
-                        Target validated · Ready for
-                        OWASP ZAP
-                      </span>
+                          <div>
+                            <b>
+                              {dastHostname ||
+                                dastUrl}
+                            </b>
 
-                      <code>
-                        {dastUrl}
-                      </code>
+                            <span>
+                              Target validated ·
+                              ZAP destination locked
+                            </span>
 
-                      <span>
-                        {dastAllowedBy ===
-                        "explicit-allowlist"
-                          ? "Explicitly allowlisted target"
-                          : "Public network target"}
-                      </span>
-                    </div>
+                            <code>
+                              {dastUrl}
+                            </code>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="source-upload-replace"
+                          onClick={() => {
+                            setDastValidated(false);
+                            setDastHostname("");
+                            setDastAllowedBy("");
+                          }}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="container-input-controls">
+                        <input
+                          value={dastUrl}
+                          disabled={
+                            validatingDast ||
+                            creatingAsset
+                          }
+                          onChange={(event) => {
+                            setDastUrl(
+                              event.target.value
+                            );
+
+                            setDastValidated(false);
+                            setDastHostname("");
+                            setDastAllowedBy("");
+                          }}
+                          onKeyDown={(event) => {
+                            if (
+                              event.key === "Enter"
+                            ) {
+                              event.preventDefault();
+                              void handleDastValidation();
+                            }
+                          }}
+                          placeholder="https://api.example.com"
+                        />
+
+                        <button
+                          type="button"
+                          disabled={
+                            validatingDast ||
+                            !dastUrl.trim()
+                          }
+                          onClick={() =>
+                            void handleDastValidation()
+                          }
+                        >
+                          {validatingDast
+                            ? "Validating..."
+                            : "Validate target"}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  <button
-                    type="button"
-                    className="source-upload-replace"
-                    onClick={() => {
-                      setDastValidated(false);
-                      setDastHostname("");
-                      setDastAllowedBy("");
-                    }}
-                  >
-                    Change
-                  </button>
-                </div>
-              ) : (
-                <div className="container-input-controls">
-                  <input
-                    value={dastUrl}
-                    disabled={
-                      validatingDast ||
-                      creatingAsset
-                    }
-                    onChange={(event) => {
-                      setDastUrl(
-                        event.target.value
-                      );
+                  <div className="openapi-spec-section">
+                    <span className="security-input-label">
+                      API DEFINITION
+                    </span>
 
-                      setDastValidated(false);
-                      setDastHostname("");
-                      setDastAllowedBy("");
-                    }}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === "Enter"
-                      ) {
-                        event.preventDefault();
+                    {dastOpenApiPath ? (
+                      <div className="container-input-result">
+                        <div>
+                          <span className="source-upload-success">
+                            ✓
+                          </span>
 
-                        void handleDastValidation();
-                      }
-                    }}
-                    placeholder="https://staging.example.com"
-                  />
+                          <div>
+                            <b>
+                              {dastOpenApiName}
+                            </b>
 
-                  <button
-                    type="button"
-                    disabled={
-                      validatingDast ||
-                      !dastUrl.trim()
-                    }
-                    onClick={() =>
-                      void handleDastValidation()
-                    }
-                  >
-                    {validatingDast
-                      ? "Validating..."
-                      : "Validate target"}
-                  </button>
-                </div>
-              )}
+                            <span>
+                              {dastOpenApiSpecification}{" "}
+                              {dastOpenApiVersion}
+                              {" · "}
+                              Ready for ZAP API Scan
+                            </span>
+
+                            <span>
+                              {(
+                                dastOpenApiSize /
+                                1024
+                              ).toFixed(1)} KB ·
+                              Validated API definition
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="source-upload-replace"
+                          onClick={() => {
+                            setDastOpenApiPath("");
+                            setDastOpenApiName("");
+                            setDastOpenApiSize(0);
+                            setDastOpenApiVersion("");
+                            setDastOpenApiSpecification("");
+                          }}
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="container-archive-upload">
+                        <input
+                          type="file"
+                          accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml"
+                          disabled={
+                            uploadingOpenApi ||
+                            creatingAsset
+                          }
+                          onChange={(event) => {
+                            const file =
+                              event.target.files?.[0];
+
+                            if (file) {
+                              void handleOpenApiUpload(
+                                file
+                              );
+                            }
+
+                            event.currentTarget.value =
+                              "";
+                          }}
+                        />
+
+                        <span className="source-upload-icon">
+                          ↑
+                        </span>
+
+                        <div>
+                          <b>
+                            {uploadingOpenApi
+                              ? "Uploading & validating OpenAPI..."
+                              : "Upload OpenAPI JSON / YAML"}
+                          </b>
+
+                          <small>
+                            OpenAPI 3.x · Swagger 2.0 ·
+                            Maximum 5 MB
+                          </small>
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                </div>              )}
 
               <small className="container-input-note">
-                HTTP/HTTPS target · SSRF-aware network
-                policy · OWASP ZAP
+                {dastMode === "web"
+                  ? "Web baseline scan · SSRF-aware target validation"
+                  : "API definition scan · OWASP ZAP API Scan"}
               </small>
             </div>
 
@@ -2115,6 +2499,8 @@ export default function AssetsInputs({
                     <code>
                       {selectedProfile
                         ?.dastUrl ||
+                        selectedProfile
+                          ?.dastOpenApiPath ||
                         "Not configured"}
                     </code>
                   </div>

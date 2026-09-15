@@ -148,10 +148,17 @@ export const realZapAdapter: ScannerAdapter = {
      * API validation remains responsible for deciding
      * which DAST destinations are allowed.
      */
+    const openApiPath =
+      asset.scanProfile
+        ?.dastOpenApiPath;
+
     const target =
       asset.scanProfile?.dastUrl ||
       process.env.APPSECGATE_DAST_TARGET ||
       "http://appsecgate-zap-target:5000";
+
+    const apiMode =
+      Boolean(openApiPath);
 
     const network =
       process.env.APPSECGATE_SCANNER_NETWORK ||
@@ -166,21 +173,67 @@ export const realZapAdapter: ScannerAdapter = {
         reportName
       );
 
+    const openApiMountDirectory =
+      openApiPath
+        ? path.dirname(openApiPath)
+        : undefined;
+
+    const openApiContainerPath =
+      openApiPath
+        ? `/zap/openapi/${path.basename(
+            openApiPath
+          )}`
+        : undefined;
+
     try {
-      const result = await runCommand(
-        "docker",
-        [
-          "run",
-          "--rm",
+      const dockerArgs = [
+        "run",
+        "--rm",
 
-          "--network",
-          network,
+        "--network",
+        network,
 
+        "-v",
+        `${os.tmpdir()}:/zap/wrk/:rw`,
+      ];
+
+      if (
+        apiMode &&
+        openApiMountDirectory
+      ) {
+        dockerArgs.push(
           "-v",
-          `${os.tmpdir()}:/zap/wrk/:rw`,
+          `${openApiMountDirectory}:/zap/openapi:ro`
+        );
+      }
 
-          "ghcr.io/zaproxy/zaproxy:stable",
+      dockerArgs.push(
+        "ghcr.io/zaproxy/zaproxy:stable"
+      );
 
+      if (
+        apiMode &&
+        openApiContainerPath
+      ) {
+        dockerArgs.push(
+          "zap-api-scan.py",
+
+          "-t",
+          openApiContainerPath,
+
+          "-f",
+          "openapi",
+
+          "-O",
+          target,
+
+          "-J",
+          reportName,
+
+          "-I"
+        );
+      } else {
+        dockerArgs.push(
           "zap-baseline.py",
 
           "-t",
@@ -192,13 +245,19 @@ export const realZapAdapter: ScannerAdapter = {
           "-m",
           "1",
 
-          "-I",
-        ],
-        {
-          cwd: process.cwd(),
-          timeoutMs: 240_000,
-        }
-      );
+          "-I"
+        );
+      }
+
+      const result =
+        await runCommand(
+          "docker",
+          dockerArgs,
+          {
+            cwd: process.cwd(),
+            timeoutMs: 240_000,
+          }
+        );
 
       let reportText: string;
 

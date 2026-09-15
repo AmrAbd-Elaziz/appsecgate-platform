@@ -17,6 +17,7 @@ function validateLocalPath(
   field:
     | "sourcePath"
     | "iacPath"
+    | "dastOpenApiPath"
     | "containerArchivePath"
 ): string {
   if (value.includes("\0")) {
@@ -124,6 +125,14 @@ export function validateScanProfile(
       validateDastUrl(profile.dastUrl);
   }
 
+  if (profile.dastOpenApiPath) {
+    validated.dastOpenApiPath =
+      validateLocalPath(
+        profile.dastOpenApiPath,
+        "dastOpenApiPath"
+      );
+  }
+
   if (profile.containerImage) {
     validated.containerImage =
       validateContainerImage(
@@ -137,6 +146,15 @@ export function validateScanProfile(
         profile.containerArchivePath,
         "containerArchivePath"
       );
+  }
+
+  if (
+    validated.dastOpenApiPath &&
+    !validated.dastUrl
+  ) {
+    throw new ScanProfileValidationError(
+      "OpenAPI DAST requires a validated DAST target URL."
+    );
   }
 
   if (

@@ -69,8 +69,17 @@ export function resolveScannerApplicability(
   const hasIac =
     hasValue(profile.iacPath);
 
-  const hasDast =
+  const hasDastUrl =
     hasValue(profile.dastUrl);
+
+  const hasDastOpenApi =
+    hasValue(
+      profile.dastOpenApiPath
+    );
+
+  const hasDast =
+    hasDastUrl ||
+    hasDastOpenApi;
 
   const hasContainerImage =
     hasValue(profile.containerImage);
@@ -129,9 +138,11 @@ export function resolveScannerApplicability(
         return {
           adapter,
           required: hasDast,
-          reason: hasDast
+          reason: hasDastUrl
             ? "dastUrl configured."
-            : "dastUrl not configured.",
+            : hasDastOpenApi
+              ? "dastOpenApiPath configured."
+              : "No DAST input configured.",
         };
 
       case "Trivy Container":
