@@ -45,3 +45,6 @@ next-env.d.ts
 *.pre-model
 *.pre-central-data
 *.before-assessments
+
+# AppSecGate local runtime data
+data/appsecgate.json

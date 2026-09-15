@@ -1,9 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import {
-  initialAssets,
   type Asset,
   type AssetType,
   type Environment,
@@ -15,9 +14,11 @@ type Props = {
 };
 
 export default function AssetsInputs({ onRunAssessment }: Props) {
-  const [assets, setAssets] = useState<Asset[]>(initialAssets);
-  const [selectedAssetId, setSelectedAssetId] = useState<number>(1);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [selectedAssetId, setSelectedAssetId] = useState<number>(0);
   const [showForm, setShowForm] = useState(false);
+  const [loadingAssets, setLoadingAssets] = useState(true);
+  const [assetError, setAssetError] = useState("");
 
   const [name, setName] = useState("");
   const [type, setType] = useState<AssetType>("Web Application");
@@ -26,10 +27,66 @@ export default function AssetsInputs({ onRunAssessment }: Props) {
   const [criticality, setCriticality] =
     useState<Criticality>("High");
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadAssets() {
+      try {
+        setLoadingAssets(true);
+        setAssetError("");
+
+        const response = await fetch("/api/assets", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load assets.");
+        }
+
+        const payload = await response.json();
+        const loadedAssets = payload.data as Asset[];
+
+        if (cancelled) {
+          return;
+        }
+
+        setAssets(loadedAssets);
+
+        if (loadedAssets.length > 0) {
+          setSelectedAssetId((current) =>
+            loadedAssets.some((asset) => asset.id === current)
+              ? current
+              : loadedAssets[0].id
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAssetError(
+            error instanceof Error
+              ? error.message
+              : "Unable to load assets."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingAssets(false);
+        }
+      }
+    }
+
+    loadAssets();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const selectedAsset =
     assets.find((asset) => asset.id === selectedAssetId) ?? null;
 
-  function handleAddAsset(event: FormEvent<HTMLFormElement>) {
+  async function handleAddAsset(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     const cleanName = name.trim();
@@ -38,22 +95,47 @@ export default function AssetsInputs({ onRunAssessment }: Props) {
       return;
     }
 
-    const newAsset: Asset = {
-      id: Date.now(),
-      name: cleanName,
-      type,
-      environment,
-      criticality,
-    };
+    try {
+      setAssetError("");
 
-    setAssets((current) => [...current, newAsset]);
-    setSelectedAssetId(newAsset.id);
+      const response = await fetch("/api/assets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: cleanName,
+          type,
+          environment,
+          criticality,
+        }),
+      });
 
-    setName("");
-    setType("Web Application");
-    setEnvironment("Production");
-    setCriticality("High");
-    setShowForm(false);
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error || "Unable to create asset."
+        );
+      }
+
+      const newAsset = payload.data as Asset;
+
+      setAssets((current) => [...current, newAsset]);
+      setSelectedAssetId(newAsset.id);
+
+      setName("");
+      setType("Web Application");
+      setEnvironment("Production");
+      setCriticality("High");
+      setShowForm(false);
+    } catch (error) {
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create asset."
+      );
+    }
   }
 
   function handleRunAssessment() {
