@@ -9,6 +9,7 @@ import {
   type AssessmentRun,
   type EvidenceRecord,
   type PersistedAssessment,
+  type RemediationProof,
 } from "../data/appsecgate";
 
 type Props = {
@@ -32,6 +33,52 @@ export default function EvidenceVault({
   ] = useState<EvidenceRecord | null>(
     null
   );
+
+  const [
+    remediationProofs,
+    setRemediationProofs,
+  ] = useState<RemediationProof[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRemediationProofs() {
+      try {
+        const response = await fetch(
+          "/api/evidence/remediation",
+          {
+            cache: "no-store",
+          }
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json();
+
+        if (
+          !cancelled &&
+          Array.isArray(payload.data)
+        ) {
+          setRemediationProofs(
+            payload.data
+          );
+        }
+      } catch {
+        /*
+         * Scanner evidence remains usable even if
+         * remediation evidence cannot be loaded.
+         */
+      }
+    }
+
+    void loadRemediationProofs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [assessment?.id]);
 
   useEffect(() => {
     if (!selectedEvidence) {
@@ -95,8 +142,60 @@ export default function EvidenceVault({
     );
   }
 
-  const allEvidenceRecords =
+  const scannerEvidenceRecords =
     assessment?.evidence ?? [];
+
+  const remediationEvidenceRecords: EvidenceRecord[] =
+    remediationProofs
+      .filter(
+        (proof) =>
+          !assessment ||
+          proof.assetId ===
+            assessment.assetId
+      )
+      .map((proof) => {
+        /*
+         * Preserve the original scanner location for
+         * remediation proof intelligence whenever the
+         * matching finding has scanner evidence.
+         */
+        const scannerEvidence =
+          scannerEvidenceRecords.find(
+            (record) =>
+              record.findingId ===
+              proof.findingId
+          );
+
+        return {
+          id: proof.id,
+          runId:
+            scannerEvidence?.runId ??
+            "Persistent remediation evidence",
+          assetId: proof.assetId,
+          findingId: proof.findingId,
+          controlId: proof.controlId,
+          title: proof.title,
+          type: "Remediation Proof",
+          source: proof.source,
+          status: proof.status,
+          integrity: proof.integrity,
+
+          /*
+           * Finding Location belongs to the detected
+           * finding, so reuse scanner provenance rather
+           * than replacing it with remediation data.
+           */
+          location:
+            scannerEvidence?.location,
+          cwe:
+            scannerEvidence?.cwe,
+        };
+      });
+
+  const allEvidenceRecords = [
+    ...scannerEvidenceRecords,
+    ...remediationEvidenceRecords,
+  ];
 
   const evidenceRecords =
     selectedFindingId
@@ -319,6 +418,16 @@ export default function EvidenceVault({
           const location =
             selectedEvidence.location;
 
+          const remediationProof =
+            selectedEvidence.type ===
+            "Remediation Proof"
+              ? remediationProofs.find(
+                  (proof) =>
+                    proof.id ===
+                    selectedEvidence.id
+                )
+              : undefined;
+
           const riskLabel =
             finding
               ? `${finding.riskScore}/100 · ${finding.riskLevel}`
@@ -467,7 +576,17 @@ export default function EvidenceVault({
                       <div>
                         <small>SCANNER</small>
                         <b>
-                          {selectedEvidence.source}
+                          {selectedEvidence.type ===
+                          "Remediation Proof"
+                            ? assessment?.evidence.find(
+                                (record) =>
+                                  record.findingId ===
+                                  selectedEvidence.findingId &&
+                                  record.type ===
+                                  "Scanner Output"
+                              )?.source ||
+                              "Scanner unavailable"
+                            : selectedEvidence.source}
                         </b>
                       </div>
 
