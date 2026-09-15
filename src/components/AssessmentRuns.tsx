@@ -138,7 +138,7 @@ export default function AssessmentRuns({
             <div>
               <h3>Scanner execution</h3>
               <span className="panel-subtitle">
-                Full security gate coverage
+                Required scanner coverage
               </span>
             </div>
             <span>{completedScanners}/6 completed</span>

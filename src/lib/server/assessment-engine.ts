@@ -9,6 +9,9 @@ import type {
 } from "../../data/appsecgate";
 
 import { scannerAdapters } from "./scanners/adapters";
+import {
+  getRequiredScannerAdapters,
+} from "./scanners/applicability";
 import type {
   RawFinding,
   ScannerAdapter,
@@ -97,9 +100,16 @@ export async function executeAssessment(
   /*
    * Scanner stage
    */
+  const requiredScannerAdapters =
+    getRequiredScannerAdapters(
+      asset,
+      scannerAdapters
+    );
+
   const executions = await Promise.all(
-    scannerAdapters.map(
-      (adapter) => runScannerSafely(adapter, asset)
+    requiredScannerAdapters.map(
+      (adapter) =>
+        runScannerSafely(adapter, asset)
     )
   );
 

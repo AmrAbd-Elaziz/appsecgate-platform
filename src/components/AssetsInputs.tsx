@@ -152,6 +152,30 @@ export default function AssetsInputs({
   const profileConfigured =
     configuredTargets > 0;
 
+  const requiredScannerCount =
+    !selectedProfile
+      ? 6
+      : (
+          selectedProfile.sourcePath
+            ? 4
+            : selectedProfile.iacPath
+              ? 1
+              : 0
+        ) +
+        (selectedProfile.dastUrl ? 1 : 0) +
+        (
+          selectedProfile.containerImage
+            ? 1
+            : 0
+        );
+
+  const assessmentMode =
+    !selectedProfile
+      ? "Legacy full security gate"
+      : requiredScannerCount > 0
+        ? "Profile-aware security gate"
+        : "No scanner targets";
+
   function resetForm() {
     setName("");
     setType("Web Application");
@@ -725,17 +749,17 @@ export default function AssetsInputs({
                   </span>
 
                   <b>
-                    Full security gate
+                    {assessmentMode}
                   </b>
                 </div>
 
                 <div>
                   <span>
-                    Scanner targets
+                    Required scanners
                   </span>
 
                   <b>
-                    {configuredTargets}/4
+                    {requiredScannerCount}/6
                   </b>
                 </div>
               </div>
