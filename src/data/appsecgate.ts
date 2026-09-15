@@ -136,6 +136,36 @@ export type SecurityControl = {
   requiredEvidence: string;
 };
 
+export type ControlLifecycleStatus =
+  | "Required"
+  | "Implemented"
+  | "Verified";
+
+export type ControlLifecycle = {
+  controlId: string;
+  findingId: string;
+  assetId: number;
+  status: ControlLifecycleStatus;
+  firstRequiredAt: string;
+  lastUpdatedAt: string;
+  statusChangedAt: string;
+  firstSeenRunId: string;
+  lastSeenRunId: string;
+  implementedAt?: string;
+  verifiedAt?: string;
+  reopenedAt?: string;
+};
+
+export type ControlIntelligenceRecord = {
+  control: SecurityControl;
+  lifecycle: ControlLifecycle;
+  finding: Finding;
+  findingLifecycle: FindingLifecycle;
+  asset: Asset;
+  assessmentId: string;
+  completedAt: string;
+};
+
 export type EvidenceRecord = {
   id: string;
   runId: string;

@@ -6,6 +6,7 @@ import {
 } from "../../../lib/server/assessment-engine";
 
 import {
+  reconcileControlLifecycles,
   reconcileFindingLifecycles,
   getAssetById,
   listAssessments,
@@ -61,6 +62,10 @@ export async function POST(request: Request) {
      * - Closed finding seen again -> Open / Reopened
      */
     await reconcileFindingLifecycles(
+      assessment
+    );
+
+    await reconcileControlLifecycles(
       assessment
     );
 
