@@ -57,9 +57,6 @@ export default function SecurityControls({
   const [search, setSearch] =
     useState("");
 
-  const [statusFilter, setStatusFilter] =
-    useState("All");
-
   const [severityFilter, setSeverityFilter] =
     useState("All");
 
@@ -200,11 +197,6 @@ export default function SecurityControls({
               .includes(query)
           );
 
-        const matchesStatus =
-          statusFilter === "All" ||
-          record.lifecycle.status ===
-            statusFilter;
-
         const matchesSeverity =
           severityFilter === "All" ||
           record.control.severity ===
@@ -217,7 +209,6 @@ export default function SecurityControls({
 
         return (
           matchesSearch &&
-          matchesStatus &&
           matchesSeverity &&
           matchesAsset
         );
@@ -226,7 +217,6 @@ export default function SecurityControls({
   }, [
     scopedRecords,
     search,
-    statusFilter,
     severityFilter,
     assetFilter,
   ]);
@@ -234,20 +224,23 @@ export default function SecurityControls({
   const summary = useMemo(
     () => ({
       total: scopedRecords.length,
-      required: scopedRecords.filter(
+
+      findingsMapped: new Set(
+        scopedRecords.map(
+          (record) => record.finding.id
+        )
+      ).size,
+
+      assetsCovered: new Set(
+        scopedRecords.map(
+          (record) => record.asset.id
+        )
+      ).size,
+
+      criticalControls: scopedRecords.filter(
         (record) =>
-          record.lifecycle.status ===
-          "Required"
-      ).length,
-      implemented: scopedRecords.filter(
-        (record) =>
-          record.lifecycle.status ===
-          "Implemented"
-      ).length,
-      verified: scopedRecords.filter(
-        (record) =>
-          record.lifecycle.status ===
-          "Verified"
+          record.control.severity ===
+          "CRITICAL"
       ).length,
     }),
     [scopedRecords]
@@ -258,16 +251,15 @@ export default function SecurityControls({
       <header className="page-header controls-v2-header">
         <div>
           <p className="eyebrow">
-            REMEDIATION GOVERNANCE
+            SECURITY CONTROL INTELLIGENCE
           </p>
 
           <h1>Security Controls</h1>
 
           <p className="page-description">
-            Persistent remediation controls
-            linked to findings, assets,
-            scanner verification, and
-            assurance evidence.
+            Security controls mapped to
+            findings, assets, assessment risk,
+            and scanner evidence.
           </p>
         </div>
 
@@ -302,37 +294,33 @@ export default function SecurityControls({
           <small>Total controls</small>
           <b>{summary.total}</b>
           <span>
-            Persistent mapped controls
+            Mapped security controls
           </span>
         </article>
 
         <article>
-          <small>Required</small>
+          <small>Findings mapped</small>
+          <b>{summary.findingsMapped}</b>
+          <span>
+            Control-linked findings
+          </span>
+        </article>
+
+        <article>
+          <small>Assets covered</small>
+          <b>{summary.assetsCovered}</b>
+          <span>
+            Across assessments
+          </span>
+        </article>
+
+        <article>
+          <small>Critical controls</small>
           <b className="control-danger">
-            {summary.required}
+            {summary.criticalControls}
           </b>
           <span>
-            Remediation required
-          </span>
-        </article>
-
-        <article>
-          <small>Implemented</small>
-          <b>
-            {summary.implemented}
-          </b>
-          <span>
-            Awaiting verification
-          </span>
-        </article>
-
-        <article>
-          <small>Verified</small>
-          <b className="control-success">
-            {summary.verified}
-          </b>
-          <span>
-            Scanner validated
+            Critical-risk coverage
           </span>
         </article>
       </section>
@@ -344,8 +332,8 @@ export default function SecurityControls({
               Control Intelligence
             </h3>
             <span className="panel-subtitle">
-              Finding → control → evidence
-              → scanner verification
+              Finding → risk → control
+              → evidence → gate decision
             </span>
           </div>
 
@@ -366,20 +354,6 @@ export default function SecurityControls({
             placeholder="Search control, finding, asset, owner..."
             aria-label="Search security controls"
           />
-
-          <select
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(
-                event.target.value
-              )
-            }
-          >
-            <option>All</option>
-            <option>Required</option>
-            <option>Implemented</option>
-            <option>Verified</option>
-          </select>
 
           <select
             value={severityFilter}
@@ -432,7 +406,6 @@ export default function SecurityControls({
               <thead>
                 <tr>
                   <th>Control</th>
-                  <th>Status</th>
                   <th>Severity</th>
                   <th>Asset</th>
                   <th>Finding</th>
@@ -475,16 +448,6 @@ export default function SecurityControls({
                         </small>
                       </td>
 
-                      <td>
-                        <span
-                          className={`controls-v2-status ${record.lifecycle.status.toLowerCase()}`}
-                        >
-                          {
-                            record.lifecycle
-                              .status
-                          }
-                        </span>
-                      </td>
 
                       <td>
                         <span
@@ -600,15 +563,6 @@ export default function SecurityControls({
 
             <div className="controls-v2-modal-badges">
               <span
-                className={`controls-v2-status ${selectedRecord.lifecycle.status.toLowerCase()}`}
-              >
-                {
-                  selectedRecord.lifecycle
-                    .status
-                }
-              </span>
-
-              <span
                 className={`badge ${selectedRecord.control.severity.toLowerCase()}`}
               >
                 {
@@ -691,7 +645,7 @@ export default function SecurityControls({
 
             <section className="controls-v2-detail-section">
               <small>
-                REMEDIATION
+                CONTROL GUIDANCE
               </small>
               <p>
                 {
@@ -716,7 +670,7 @@ export default function SecurityControls({
             <div className="controls-v2-timeline">
               <section>
                 <small>
-                  FIRST REQUIRED
+                  FIRST MAPPED
                 </small>
                 <b>
                   {formatDate(
@@ -728,7 +682,7 @@ export default function SecurityControls({
 
               <section>
                 <small>
-                  STATUS CHANGED
+                  FINDING STATE CHANGED
                 </small>
                 <b>
                   {formatDate(
@@ -752,12 +706,11 @@ export default function SecurityControls({
 
               <section>
                 <small>
-                  VERIFIED AT
+                  LAST ASSESSED
                 </small>
                 <b>
                   {formatDate(
-                    selectedRecord.lifecycle
-                      .verifiedAt
+                    selectedRecord.completedAt
                   )}
                 </b>
               </section>

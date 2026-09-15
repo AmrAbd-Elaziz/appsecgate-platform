@@ -96,6 +96,39 @@ export default function FindingIntelligence({
     FindingIntelligenceRecord | null
   >(null);
 
+  function openFindingDetail(
+    record: FindingIntelligenceRecord
+  ) {
+    setSelectedRecord(record);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "findings");
+    url.searchParams.set(
+      "finding",
+      record.finding.id
+    );
+
+    window.history.pushState(
+      {
+        view: "findings",
+        finding: record.finding.id,
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  function closeFindingDetail() {
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.has("finding")) {
+      window.history.back();
+      return;
+    }
+
+    setSelectedRecord(null);
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -154,6 +187,44 @@ export default function FindingIntelligence({
   }, [assessment?.id]);
 
   useEffect(() => {
+    function syncFindingFromUrl() {
+      const params = new URLSearchParams(
+        window.location.search
+      );
+
+      const findingId = params.get("finding");
+
+      if (!findingId) {
+        setSelectedRecord(null);
+        return;
+      }
+
+      const matchingRecord = records.find(
+        (record) =>
+          record.finding.id === findingId
+      );
+
+      setSelectedRecord(
+        matchingRecord ?? null
+      );
+    }
+
+    syncFindingFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncFindingFromUrl
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncFindingFromUrl
+      );
+    };
+  }, [records]);
+
+  useEffect(() => {
     if (!selectedRecord) {
       return;
     }
@@ -162,7 +233,7 @@ export default function FindingIntelligence({
       event: KeyboardEvent
     ) {
       if (event.key === "Escape") {
-        setSelectedRecord(null);
+        closeFindingDetail();
       }
     }
 
@@ -601,7 +672,7 @@ export default function FindingIntelligence({
                         tabIndex={0}
                         role="button"
                         onClick={() =>
-                          setSelectedRecord(
+                          openFindingDetail(
                             record
                           )
                         }
@@ -616,7 +687,7 @@ export default function FindingIntelligence({
                           ) {
                             event.preventDefault();
 
-                            setSelectedRecord(
+                            openFindingDetail(
                               record
                             );
                           }
@@ -701,7 +772,7 @@ export default function FindingIntelligence({
               event.target ===
               event.currentTarget
             ) {
-              setSelectedRecord(null);
+              closeFindingDetail();
             }
           }}
         >
@@ -729,11 +800,7 @@ export default function FindingIntelligence({
                 type="button"
                 className="finding-modal-close"
                 aria-label="Close finding details"
-                onClick={() =>
-                  setSelectedRecord(
-                    null
-                  )
-                }
+                onClick={closeFindingDetail}
               >
                 ×
               </button>

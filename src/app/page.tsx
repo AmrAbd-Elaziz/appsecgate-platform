@@ -99,7 +99,56 @@ function Placeholder({ title }: { title: string }) {
 }
 
 export default function Home() {
-  const [view, setView] = useState<View>("overview");
+  const [view, setViewState] = useState<View>("overview");
+
+  function isValidView(value: string | null): value is View {
+    return navigation.some(([candidate]) => candidate === value);
+  }
+
+  function setView(nextView: View) {
+    setViewState(nextView);
+
+    const url = new URL(window.location.href);
+
+    if (nextView === "overview") {
+      url.searchParams.delete("view");
+    } else {
+      url.searchParams.set("view", nextView);
+    }
+
+    window.history.pushState(
+      { view: nextView },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  useEffect(() => {
+    function syncViewFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedView = params.get("view");
+
+      setViewState(
+        isValidView(requestedView)
+          ? requestedView
+          : "overview"
+      );
+    }
+
+    syncViewFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncViewFromUrl
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncViewFromUrl
+      );
+    };
+  }, []);
   const [latestAssessment, setLatestAssessment] =
     useState<PersistedAssessment | null>(null);
 
