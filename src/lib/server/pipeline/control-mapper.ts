@@ -6,86 +6,150 @@ import type {
 type ControlTemplate = {
   name: string;
   domain: string;
-  status:
-    | "Required"
-    | "In Progress"
-    | "Implemented";
   owner: string;
   remediation: string;
   requiredEvidence: string;
 };
 
-const templates: Record<string, ControlTemplate> = {
-  "CTRL-001": {
+const templates: Record<
+  string,
+  ControlTemplate
+> = {
+  "CTRL-SECRETS": {
     name: "Secret Management",
     domain: "Application Security",
-    status: "Required",
     owner: "Application Team",
     remediation:
-      "Remove hardcoded secrets and retrieve credentials from an approved secrets manager at runtime.",
+      "Remove exposed credentials, rotate affected secrets, and retrieve credentials from an approved secrets manager at runtime.",
     requiredEvidence:
-      "Secret rotation + clean Gitleaks scan",
+      "Secret rotation confirmation + clean Gitleaks retest",
   },
 
-  "CTRL-002": {
-    name: "Input Validation",
+  "CTRL-INPUT": {
+    name: "Secure Input & Query Handling",
     domain: "Application Security",
-    status: "In Progress",
     owner: "Application Team",
     remediation:
-      "Replace dynamic SQL construction with parameterized queries and validate untrusted input.",
+      "Use parameterized queries and enforce server-side validation for untrusted input.",
     requiredEvidence:
-      "Code fix + Semgrep/ZAP retest",
+      "Code remediation + clean SAST/DAST retest",
   },
 
-  "CTRL-003": {
-    name: "Dependency Security",
+  "CTRL-SAST": {
+    name: "Secure Coding Remediation",
+    domain: "Application Security",
+    owner: "Application Team",
+    remediation:
+      "Remediate the identified source-code weakness and validate the fix through static analysis.",
+    requiredEvidence:
+      "Code change + clean Semgrep retest",
+  },
+
+  "CTRL-WEB": {
+    name: "Web Security Hardening",
+    domain: "Application Security",
+    owner: "Application Team",
+    remediation:
+      "Apply the required web security control and validate the deployed application through DAST.",
+    requiredEvidence:
+      "Configuration or code change + clean OWASP ZAP retest",
+  },
+
+  "CTRL-DEPENDENCY": {
+    name: "Dependency Vulnerability Management",
     domain: "Software Supply Chain",
-    status: "Required",
     owner: "Platform Team",
     remediation:
-      "Upgrade the affected dependency and rebuild from an approved patched base image.",
+      "Upgrade or replace the affected dependency with a supported patched version and rebuild the application.",
     requiredEvidence:
-      "Updated SBOM + clean Trivy scan",
+      "Updated dependency inventory + clean Trivy filesystem scan",
   },
 
-  "CTRL-004": {
-    name: "Cloud Configuration",
+  "CTRL-CONTAINER": {
+    name: "Container Image Hardening",
+    domain: "Container Security",
+    owner: "Platform Team",
+    remediation:
+      "Rebuild the image from a supported patched base image and update vulnerable operating-system and application packages.",
+    requiredEvidence:
+      "New image digest + clean Trivy container scan",
+  },
+
+  "CTRL-IAC": {
+    name: "Infrastructure-as-Code Hardening",
     domain: "Cloud Security",
-    status: "Implemented",
     owner: "Cloud Team",
     remediation:
-      "Enforce public access block configuration through infrastructure-as-code policy.",
+      "Correct the infrastructure-as-code policy violation and enforce the secure configuration through code.",
     requiredEvidence:
-      "IaC change + Checkov validation",
+      "IaC change + clean Checkov retest",
+  },
+
+  "CTRL-GENERAL": {
+    name: "Security Finding Remediation",
+    domain: "Security Engineering",
+    owner: "Security Team",
+    remediation:
+      "Investigate and remediate the validated security finding according to risk and asset criticality.",
+    requiredEvidence:
+      "Remediation proof + scanner retest",
   },
 };
 
 export function mapControls(
   findings: Finding[]
 ): SecurityControl[] {
-  return findings.flatMap((finding) => {
-    const template = templates[finding.controlId];
+  return findings.map(
+    (finding, index) => {
+      const template =
+        templates[
+          finding.controlId
+        ] ??
+        templates[
+          "CTRL-GENERAL"
+        ];
 
-    if (!template) {
-      return [];
-    }
+      return {
+        /*
+         * A control instance belongs to one
+         * finding. Keep template identity in
+         * the prefix while ensuring unique IDs.
+         */
+        id:
+          `${finding.controlId}-${String(
+            index + 1
+          ).padStart(3, "0")}`,
 
-    return [
-      {
-        id: finding.controlId,
-        runId: finding.runId,
-        assetId: finding.assetId,
-        findingId: finding.id,
-        name: template.name,
-        domain: template.domain,
-        severity: finding.severity,
-        status: template.status,
-        owner: template.owner,
-        remediation: template.remediation,
+        runId:
+          finding.runId,
+
+        assetId:
+          finding.assetId,
+
+        findingId:
+          finding.id,
+
+        name:
+          template.name,
+
+        domain:
+          template.domain,
+
+        severity:
+          finding.severity,
+
+        status:
+          "Required",
+
+        owner:
+          template.owner,
+
+        remediation:
+          template.remediation,
+
         requiredEvidence:
           template.requiredEvidence,
-      },
-    ];
-  });
+      };
+    }
+  );
 }

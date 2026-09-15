@@ -96,7 +96,10 @@ export async function executeAssessment(
 
   const controls = mapControls(findings);
 
-  const evidence = buildEvidence(findings);
+  const evidence = buildEvidence(
+    findings,
+    controls
+  );
 
   const policy = evaluatePolicy(findings);
 

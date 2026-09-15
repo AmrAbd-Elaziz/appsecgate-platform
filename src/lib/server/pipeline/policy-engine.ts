@@ -10,18 +10,24 @@ export type PolicyDecision = {
 export function evaluatePolicy(
   findings: Finding[]
 ): PolicyDecision {
-  const blockers = findings.filter(
-    (finding) =>
-      finding.blocker &&
-      finding.status === "Confirmed"
-  );
+  const blockers =
+    findings.filter(
+      (finding) =>
+        finding.blocker &&
+        finding.status ===
+          "Confirmed"
+    );
 
   return {
     decision:
-      blockers.length > 0 ? "BLOCK" : "PASS",
+      blockers.length > 0
+        ? "BLOCK"
+        : "PASS",
 
-    blockers: blockers.map(
-      (finding) => finding.id
-    ),
+    blockers:
+      blockers.map(
+        (finding) =>
+          finding.id
+      ),
   };
 }

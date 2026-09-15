@@ -1,88 +1,84 @@
+import { createHash } from "node:crypto";
+
 import type {
   EvidenceRecord,
   Finding,
+  SecurityControl,
 } from "../../../data/appsecgate";
 
+function evidenceId(
+  findingId: string
+): string {
+  const digest =
+    createHash("sha256")
+      .update(findingId)
+      .digest("hex")
+      .slice(0, 8)
+      .toUpperCase();
+
+  return `EVD-${digest}`;
+}
+
 export function buildEvidence(
-  findings: Finding[]
+  findings: Finding[],
+  controls: SecurityControl[]
 ): EvidenceRecord[] {
-  const evidence: EvidenceRecord[] = [];
+  const controlByFinding =
+    new Map(
+      controls.map(
+        (control) => [
+          control.findingId,
+          control,
+        ]
+      )
+    );
 
-  for (const finding of findings) {
-    if (finding.id === "ASG-1042") {
-      evidence.push(
-        {
-          id: "EVD-001",
-          runId: finding.runId,
-          assetId: finding.assetId,
-          findingId: finding.id,
-          controlId: finding.controlId,
-          title: "Gitleaks secret detection result",
-          type: "Scanner Output",
-          source: "Gitleaks",
-          status: "Verified",
-          integrity: "SHA-256 recorded",
-        },
-        {
-          id: "EVD-005",
-          runId: finding.runId,
-          assetId: finding.assetId,
-          findingId: finding.id,
-          controlId: finding.controlId,
-          title: "Secret rotation confirmation",
-          type: "Remediation Proof",
-          source: "Application Team",
-          status: "Pending Review",
-          integrity: "Awaiting validation",
-        }
-      );
+  return findings.map(
+    (finding) => {
+      const control =
+        controlByFinding.get(
+          finding.id
+        );
+
+      if (!control) {
+        throw new Error(
+          `Missing control for finding ${finding.id}`
+        );
+      }
+
+      return {
+        id:
+          evidenceId(
+            finding.id
+          ),
+
+        runId:
+          finding.runId,
+
+        assetId:
+          finding.assetId,
+
+        findingId:
+          finding.id,
+
+        controlId:
+          control.id,
+
+        title:
+          `${finding.source} scanner evidence`,
+
+        type:
+          "Scanner Output",
+
+        source:
+          finding.source,
+
+        status:
+          "Verified",
+
+        integrity:
+          "Scanner result persisted with assessment",
+      };
     }
-
-    if (finding.id === "ASG-1038") {
-      evidence.push({
-        id: "EVD-002",
-        runId: finding.runId,
-        assetId: finding.assetId,
-        findingId: finding.id,
-        controlId: finding.controlId,
-        title: "SQL injection validation evidence",
-        type: "Scanner Output",
-        source: "Semgrep + OWASP ZAP",
-        status: "Verified",
-        integrity: "Correlated evidence",
-      });
-    }
-
-    if (finding.id === "ASG-1029") {
-      evidence.push({
-        id: "EVD-003",
-        runId: finding.runId,
-        assetId: finding.assetId,
-        findingId: finding.id,
-        controlId: finding.controlId,
-        title: "Container dependency scan",
-        type: "Scanner Output",
-        source: "Trivy",
-        status: "Verified",
-        integrity: "SHA-256 recorded",
-      });
-    }
-
-    if (finding.id === "ASG-1017") {
-      evidence.push({
-        id: "EVD-004",
-        runId: finding.runId,
-        assetId: finding.assetId,
-        findingId: finding.id,
-        controlId: finding.controlId,
-        title: "S3 public access remediation",
-        type: "Retest",
-        source: "Checkov",
-        status: "Verified",
-        integrity: "Retest validated",
-      });
-    }
-  }
-
-  return evidence;
+  );
 }
