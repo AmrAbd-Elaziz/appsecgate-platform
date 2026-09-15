@@ -1,20 +1,20 @@
 "use client";
 
 import {
-  getFindingsForRun,
-  getControlsForRun,
-  getAssessmentMetrics,
   type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 
 type Props = {
   run: AssessmentRun | null;
+  assessment: PersistedAssessment | null;
   onGoToAssessment: () => void;
   onViewControls: () => void;
 };
 
 export default function FindingIntelligence({
   run,
+  assessment,
   onGoToAssessment,
   onViewControls,
 }: Props) {
@@ -45,12 +45,19 @@ export default function FindingIntelligence({
     );
   }
 
-  const normalizedFindings = getFindingsForRun(run);
-  const controls = getControlsForRun(run);
-  const metrics = getAssessmentMetrics(run);
+  const normalizedFindings =
+    assessment?.findings ?? [];
 
-  const critical = metrics.criticalFindings;
-  const blockers = metrics.blockers;
+  const controls =
+    assessment?.controls ?? [];
+
+  const critical = normalizedFindings.filter(
+    (finding) =>
+      finding.severity === "CRITICAL"
+  ).length;
+
+  const blockers =
+    assessment?.blockers.length ?? 0;
 
   return (
     <>

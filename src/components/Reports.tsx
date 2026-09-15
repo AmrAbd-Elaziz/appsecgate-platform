@@ -1,18 +1,19 @@
 "use client";
 
 import {
-  getAssessmentMetrics,
-  getFindingsForRun,
   type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 
 type Props = {
   run: AssessmentRun | null;
+  assessment: PersistedAssessment | null;
   onGoToEvidence: () => void;
 };
 
 export default function Reports({
   run,
+  assessment,
   onGoToEvidence,
 }: Props) {
   if (!run) {
@@ -42,8 +43,49 @@ export default function Reports({
     );
   }
 
-  const metrics = getAssessmentMetrics(run);
-  const findings = getFindingsForRun(run);
+  const findings =
+    assessment?.findings ?? [];
+
+  const controls =
+    assessment?.controls ?? [];
+
+  const evidence =
+    assessment?.evidence ?? [];
+
+  const metrics = {
+    rawFindings:
+      assessment?.rawFindingCount ?? 0,
+
+    normalizedFindings:
+      findings.length,
+
+    criticalFindings: findings.filter(
+      (finding) =>
+        finding.severity === "CRITICAL"
+    ).length,
+
+    blockers:
+      assessment?.blockers.length ?? 0,
+
+    mappedControls:
+      controls.length,
+
+    implementedControls: controls.filter(
+      (control) =>
+        control.status === "Implemented"
+    ).length,
+
+    evidenceRecords:
+      evidence.length,
+
+    verifiedEvidence: evidence.filter(
+      (record) =>
+        record.status === "Verified"
+    ).length,
+
+    scannerCoverage:
+      assessment?.scannerExecutions.length ?? 0,
+  };
 
   const highFindings = findings.filter(
     (finding) => finding.severity === "HIGH"

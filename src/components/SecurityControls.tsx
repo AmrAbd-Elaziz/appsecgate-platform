@@ -1,19 +1,20 @@
 "use client";
 
 import {
-  getControlsForRun,
-  getFindingsForRun,
   type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 
 type Props = {
   run: AssessmentRun | null;
+  assessment: PersistedAssessment | null;
   onGoToFindings: () => void;
   onViewEvidence: () => void;
 };
 
 export default function SecurityControls({
   run,
+  assessment,
   onGoToFindings,
   onViewEvidence,
 }: Props) {
@@ -44,8 +45,11 @@ export default function SecurityControls({
     );
   }
 
-  const controls = getControlsForRun(run);
-  const findings = getFindingsForRun(run);
+  const controls =
+    assessment?.controls ?? [];
+
+  const findings =
+    assessment?.findings ?? [];
 
   const required = controls.filter(
     (control) => control.status === "Required"

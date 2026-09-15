@@ -438,3 +438,25 @@ export function getAssessmentMetrics(
     scannerCoverage: run.scanners.length,
   };
 }
+
+/* ==========================================
+   V2 Persisted Assessment Aggregate
+========================================== */
+
+export type PersistedAssessment = {
+  id: string;
+  assetId: number;
+  asset: Asset;
+  status: "Completed";
+  decision: "BLOCK" | "PASS";
+  startedAt: string;
+  completedAt: string;
+
+  scannerExecutions: ScannerResult[];
+  rawFindingCount: number;
+
+  findings: Finding[];
+  controls: SecurityControl[];
+  evidence: EvidenceRecord[];
+  blockers: string[];
+};

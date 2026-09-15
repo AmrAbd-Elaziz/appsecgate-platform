@@ -1,20 +1,20 @@
 "use client";
 
 import {
-  getEvidenceForRun,
-  getControlsForRun,
-  getAssessmentMetrics,
   type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 
 type Props = {
   run: AssessmentRun | null;
+  assessment: PersistedAssessment | null;
   onGoToControls: () => void;
   onViewReports: () => void;
 };
 
 export default function EvidenceVault({
   run,
+  assessment,
   onGoToControls,
   onViewReports,
 }: Props) {
@@ -45,11 +45,15 @@ export default function EvidenceVault({
     );
   }
 
-  const evidenceRecords = getEvidenceForRun(run);
-  const controls = getControlsForRun(run);
-  const metrics = getAssessmentMetrics(run);
+  const evidenceRecords =
+    assessment?.evidence ?? [];
 
-  const verified = metrics.verifiedEvidence;
+  const controls =
+    assessment?.controls ?? [];
+
+  const verified = evidenceRecords.filter(
+    (record) => record.status === "Verified"
+  ).length;
 
   const pending = evidenceRecords.filter(
     (record) => record.status === "Pending Review"

@@ -5,7 +5,7 @@ import AssetsInputs from "../components/AssetsInputs";
 import AssessmentRuns from "../components/AssessmentRuns";
 import {
   type Asset,
-  type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 import FindingIntelligence from "../components/FindingIntelligence";
 import SecurityControls from "../components/SecurityControls";
@@ -72,7 +72,19 @@ function Placeholder({ title }: { title: string }) {
 
 export default function Home() {
   const [view, setView] = useState<View>("overview");
-  const [latestRun, setLatestRun] = useState<AssessmentRun | null>(null);
+  const [latestAssessment, setLatestAssessment] =
+    useState<PersistedAssessment | null>(null);
+
+  const latestRun = latestAssessment
+    ? {
+        id: latestAssessment.id,
+        asset: latestAssessment.asset,
+        status: latestAssessment.status,
+        decision: latestAssessment.decision,
+        startedAt: latestAssessment.startedAt,
+        scanners: latestAssessment.scannerExecutions,
+      }
+    : null;
 
   async function handleRunAssessment(asset: Asset) {
     try {
@@ -94,9 +106,10 @@ export default function Home() {
         );
       }
 
-      const run = payload.run as AssessmentRun;
+      const assessment =
+        payload.data as PersistedAssessment;
 
-      setLatestRun(run);
+      setLatestAssessment(assessment);
       setView("assessments");
     } catch (error) {
       console.error("Assessment execution failed:", error);
@@ -203,30 +216,35 @@ export default function Home() {
         ) : view === "assessments" ? (
           <AssessmentRuns
             run={latestRun}
+            assessment={latestAssessment}
             onGoToAssets={() => setView("assets")}
             onViewFindings={() => setView("findings")}
           />
         ) : view === "findings" ? (
           <FindingIntelligence
             run={latestRun}
+            assessment={latestAssessment}
             onGoToAssessment={() => setView("assessments")}
             onViewControls={() => setView("controls")}
           />
         ) : view === "controls" ? (
           <SecurityControls
             run={latestRun}
+            assessment={latestAssessment}
             onGoToFindings={() => setView("findings")}
             onViewEvidence={() => setView("evidence")}
           />
         ) : view === "evidence" ? (
           <EvidenceVault
             run={latestRun}
+            assessment={latestAssessment}
             onGoToControls={() => setView("controls")}
             onViewReports={() => setView("reports")}
           />
         ) : view === "reports" ? (
           <Reports
             run={latestRun}
+            assessment={latestAssessment}
             onGoToEvidence={() => setView("evidence")}
           />
         ) : (

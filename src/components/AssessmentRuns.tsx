@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  getAssessmentMetrics,
   type AssessmentRun,
+  type PersistedAssessment,
 } from "../data/appsecgate";
 
 type Props = {
   run: AssessmentRun | null;
+  assessment: PersistedAssessment | null;
   onGoToAssets: () => void;
   onViewFindings: () => void;
 };
@@ -15,6 +16,7 @@ type Props = {
 
 export default function AssessmentRuns({
   run,
+  assessment,
   onGoToAssets,
   onViewFindings,
 }: Props) {
@@ -45,11 +47,28 @@ export default function AssessmentRuns({
     );
   }
 
-  const metrics = getAssessmentMetrics(run);
   const completedScanners = run.scanners.filter(
     (scanner) => scanner.status === "Completed"
   ).length;
-  const totalFindings = metrics.rawFindings;
+
+  const totalFindings =
+    assessment?.rawFindingCount ?? 0;
+
+  const metrics = {
+    rawFindings: assessment?.rawFindingCount ?? 0,
+    normalizedFindings:
+      assessment?.findings.length ?? 0,
+    criticalFindings:
+      assessment?.findings.filter(
+        (finding) =>
+          finding.severity === "CRITICAL"
+      ).length ?? 0,
+    blockers: assessment?.blockers.length ?? 0,
+    mappedControls:
+      assessment?.controls.length ?? 0,
+    evidenceRecords:
+      assessment?.evidence.length ?? 0,
+  };
 
   return (
     <>

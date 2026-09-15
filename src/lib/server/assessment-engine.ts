@@ -5,6 +5,7 @@ import type {
   Finding,
   ScannerResult,
   SecurityControl,
+  PersistedAssessment as BasePersistedAssessment,
 } from "../../data/appsecgate";
 
 import { scannerAdapters } from "./scanners/adapters";
@@ -28,24 +29,10 @@ import {
   evaluatePolicy,
 } from "./pipeline/policy-engine";
 
-export type PersistedAssessment = {
-  id: string;
-  assetId: number;
-  asset: Asset;
-  status: "Completed";
-  decision: "BLOCK" | "PASS";
-  startedAt: string;
-  completedAt: string;
-
-  scannerExecutions: ScannerResult[];
-  rawFindingCount: number;
-  rawFindings: RawFinding[];
-
-  findings: Finding[];
-  controls: SecurityControl[];
-  evidence: EvidenceRecord[];
-  blockers: string[];
-};
+export type PersistedAssessment =
+  BasePersistedAssessment & {
+    rawFindings: RawFinding[];
+  };
 
 function createRunId(): string {
   const timestamp =
