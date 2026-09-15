@@ -204,6 +204,21 @@ export type EvidenceRecord = {
   cwe?: string;
 };
 
+export type RemediationProof = {
+  id: string;
+  assetId: number;
+  findingId: string;
+  controlId: string;
+  type: "Remediation Proof";
+  source: "Security Engineering";
+  status: "Pending Review" | "Verified";
+  title: string;
+  description: string;
+  integrity: string;
+  createdAt: string;
+  verifiedAt?: string;
+};
+
 /* ==========================================
    Managed Assets
 ========================================== */
