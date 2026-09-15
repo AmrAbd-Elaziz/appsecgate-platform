@@ -10,6 +10,7 @@ import { realSemgrepAdapter } from "./semgrep-adapter";
 import { realTrivyFsAdapter } from "./trivy-fs-adapter";
 import { realCheckovAdapter } from "./checkov-adapter";
 import { realTrivyImageAdapter } from "./trivy-image-adapter";
+import { realZapAdapter } from "./zap-adapter";
 
 function execution(
   category: string,
@@ -168,7 +169,7 @@ export const containerAdapter: ScannerAdapter = {
 
 export const scannerAdapters: ScannerAdapter[] = [
   realSemgrepAdapter,
-  zapAdapter,
+  realZapAdapter,
   realGitleaksAdapter,
   realTrivyFsAdapter,
   realCheckovAdapter,
