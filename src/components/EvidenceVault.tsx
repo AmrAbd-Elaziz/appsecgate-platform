@@ -76,7 +76,7 @@ export default function EvidenceVault({
             <p className="eyebrow">AUDITABLE SECURITY ASSURANCE</p>
             <h1>Evidence Vault</h1>
             <p className="page-description">
-              Preserve scanner output, remediation proof, and retest evidence.
+              Preserve scanner-generated evidence and security assessment context.
             </p>
           </div>
         </header>
@@ -110,17 +110,23 @@ export default function EvidenceVault({
   const controls =
     assessment?.controls ?? [];
 
-  const verified = evidenceRecords.filter(
-    (record) => record.status === "Verified"
-  ).length;
+  const evidenceSources = new Set(
+    evidenceRecords
+      .map((record) => record.source)
+      .filter(Boolean)
+  ).size;
 
-  const pending = evidenceRecords.filter(
-    (record) => record.status === "Pending Review"
-  ).length;
+  const findingsCovered = new Set(
+    evidenceRecords
+      .map((record) => record.findingId)
+      .filter(Boolean)
+  ).size;
 
-  const scannerEvidence = evidenceRecords.filter(
-    (record) => record.type === "Scanner Output"
-  ).length;
+  const controlsMapped = new Set(
+    evidenceRecords
+      .map((record) => record.controlId)
+      .filter(Boolean)
+  ).size;
 
   return (
     <>
@@ -129,8 +135,8 @@ export default function EvidenceVault({
           <p className="eyebrow">AUDITABLE SECURITY ASSURANCE</p>
           <h1>Evidence Vault</h1>
           <p className="page-description">
-            Trace assessment decisions back to scanner output, remediation
-            proof, and validated retest evidence.
+            Trace assessment decisions back to scanner findings, mapped
+            controls, and auditable security evidence.
           </p>
         </div>
 
@@ -145,25 +151,25 @@ export default function EvidenceVault({
         <article>
           <small>Evidence records</small>
           <b>{evidenceRecords.length}</b>
-          <span>Linked assurance records</span>
+          <span>Assurance records</span>
         </article>
 
         <article>
-          <small>Verified</small>
-          <b className="evidence-success">{verified}</b>
-          <span>Integrity validated</span>
+          <small>Evidence sources</small>
+          <b className="evidence-success">{evidenceSources}</b>
+          <span>Security scanners</span>
         </article>
 
         <article>
-          <small>Pending review</small>
-          <b className="evidence-warning">{pending}</b>
-          <span>Requires validation</span>
+          <small>Findings covered</small>
+          <b>{findingsCovered}</b>
+          <span>With evidence</span>
         </article>
 
         <article>
-          <small>Scanner evidence</small>
-          <b>{scannerEvidence}</b>
-          <span>Machine-generated records</span>
+          <small>Controls mapped</small>
+          <b>{controlsMapped}</b>
+          <span>Evidence-linked</span>
         </article>
       </section>
 
@@ -172,7 +178,7 @@ export default function EvidenceVault({
           <div>
             <h3>Assessment evidence</h3>
             <span className="panel-subtitle">
-              Finding → control → evidence → verification
+              Finding → control → scanner evidence → gate decision
             </span>
           </div>
           <span>{evidenceRecords.length} records</span>
