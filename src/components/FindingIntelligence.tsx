@@ -141,6 +141,14 @@ export default function FindingIntelligence({
                       {finding.status}
                     </span>
 
+                    <span className="validation-tag">
+                      RISK {finding.riskScore}/100
+                    </span>
+
+                    <span className="validation-tag">
+                      {finding.riskLevel.toUpperCase()} RISK
+                    </span>
+
                     {finding.blocker && (
                       <span className="blocker-tag">
                         RELEASE BLOCKER
@@ -168,10 +176,21 @@ export default function FindingIntelligence({
                   </span>
 
                   <span>
+                    <small>CONFIDENCE</small>
+                    <b>{finding.confidence}</b>
+                  </span>
+
+                  <span>
+                    <small>SCANNERS</small>
+                    <b>{finding.scannerCount}</b>
+                  </span>
+
+                  <span>
                     <small>CONTROL</small>
                     <b>
                       {controls.find(
-                        (control) => control.id === finding.controlId
+                        (control) =>
+                          control.findingId === finding.id
                       )?.name ?? finding.controlId}
                     </b>
                   </span>

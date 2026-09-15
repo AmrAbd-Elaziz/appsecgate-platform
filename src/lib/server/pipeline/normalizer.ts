@@ -378,6 +378,24 @@ export function normalizeAndCorrelate(
             controlIdFor(
               primary
             ),
+
+          /*
+           * Risk intelligence is calculated in the
+           * dedicated scoring stage immediately after
+           * correlation.
+           */
+          riskScore: 0,
+          riskLevel: "Low",
+          confidence: "Low",
+          scannerCount: 1,
+
+          riskFactors: {
+            technicalSeverity: 0,
+            assetCriticality: 0,
+            environment: 0,
+            confidence: 0,
+            corroboration: 0,
+          },
         } satisfies Finding;
       }
     )

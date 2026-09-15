@@ -63,6 +63,19 @@ export type Finding = {
   blocker: boolean;
   description: string;
   controlId: string;
+
+  riskScore: number;
+  riskLevel: "Critical" | "High" | "Medium" | "Low";
+  confidence: "High" | "Medium" | "Low";
+  scannerCount: number;
+
+  riskFactors: {
+    technicalSeverity: number;
+    assetCriticality: number;
+    environment: number;
+    confidence: number;
+    corroboration: number;
+  };
 };
 
 export type SecurityControl = {
@@ -208,6 +221,29 @@ export function getFindingsForRun(
       description:
         "A hardcoded application secret was identified in source code and validated as reachable by the application.",
       controlId: "CTRL-001",
+
+
+      riskScore: 0,
+
+      riskLevel: "Low",
+
+      confidence: "Low",
+
+      scannerCount: 1,
+
+      riskFactors: {
+
+        technicalSeverity: 0,
+
+        assetCriticality: 0,
+
+        environment: 0,
+
+        confidence: 0,
+
+        corroboration: 0,
+
+      },
     },
     {
       id: "ASG-1038",
@@ -222,6 +258,29 @@ export function getFindingsForRun(
       description:
         "Static and dynamic analysis signals were correlated to confirm an injectable user-controlled query path.",
       controlId: "CTRL-002",
+
+
+      riskScore: 0,
+
+      riskLevel: "Low",
+
+      confidence: "Low",
+
+      scannerCount: 1,
+
+      riskFactors: {
+
+        technicalSeverity: 0,
+
+        assetCriticality: 0,
+
+        environment: 0,
+
+        confidence: 0,
+
+        corroboration: 0,
+
+      },
     },
     {
       id: "ASG-1029",
@@ -236,6 +295,29 @@ export function getFindingsForRun(
       description:
         "The deployed dependency set includes a vulnerable OpenSSL package requiring remediation.",
       controlId: "CTRL-003",
+
+
+      riskScore: 0,
+
+      riskLevel: "Low",
+
+      confidence: "Low",
+
+      scannerCount: 1,
+
+      riskFactors: {
+
+        technicalSeverity: 0,
+
+        assetCriticality: 0,
+
+        environment: 0,
+
+        confidence: 0,
+
+        corroboration: 0,
+
+      },
     },
     {
       id: "ASG-1017",
@@ -250,6 +332,29 @@ export function getFindingsForRun(
       description:
         "Infrastructure-as-code configuration does not enforce the expected public access block control.",
       controlId: "CTRL-004",
+
+
+      riskScore: 0,
+
+      riskLevel: "Low",
+
+      confidence: "Low",
+
+      scannerCount: 1,
+
+      riskFactors: {
+
+        technicalSeverity: 0,
+
+        assetCriticality: 0,
+
+        environment: 0,
+
+        confidence: 0,
+
+        corroboration: 0,
+
+      },
     },
   ];
 }

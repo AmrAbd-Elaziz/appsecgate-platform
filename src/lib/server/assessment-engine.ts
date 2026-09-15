@@ -22,6 +22,10 @@ import {
 } from "./pipeline/control-mapper";
 
 import {
+  scoreFindings,
+} from "./pipeline/risk-engine";
+
+import {
   buildEvidence,
 } from "./pipeline/evidence-builder";
 
@@ -89,10 +93,17 @@ export async function executeAssessment(
   /*
    * Security intelligence pipeline
    */
-  const findings = normalizeAndCorrelate(
-    baseRun,
-    rawFindings
-  );
+  const normalizedFindings =
+    normalizeAndCorrelate(
+      baseRun,
+      rawFindings
+    );
+
+  const findings =
+    scoreFindings(
+      normalizedFindings,
+      asset
+    );
 
   const controls = mapControls(findings);
 
@@ -101,7 +112,10 @@ export async function executeAssessment(
     controls
   );
 
-  const policy = evaluatePolicy(findings);
+  const policy = evaluatePolicy(
+    findings,
+    asset
+  );
 
   return {
     id,
