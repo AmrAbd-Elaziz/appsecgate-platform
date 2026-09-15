@@ -3253,3 +3253,22 @@ h3 { margin: 0; font-size: 14px; }
   color: #667796;
   font-size: 7px;
 }
+
+/* =========================================================
+   DAST Target Acquisition
+   ========================================================= */
+
+.dast-input-container {
+  align-self: stretch;
+}
+
+.dast-input-container
+.container-input-result code {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: #8ea8dd;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -118,6 +118,30 @@ export default function AssetsInputs({
     useState("");
 
   const [
+    validatingDast,
+    setValidatingDast,
+  ] = useState(false);
+
+  const [
+    dastValidated,
+    setDastValidated,
+  ] = useState(false);
+
+  const [
+    dastHostname,
+    setDastHostname,
+  ] = useState("");
+
+  const [
+    dastAllowedBy,
+    setDastAllowedBy,
+  ] = useState<
+    "public-network" |
+    "explicit-allowlist" |
+    ""
+  >("");
+
+  const [
     containerImage,
     setContainerImage,
   ] = useState("");
@@ -376,6 +400,74 @@ export default function AssetsInputs({
       );
     } finally {
       setUploadingSource(false);
+    }
+  }
+
+  async function handleDastValidation() {
+    const target =
+      dastUrl.trim();
+
+    if (!target) {
+      setAssetError(
+        "Enter a DAST target URL first."
+      );
+      return;
+    }
+
+    try {
+      setValidatingDast(true);
+      setAssetError("");
+
+      const response =
+        await fetch(
+          "/api/inputs/dast/validate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              dastUrl: target,
+            }),
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to validate DAST target."
+        );
+      }
+
+      setDastUrl(
+        payload.data.dastUrl
+      );
+
+      setDastHostname(
+        payload.data.hostname || ""
+      );
+
+      setDastAllowedBy(
+        payload.data.allowedBy || ""
+      );
+
+      setDastValidated(true);
+    } catch (error) {
+      setDastValidated(false);
+      setDastHostname("");
+      setDastAllowedBy("");
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to validate DAST target."
+      );
+    } finally {
+      setValidatingDast(false);
     }
   }
 
@@ -726,6 +818,10 @@ export default function AssetsInputs({
     setSourcePath("");
     setIacPath("");
     setDastUrl("");
+    setDastValidated(false);
+    setDastHostname("");
+    setDastAllowedBy("");
+    setValidatingDast(false);
     setContainerImage("");
     setContainerValidated(false);
     setContainerImageId("");
@@ -761,6 +857,16 @@ export default function AssetsInputs({
     if (!cleanName) {
       setAssetError(
         "Asset name is required."
+      );
+      return;
+    }
+
+    if (
+      dastUrl.trim() &&
+      !dastValidated
+    ) {
+      setAssetError(
+        "Validate the DAST target before creating the asset."
       );
       return;
     }
@@ -1410,23 +1516,117 @@ export default function AssetsInputs({
               )}
             </div>
 
-            <label className="form-field">
-              <span>DAST URL</span>
+            <div className="security-input-container dast-input-container">
+              <div className="security-input-source-head">
+                <div>
+                  <span className="security-input-label">
+                    DAST TARGET
+                  </span>
 
-              <input
-                value={dastUrl}
-                onChange={(event) =>
-                  setDastUrl(
-                    event.target.value
-                  )
-                }
-                placeholder="https://staging.example.com"
-              />
+                  <b>
+                    Dynamic application target
+                  </b>
+                </div>
 
-              <small>
-                OWASP ZAP target
+                <span className="security-input-tools">
+                  OWASP ZAP
+                </span>
+              </div>
+
+              {dastValidated ? (
+                <div className="container-input-result">
+                  <div>
+                    <span className="source-upload-success">
+                      ✓
+                    </span>
+
+                    <div>
+                      <b>
+                        {dastHostname ||
+                          dastUrl}
+                      </b>
+
+                      <span>
+                        Target validated · Ready for
+                        OWASP ZAP
+                      </span>
+
+                      <code>
+                        {dastUrl}
+                      </code>
+
+                      <span>
+                        {dastAllowedBy ===
+                        "explicit-allowlist"
+                          ? "Explicitly allowlisted target"
+                          : "Public network target"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="source-upload-replace"
+                    onClick={() => {
+                      setDastValidated(false);
+                      setDastHostname("");
+                      setDastAllowedBy("");
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                <div className="container-input-controls">
+                  <input
+                    value={dastUrl}
+                    disabled={
+                      validatingDast ||
+                      creatingAsset
+                    }
+                    onChange={(event) => {
+                      setDastUrl(
+                        event.target.value
+                      );
+
+                      setDastValidated(false);
+                      setDastHostname("");
+                      setDastAllowedBy("");
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        event.key === "Enter"
+                      ) {
+                        event.preventDefault();
+
+                        void handleDastValidation();
+                      }
+                    }}
+                    placeholder="https://staging.example.com"
+                  />
+
+                  <button
+                    type="button"
+                    disabled={
+                      validatingDast ||
+                      !dastUrl.trim()
+                    }
+                    onClick={() =>
+                      void handleDastValidation()
+                    }
+                  >
+                    {validatingDast
+                      ? "Validating..."
+                      : "Validate target"}
+                  </button>
+                </div>
+              )}
+
+              <small className="container-input-note">
+                HTTP/HTTPS target · SSRF-aware network
+                policy · OWASP ZAP
               </small>
-            </label>
+            </div>
 
             <div className="security-input-container">
               <div className="security-input-source-head">
