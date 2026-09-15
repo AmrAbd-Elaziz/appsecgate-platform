@@ -4,7 +4,6 @@ import { useState } from "react";
 import AssetsInputs from "../components/AssetsInputs";
 import AssessmentRuns from "../components/AssessmentRuns";
 import {
-  createAssessmentRun,
   type Asset,
   type AssessmentRun,
 } from "../data/appsecgate";
@@ -75,11 +74,33 @@ export default function Home() {
   const [view, setView] = useState<View>("overview");
   const [latestRun, setLatestRun] = useState<AssessmentRun | null>(null);
 
-  function handleRunAssessment(asset: Asset) {
-    const run = createAssessmentRun(asset);
+  async function handleRunAssessment(asset: Asset) {
+    try {
+      const response = await fetch("/api/assessments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assetId: asset.id,
+        }),
+      });
 
-    setLatestRun(run);
-    setView("assessments");
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error || "Unable to run assessment."
+        );
+      }
+
+      const run = payload.run as AssessmentRun;
+
+      setLatestRun(run);
+      setView("assessments");
+    } catch (error) {
+      console.error("Assessment execution failed:", error);
+    }
   }
 
   return (
