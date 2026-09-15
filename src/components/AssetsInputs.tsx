@@ -62,6 +62,22 @@ export default function AssetsInputs({
       detectedFiles: number;
     } | null>(null);
 
+  const [iacUploadName, setIacUploadName] =
+    useState("");
+
+  const [iacUploadSize, setIacUploadSize] =
+    useState(0);
+
+  const [uploadingIac, setUploadingIac] =
+    useState(false);
+
+  const [
+    iacAcquisition,
+    setIacAcquisition,
+  ] = useState<
+    "source" | "upload" | null
+  >(null);
+
   const [repositoryUrl, setRepositoryUrl] =
     useState("");
 
@@ -277,6 +293,15 @@ export default function AssetsInputs({
           : ""
       );
 
+      setIacAcquisition(
+        upload.discovery?.iacDetected
+          ? "source"
+          : null
+      );
+
+      setIacUploadName("");
+      setIacUploadSize(0);
+
       setSourceUploadName(
         upload.originalName
       );
@@ -308,6 +333,85 @@ export default function AssetsInputs({
       );
     } finally {
       setUploadingSource(false);
+    }
+  }
+
+  async function handleIacUpload(
+    file: File
+  ) {
+    if (
+      !file.name
+        .toLowerCase()
+        .endsWith(".zip")
+    ) {
+      setAssetError(
+        "Infrastructure as Code must be uploaded as a ZIP archive."
+      );
+      return;
+    }
+
+    try {
+      setUploadingIac(true);
+      setAssetError("");
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "file",
+        file
+      );
+
+      const response =
+        await fetch(
+          "/api/uploads/iac",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to upload IaC archive."
+        );
+      }
+
+      const upload =
+        payload.data;
+
+      setIacPath(
+        upload.iacPath
+      );
+
+      setIacUploadName(
+        upload.originalName
+      );
+
+      setIacUploadSize(
+        upload.uploadSize
+      );
+
+      setIacAcquisition(
+        "upload"
+      );
+    } catch (error) {
+      setIacPath("");
+      setIacUploadName("");
+      setIacUploadSize(0);
+      setIacAcquisition(null);
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload IaC archive."
+      );
+    } finally {
+      setUploadingIac(false);
     }
   }
 
@@ -365,6 +469,15 @@ export default function AssetsInputs({
           : ""
       );
 
+      setIacAcquisition(
+        imported.discovery?.iacDetected
+          ? "source"
+          : null
+      );
+
+      setIacUploadName("");
+      setIacUploadSize(0);
+
       setSourceUploadName(
         imported.repositoryName
       );
@@ -418,6 +531,11 @@ export default function AssetsInputs({
     setRepositoryUrl("");
     setSourceAcquisition(null);
     setImportingRepository(false);
+
+    setIacUploadName("");
+    setIacUploadSize(0);
+    setUploadingIac(false);
+    setIacAcquisition(null);
   }
 
   async function handleAddAsset(
@@ -956,6 +1074,115 @@ export default function AssetsInputs({
               )}
             </div>
 
+            <div className="security-input-iac">
+              <div className="security-input-source-head">
+                <div>
+                  <span className="security-input-label">
+                    INFRASTRUCTURE AS CODE
+                  </span>
+
+                  <b>
+                    Infrastructure configuration
+                  </b>
+                </div>
+
+                <span className="security-input-tools">
+                  Checkov
+                </span>
+              </div>
+
+              {iacPath ? (
+                <div className="iac-input-result">
+                  <div>
+                    <span className="source-upload-success">
+                      ✓
+                    </span>
+
+                    <div>
+                      <b>
+                        {iacAcquisition === "source"
+                          ? "IaC auto-detected from source"
+                          : iacUploadName ||
+                            "IaC workspace ready"}
+                      </b>
+
+                      <span>
+                        {iacAcquisition === "source"
+                          ? "Using the application source workspace"
+                          : `${(
+                              iacUploadSize /
+                              1024
+                            ).toFixed(1)} KB · Separate IaC input`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="source-upload-replace"
+                    onClick={() => {
+                      setIacPath("");
+                      setIacUploadName("");
+                      setIacUploadSize(0);
+                      setIacAcquisition(null);
+                    }}
+                  >
+                    {iacAcquisition === "source"
+                      ? "Use separate IaC"
+                      : "Replace"}
+                  </button>
+                </div>
+              ) : (
+                <label
+                  className={
+                    "iac-upload-zone" +
+                    (uploadingIac
+                      ? " uploading"
+                      : "")
+                  }
+                >
+                  <input
+                    type="file"
+                    accept=".zip,application/zip"
+                    disabled={
+                      uploadingIac ||
+                      creatingAsset
+                    }
+                    onChange={(event) => {
+                      const file =
+                        event.target.files?.[0];
+
+                      if (file) {
+                        void handleIacUpload(
+                          file
+                        );
+                      }
+
+                      event.currentTarget.value =
+                        "";
+                    }}
+                  />
+
+                  <span className="source-upload-icon">
+                    ↑
+                  </span>
+
+                  <div>
+                    <b>
+                      {uploadingIac
+                        ? "Uploading & validating IaC..."
+                        : "Upload separate IaC ZIP"}
+                    </b>
+
+                    <small>
+                      Terraform · YAML · Kubernetes ·
+                      CloudFormation · Maximum 25 MB
+                    </small>
+                  </div>
+                </label>
+              )}
+            </div>
+
             <label className="form-field">
               <span>DAST URL</span>
 
@@ -1001,7 +1228,8 @@ export default function AssetsInputs({
                 disabled={
                   creatingAsset ||
                   uploadingSource ||
-                  importingRepository
+                  importingRepository ||
+                  uploadingIac
                 }
                 onClick={() => {
                   resetForm();
@@ -1018,7 +1246,8 @@ export default function AssetsInputs({
                 disabled={
                   creatingAsset ||
                   uploadingSource ||
-                  importingRepository
+                  importingRepository ||
+                  uploadingIac
                 }
               >
                 {creatingAsset
@@ -1027,7 +1256,9 @@ export default function AssetsInputs({
                     ? "Processing source..."
                     : importingRepository
                       ? "Importing repository..."
-                      : "Create asset"}
+                      : uploadingIac
+                        ? "Processing IaC..."
+                        : "Create asset"}
               </button>
             </div>
           </form>
