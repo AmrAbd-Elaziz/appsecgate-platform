@@ -10,6 +10,7 @@ type Props = {
   assessment: PersistedAssessment | null;
   onGoToControls: () => void;
   onViewReports: () => void;
+  selectedFindingId?: string | null;
 };
 
 export default function EvidenceVault({
@@ -17,6 +18,7 @@ export default function EvidenceVault({
   assessment,
   onGoToControls,
   onViewReports,
+  selectedFindingId,
 }: Props) {
   if (!run) {
     return (
@@ -45,8 +47,17 @@ export default function EvidenceVault({
     );
   }
 
-  const evidenceRecords =
+  const allEvidenceRecords =
     assessment?.evidence ?? [];
+
+  const evidenceRecords =
+    selectedFindingId
+      ? allEvidenceRecords.filter(
+          (record) =>
+            record.findingId ===
+            selectedFindingId
+        )
+      : allEvidenceRecords;
 
   const controls =
     assessment?.controls ?? [];
@@ -118,6 +129,23 @@ export default function EvidenceVault({
           </div>
           <span>{evidenceRecords.length} records</span>
         </div>
+
+        {selectedFindingId && (
+          <div className="finding-context-banner">
+            <div>
+              <small>FOCUSED FINDING</small>
+              <b>{selectedFindingId}</b>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onGoToControls}
+            >
+              View Security Control
+            </button>
+          </div>
+        )}
 
         <div className="evidence-table">
           <div className="evidence-table-header">

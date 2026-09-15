@@ -90,6 +90,38 @@ export type Finding = {
   };
 };
 
+export type FindingLifecycleStatus =
+  | "Open"
+  | "Closed";
+
+export type FindingLifecycle = {
+  findingId: string;
+  assetId: number;
+
+  status: FindingLifecycleStatus;
+
+  firstSeenAt: string;
+  lastSeenAt: string;
+  statusChangedAt: string;
+
+  closedAt?: string;
+  reopenedAt?: string;
+
+  firstSeenRunId: string;
+  lastSeenRunId: string;
+
+  source: string;
+  category: string;
+};
+
+export type FindingIntelligenceRecord = {
+  finding: Finding;
+  lifecycle: FindingLifecycle;
+  asset: Asset;
+  assessmentId: string;
+  completedAt: string;
+};
+
 export type SecurityControl = {
   id: string;
   runId: string;

@@ -10,6 +10,7 @@ type Props = {
   assessment: PersistedAssessment | null;
   onGoToFindings: () => void;
   onViewEvidence: () => void;
+  selectedFindingId?: string | null;
 };
 
 export default function SecurityControls({
@@ -17,6 +18,7 @@ export default function SecurityControls({
   assessment,
   onGoToFindings,
   onViewEvidence,
+  selectedFindingId,
 }: Props) {
   if (!run) {
     return (
@@ -45,11 +47,19 @@ export default function SecurityControls({
     );
   }
 
-  const controls =
+  const allControls =
     assessment?.controls ?? [];
 
   const findings =
     assessment?.findings ?? [];
+
+  const controls = selectedFindingId
+    ? allControls.filter(
+        (control) =>
+          control.findingId ===
+          selectedFindingId
+      )
+    : allControls;
 
   const required = controls.filter(
     (control) => control.status === "Required"
@@ -118,6 +128,23 @@ export default function SecurityControls({
           </div>
           <span>{controls.length} mapped controls</span>
         </div>
+
+        {selectedFindingId && (
+          <div className="finding-context-banner">
+            <div>
+              <small>FOCUSED FINDING</small>
+              <b>{selectedFindingId}</b>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onGoToFindings}
+            >
+              Back to Finding Intelligence
+            </button>
+          </div>
+        )}
 
         <div className="controls-list">
           {controls.map((control) => (

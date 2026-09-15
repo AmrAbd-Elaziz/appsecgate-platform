@@ -6,6 +6,7 @@ import {
 } from "../../../lib/server/assessment-engine";
 
 import {
+  reconcileFindingLifecycles,
   getAssetById,
   listAssessments,
   saveAssessment,
@@ -48,6 +49,20 @@ export async function POST(request: Request) {
     const assessment = await executeAssessment(asset);
 
     await saveAssessment(assessment);
+
+    /*
+     * Reconcile persistent finding lifecycle only after
+     * the completed assessment has been persisted.
+     *
+     * - New finding        -> Open
+     * - Existing finding   -> refresh Last Seen
+     * - Missing finding    -> Closed only when its
+     *                         relevant scanner completed
+     * - Closed finding seen again -> Open / Reopened
+     */
+    await reconcileFindingLifecycles(
+      assessment
+    );
 
     return NextResponse.json(
       {

@@ -103,6 +103,12 @@ export default function Home() {
   const [latestAssessment, setLatestAssessment] =
     useState<PersistedAssessment | null>(null);
 
+  const [focusedFindingId, setFocusedFindingId] =
+    useState<string | null>(null);
+
+  const [focusedAssessment, setFocusedAssessment] =
+    useState<PersistedAssessment | null>(null);
+
   const [assetCount, setAssetCount] = useState(0);
   const [assessmentCount, setAssessmentCount] = useState(0);
   const [overviewLoading, setOverviewLoading] = useState(true);
@@ -165,6 +171,63 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+
+  async function openFindingContext(
+    targetView: "controls" | "evidence",
+    findingId: string,
+    assessmentId: string
+  ) {
+    try {
+      const response = await fetch(
+        `/api/assessments/${assessmentId}`,
+        {
+          cache: "no-store",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Unable to load finding assessment context."
+        );
+      }
+
+      const payload = await response.json();
+
+      const contextualAssessment =
+        (payload.data ??
+          payload) as PersistedAssessment;
+
+      setFocusedFindingId(findingId);
+      setFocusedAssessment(
+        contextualAssessment
+      );
+      setView(targetView);
+    } catch (error) {
+      console.error(
+        "Finding context navigation failed:",
+        error
+      );
+    }
+  }
+
+  const displayedAssessment =
+    focusedAssessment ??
+    latestAssessment;
+
+  const displayedRun =
+    displayedAssessment
+      ? {
+          id: displayedAssessment.id,
+          asset: displayedAssessment.asset,
+          status: displayedAssessment.status,
+          decision: displayedAssessment.decision,
+          startedAt:
+            displayedAssessment.startedAt,
+          scanners:
+            displayedAssessment
+              .scannerExecutions,
+        }
+      : null;
 
   const latestRun = latestAssessment
     ? {
@@ -628,21 +691,66 @@ export default function Home() {
             run={latestRun}
             assessment={latestAssessment}
             onGoToAssessment={() => setView("assessments")}
-            onViewControls={() => setView("controls")}
+            onViewControls={(findingId, assessmentId) =>
+              void openFindingContext(
+                "controls",
+                findingId,
+                assessmentId
+              )
+            }
+            onViewEvidence={(findingId, assessmentId) =>
+              void openFindingContext(
+                "evidence",
+                findingId,
+                assessmentId
+              )
+            }
           />
         ) : view === "controls" ? (
           <SecurityControls
-            run={latestRun}
-            assessment={latestAssessment}
-            onGoToFindings={() => setView("findings")}
-            onViewEvidence={() => setView("evidence")}
+            run={
+              focusedAssessment
+                ? displayedRun
+                : latestRun
+            }
+            assessment={
+              focusedAssessment
+                ? displayedAssessment
+                : latestAssessment
+            }
+            selectedFindingId={
+              focusedFindingId
+            }
+            onGoToFindings={() => {
+              setFocusedFindingId(null);
+              setFocusedAssessment(null);
+              setView("findings");
+            }}
+            onViewEvidence={() =>
+              setView("evidence")
+            }
           />
         ) : view === "evidence" ? (
           <EvidenceVault
-            run={latestRun}
-            assessment={latestAssessment}
-            onGoToControls={() => setView("controls")}
-            onViewReports={() => setView("reports")}
+            run={
+              focusedAssessment
+                ? displayedRun
+                : latestRun
+            }
+            assessment={
+              focusedAssessment
+                ? displayedAssessment
+                : latestAssessment
+            }
+            selectedFindingId={
+              focusedFindingId
+            }
+            onGoToControls={() =>
+              setView("controls")
+            }
+            onViewReports={() =>
+              setView("reports")
+            }
           />
         ) : view === "reports" ? (
           <Reports
