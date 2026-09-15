@@ -1,15 +1,32 @@
-import {
-  getControlsForRun,
-  getEvidenceForRun,
-  getFindingsForRun,
-  scannerResults,
-  type Asset,
-  type AssessmentRun,
-  type EvidenceRecord,
-  type Finding,
-  type ScannerResult,
-  type SecurityControl,
+import type {
+  Asset,
+  AssessmentRun,
+  EvidenceRecord,
+  Finding,
+  ScannerResult,
+  SecurityControl,
 } from "../../data/appsecgate";
+
+import { scannerAdapters } from "./scanners/adapters";
+import type {
+  RawFinding,
+} from "./scanners/types";
+
+import {
+  normalizeAndCorrelate,
+} from "./pipeline/normalizer";
+
+import {
+  mapControls,
+} from "./pipeline/control-mapper";
+
+import {
+  buildEvidence,
+} from "./pipeline/evidence-builder";
+
+import {
+  evaluatePolicy,
+} from "./pipeline/policy-engine";
 
 export type PersistedAssessment = {
   id: string;
@@ -19,8 +36,11 @@ export type PersistedAssessment = {
   decision: "BLOCK" | "PASS";
   startedAt: string;
   completedAt: string;
+
   scannerExecutions: ScannerResult[];
   rawFindingCount: number;
+  rawFindings: RawFinding[];
+
   findings: Finding[];
   controls: SecurityControl[];
   evidence: EvidenceRecord[];
@@ -28,7 +48,9 @@ export type PersistedAssessment = {
 };
 
 function createRunId(): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
+  const timestamp =
+    Date.now().toString(36).toUpperCase();
+
   const random = Math.random()
     .toString(36)
     .slice(2, 6)
@@ -37,26 +59,34 @@ function createRunId(): string {
   return `ASG-RUN-${timestamp}-${random}`;
 }
 
-function executeScannerAdapters(): ScannerResult[] {
-  /*
-   * V2 engine boundary.
-   *
-   * These are deterministic adapters for now.
-   * Real Semgrep / ZAP / Gitleaks / Trivy / Checkov execution
-   * will replace these adapters later without changing the API contract.
-   */
-  return scannerResults.map((scanner) => ({
-    ...scanner,
-  }));
-}
-
 export function executeAssessment(
   asset: Asset
 ): PersistedAssessment {
   const startedAt = new Date().toISOString();
   const id = createRunId();
 
-  const scannerExecutions = executeScannerAdapters();
+  /*
+   * Scanner stage
+   */
+  const executions = scannerAdapters.map(
+    (adapter) => adapter.scan(asset)
+  );
+
+  const rawFindings = executions.flatMap(
+    (execution) => execution.rawFindings
+  );
+
+  /*
+   * Keep public ScannerResult contract compatible
+   * with the existing UI.
+   */
+  const scannerExecutions: ScannerResult[] =
+    executions.map((execution) => ({
+      category: execution.category,
+      tool: execution.tool,
+      status: execution.status,
+      findings: execution.findings,
+    }));
 
   const baseRun: AssessmentRun = {
     id,
@@ -67,40 +97,37 @@ export function executeAssessment(
     scanners: scannerExecutions,
   };
 
-  const findings = getFindingsForRun(baseRun);
-  const controls = getControlsForRun(baseRun);
-  const evidence = getEvidenceForRun(baseRun);
-
-  const blockingFindings = findings.filter(
-    (finding) =>
-      finding.blocker &&
-      finding.status === "Confirmed"
+  /*
+   * Security intelligence pipeline
+   */
+  const findings = normalizeAndCorrelate(
+    baseRun,
+    rawFindings
   );
 
-  const decision: "BLOCK" | "PASS" =
-    blockingFindings.length > 0 ? "BLOCK" : "PASS";
+  const controls = mapControls(findings);
 
-  const rawFindingCount = scannerExecutions.reduce(
-    (total, scanner) => total + scanner.findings,
-    0
-  );
+  const evidence = buildEvidence(findings);
+
+  const policy = evaluatePolicy(findings);
 
   return {
     id,
     assetId: asset.id,
     asset,
     status: "Completed",
-    decision,
+    decision: policy.decision,
     startedAt,
     completedAt: new Date().toISOString(),
+
     scannerExecutions,
-    rawFindingCount,
+    rawFindingCount: rawFindings.length,
+    rawFindings,
+
     findings,
     controls,
     evidence,
-    blockers: blockingFindings.map(
-      (finding) => finding.id
-    ),
+    blockers: policy.blockers,
   };
 }
 
