@@ -76,6 +76,80 @@ function extractCve(
     )?.[0];
 }
 
+function extractComponent(
+  finding: RawFinding
+): string {
+  /*
+   * Trivy adapters expose dependency context as:
+   *
+   *   target:package@version
+   *
+   * Keep the package/component in the correlation
+   * identity so unrelated components sharing a CVE
+   * are not collapsed into one risk.
+   */
+  const location =
+    finding.location?.trim();
+
+  if (location) {
+    const tail =
+      location.includes(":")
+        ? location.slice(
+            location.lastIndexOf(":") + 1
+          )
+        : location;
+
+    const packageMatch =
+      tail.match(
+        /^([^@\s]+)@[^\s]+$/
+      );
+
+    if (packageMatch?.[1]) {
+      return packageMatch[1]
+        .toLowerCase()
+        .trim();
+    }
+  }
+
+  /*
+   * Fallback for scanner fingerprints that encode
+   * CVE:package:context.
+   */
+  const cve =
+    extractCve(finding);
+
+  if (
+    cve &&
+    finding.fingerprint
+  ) {
+    const parts =
+      finding.fingerprint
+        .split(":")
+        .map(
+          (part) =>
+            part.trim()
+        );
+
+    const cveIndex =
+      parts.findIndex(
+        (part) =>
+          part.toUpperCase() === cve
+      );
+
+    const candidate =
+      cveIndex >= 0
+        ? parts[cveIndex + 1]
+        : undefined;
+
+    if (candidate) {
+      return candidate
+        .toLowerCase();
+    }
+  }
+
+  return "unknown-component";
+}
+
 function normalizedLocation(
   location?: string
 ): string {
@@ -106,7 +180,16 @@ function correlationKey(
    * for dependency/container vulnerabilities.
    */
   if (cve) {
-    return `CVE:${cve}`;
+    const component =
+      extractComponent(
+        finding
+      );
+
+    return [
+      "CVE",
+      cve,
+      component,
+    ].join(":");
   }
 
   const cwe =
