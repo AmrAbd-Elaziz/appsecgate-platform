@@ -54,6 +54,40 @@ export default function AssessmentRuns({
   const totalFindings =
     assessment?.rawFindingCount ?? 0;
 
+  const requiredScannerCount =
+    run.scanners.length;
+
+  const decision =
+    assessment?.decision ??
+    run.decision;
+
+  const blockerCount =
+    assessment?.blockers.length ?? 0;
+
+  const normalizedFindings =
+    assessment?.findings ?? [];
+
+  const severityCounts =
+    normalizedFindings.reduce(
+      (counts, finding) => {
+        counts[finding.severity] += 1;
+        return counts;
+      },
+      {
+        CRITICAL: 0,
+        HIGH: 0,
+        MEDIUM: 0,
+        LOW: 0,
+      }
+    );
+
+  const gateMessage =
+    decision === "BLOCK"
+      ? "Confirmed security blockers require remediation before release."
+      : decision === "INCOMPLETE"
+        ? "Required scanner coverage is incomplete, so a reliable release decision cannot be issued."
+        : "No confirmed policy blockers prevent release for this assessment.";
+
   const metrics = {
     rawFindings: assessment?.rawFindingCount ?? 0,
     normalizedFindings:
@@ -102,7 +136,7 @@ export default function AssessmentRuns({
 
         <div className="run-decision">
           <small>RELEASE DECISION</small>
-          <b>{run.decision}</b>
+          <b>{decision}</b>
         </div>
       </section>
 
@@ -115,8 +149,12 @@ export default function AssessmentRuns({
 
         <article>
           <small>Scanner coverage</small>
-          <b>{completedScanners}/6</b>
-          <span>Security engines completed</span>
+          <b>
+            {completedScanners}/{requiredScannerCount}
+          </b>
+          <span>
+            Required security engines completed
+          </span>
         </article>
 
         <article>
@@ -127,8 +165,12 @@ export default function AssessmentRuns({
 
         <article>
           <small>Confirmed blockers</small>
-          <b>2</b>
-          <span>Require remediation</span>
+          <b>{blockerCount}</b>
+          <span>
+            {blockerCount === 1
+              ? "Requires remediation"
+              : "Require remediation"}
+          </span>
         </article>
       </section>
 
@@ -141,7 +183,9 @@ export default function AssessmentRuns({
                 Required scanner coverage
               </span>
             </div>
-            <span>{completedScanners}/6 completed</span>
+            <span>
+              {completedScanners}/{requiredScannerCount} required completed
+            </span>
           </div>
 
           <div className="scanner-list">
@@ -173,28 +217,30 @@ export default function AssessmentRuns({
 
           <div className="gate-result-block">
             <small>DECISION</small>
-            <b>BLOCK</b>
+            <b>{decision}</b>
             <span>
-              Confirmed critical findings prevent production release.
+              {gateMessage}
             </span>
           </div>
 
           <div className="result-metrics">
             <div>
               <span>Normalized findings</span>
-              <b>4</b>
+              <b>{normalizedFindings.length}</b>
             </div>
             <div>
               <span>Critical</span>
-              <b className="danger-text">2</b>
+              <b className="danger-text">
+                {severityCounts.CRITICAL}
+              </b>
             </div>
             <div>
               <span>High</span>
-              <b>1</b>
+              <b>{severityCounts.HIGH}</b>
             </div>
             <div>
               <span>Medium</span>
-              <b>1</b>
+              <b>{severityCounts.MEDIUM}</b>
             </div>
           </div>
 

@@ -2486,3 +2486,307 @@ h3 { margin: 0; font-size: 14px; }
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   AppSecGate Security Input Acquisition
+   ========================================================= */
+
+.security-input-source {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(24, 34, 56, 0.58),
+      rgba(13, 20, 35, 0.42)
+    );
+}
+
+.security-input-source-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.security-input-source-head > div {
+  display: grid;
+  gap: 4px;
+}
+
+.security-input-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.security-input-source-head b {
+  color: #edf4ff;
+  font-size: 14px;
+}
+
+.security-input-tools {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.source-upload-zone {
+  min-height: 158px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  border: 1px dashed rgba(109, 145, 214, 0.48);
+  border-radius: 12px;
+  background: rgba(8, 14, 27, 0.52);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.source-upload-zone:hover {
+  border-color: rgba(116, 169, 255, 0.9);
+  background: rgba(15, 28, 51, 0.68);
+}
+
+.source-upload-zone.uploading {
+  cursor: wait;
+  opacity: 0.78;
+}
+
+.source-upload-zone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.source-upload-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(102, 157, 255, 0.42);
+  border-radius: 10px;
+  background: rgba(56, 111, 214, 0.12);
+  color: #8cb8ff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.source-upload-zone b {
+  color: #e8f0ff;
+  font-size: 13px;
+}
+
+.source-upload-zone small {
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.source-upload-result {
+  display: grid;
+  gap: 12px;
+}
+
+.source-upload-file {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(72, 189, 136, 0.25);
+  border-radius: 11px;
+  background: rgba(34, 125, 84, 0.08);
+}
+
+.source-upload-success {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(58, 196, 126, 0.13);
+  color: #6ee7a8;
+  font-weight: 900;
+}
+
+.source-upload-file > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.source-upload-file b {
+  overflow: hidden;
+  color: #edf6ff;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-upload-file span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.source-upload-replace {
+  border: 0;
+  background: transparent;
+  color: #82afff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.source-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.source-discovery-grid span {
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(10, 16, 29, 0.46);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.source-discovery-grid span.detected {
+  border-color: rgba(67, 190, 130, 0.22);
+  color: #82ddb0;
+}
+
+.source-workspace-note {
+  display: grid;
+  gap: 5px;
+  padding-top: 4px;
+}
+
+.source-workspace-note span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.source-workspace-note code {
+  overflow: hidden;
+  color: #8193b3;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .security-input-source-head {
+    display: grid;
+  }
+
+  .security-input-tools {
+    text-align: left;
+  }
+
+  .source-discovery-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* =========================================================
+   Assessment Execution Feedback
+   ========================================================= */
+
+.assessment-running-state,
+.assessment-run-error {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border-radius: 8px;
+}
+
+.assessment-running-state {
+  border: 1px solid rgba(104, 137, 255, 0.28);
+  background: rgba(65, 86, 174, 0.10);
+}
+
+.assessment-run-error {
+  grid-template-columns: 1fr;
+  border: 1px solid rgba(255, 93, 110, 0.30);
+  background: rgba(171, 45, 62, 0.10);
+}
+
+.assessment-running-state > div,
+.assessment-run-error {
+  min-width: 0;
+}
+
+.assessment-running-state b,
+.assessment-run-error b {
+  display: block;
+  margin-bottom: 3px;
+  color: #e7edff;
+  font-size: 10px;
+}
+
+.assessment-running-state span,
+.assessment-run-error span {
+  color: #8fa0bf;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.assessment-run-error b {
+  color: #ff9cab;
+}
+
+.assessment-running-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: #8ba0ff;
+  box-shadow:
+    0 0 0 0 rgba(139, 160, 255, 0.55);
+  animation:
+    assessment-running-pulse 1.4s infinite;
+}
+
+@keyframes assessment-running-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(139, 160, 255, 0.55);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 7px rgba(139, 160, 255, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(139, 160, 255, 0);
+  }
+}
+
+.run-assessment-button:disabled {
+  cursor: wait;
+}

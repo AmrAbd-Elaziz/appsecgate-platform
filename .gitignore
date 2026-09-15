@@ -48,3 +48,6 @@ next-env.d.ts
 
 # AppSecGate local runtime data
 data/appsecgate.json
+
+# AppSecGate uploaded assessment workspaces
+data/workspaces/

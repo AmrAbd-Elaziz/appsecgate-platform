@@ -15,10 +15,14 @@ import {
 
 type Props = {
   onRunAssessment: (asset: Asset) => void;
+  assessmentRunning: boolean;
+  assessmentRunError: string;
 };
 
 export default function AssetsInputs({
   onRunAssessment,
+  assessmentRunning,
+  assessmentRunError,
 }: Props) {
   const [assets, setAssets] =
     useState<Asset[]>([]);
@@ -39,6 +43,24 @@ export default function AssetsInputs({
 
   const [creatingAsset, setCreatingAsset] =
     useState(false);
+
+  const [uploadingSource, setUploadingSource] =
+    useState(false);
+
+  const [sourceUploadName, setSourceUploadName] =
+    useState("");
+
+  const [sourceUploadSize, setSourceUploadSize] =
+    useState(0);
+
+  const [sourceDiscovery, setSourceDiscovery] =
+    useState<{
+      sourceDetected: boolean;
+      iacDetected: boolean;
+      dockerfileDetected: boolean;
+      dependencyFiles: string[];
+      detectedFiles: number;
+    } | null>(null);
 
   const [name, setName] =
     useState("");
@@ -176,6 +198,98 @@ export default function AssetsInputs({
         ? "Profile-aware security gate"
         : "No scanner targets";
 
+  async function handleSourceUpload(
+    file: File
+  ) {
+    if (
+      !file.name
+        .toLowerCase()
+        .endsWith(".zip")
+    ) {
+      setAssetError(
+        "Source code must be uploaded as a ZIP archive."
+      );
+      return;
+    }
+
+    try {
+      setUploadingSource(true);
+      setAssetError("");
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "file",
+        file
+      );
+
+      const response =
+        await fetch(
+          "/api/uploads/source",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to upload source archive."
+        );
+      }
+
+      const upload =
+        payload.data;
+
+      setSourcePath(
+        upload.sourcePath
+      );
+
+      /*
+       * IaC files discovered inside the source
+       * workspace use the same workspace root.
+       * Checkov can therefore operate on the
+       * extracted source tree automatically.
+       */
+      setIacPath(
+        upload.discovery?.iacDetected
+          ? upload.sourcePath
+          : ""
+      );
+
+      setSourceUploadName(
+        upload.originalName
+      );
+
+      setSourceUploadSize(
+        upload.uploadSize
+      );
+
+      setSourceDiscovery(
+        upload.discovery
+      );
+    } catch (error) {
+      setSourcePath("");
+      setIacPath("");
+      setSourceUploadName("");
+      setSourceUploadSize(0);
+      setSourceDiscovery(null);
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload source archive."
+      );
+    } finally {
+      setUploadingSource(false);
+    }
+  }
+
   function resetForm() {
     setName("");
     setType("Web Application");
@@ -186,6 +300,10 @@ export default function AssetsInputs({
     setIacPath("");
     setDastUrl("");
     setContainerImage("");
+
+    setSourceUploadName("");
+    setSourceUploadSize(0);
+    setSourceDiscovery(null);
   }
 
   async function handleAddAsset(
@@ -285,7 +403,10 @@ export default function AssetsInputs({
   }
 
   function handleRunAssessment() {
-    if (!selectedAsset) {
+    if (
+      !selectedAsset ||
+      assessmentRunning
+    ) {
       return;
     }
 
@@ -353,9 +474,9 @@ export default function AssetsInputs({
               </h3>
 
               <p className="asset-form-copy">
-                Define the asset and its
-                persisted security scanner
-                targets.
+                Define the asset and provide
+                the security inputs AppSecGate
+                should assess.
               </p>
             </div>
           </div>
@@ -454,58 +575,189 @@ export default function AssetsInputs({
             <div className="scan-profile-heading">
               <div>
                 <p className="eyebrow">
-                  SECURITY SCAN PROFILE
+                  SECURITY INPUTS
                 </p>
 
                 <h4>
-                  Scanner targets
+                  Assessment artifacts
                 </h4>
               </div>
 
               <span>
-                Optional · persisted per asset
+                Upload · detect · assess
               </span>
             </div>
 
-            <label className="form-field">
-              <span>
-                Source path
-              </span>
+            <div className="security-input-source">
+              <div className="security-input-source-head">
+                <div>
+                  <span className="security-input-label">
+                    SOURCE CODE
+                  </span>
 
-              <input
-                value={sourcePath}
-                onChange={(event) =>
-                  setSourcePath(
-                    event.target.value
-                  )
-                }
-                placeholder="/workspace/application"
-              />
+                  <b>
+                    Upload application source
+                  </b>
+                </div>
 
-              <small>
-                Semgrep · Gitleaks ·
-                Trivy FS
-              </small>
-            </label>
+                <span className="security-input-tools">
+                  Semgrep · Gitleaks · Trivy FS · Checkov
+                </span>
+              </div>
 
-            <label className="form-field">
-              <span>IaC path</span>
+              {!sourcePath ? (
+                <label
+                  className={
+                    "source-upload-zone" +
+                    (uploadingSource
+                      ? " uploading"
+                      : "")
+                  }
+                >
+                  <input
+                    type="file"
+                    accept=".zip,application/zip"
+                    disabled={uploadingSource}
+                    onChange={(event) => {
+                      const file =
+                        event.target.files?.[0];
 
-              <input
-                value={iacPath}
-                onChange={(event) =>
-                  setIacPath(
-                    event.target.value
-                  )
-                }
-                placeholder="/workspace/terraform"
-              />
+                      if (file) {
+                        void handleSourceUpload(
+                          file
+                        );
+                      }
 
-              <small>
-                Checkov · falls back to
-                source path
-              </small>
-            </label>
+                      event.currentTarget.value =
+                        "";
+                    }}
+                  />
+
+                  <span className="source-upload-icon">
+                    ↑
+                  </span>
+
+                  <b>
+                    {uploadingSource
+                      ? "Uploading & inspecting..."
+                      : "Drop source ZIP here or browse"}
+                  </b>
+
+                  <small>
+                    ZIP archive · Maximum 50 MB ·
+                    safely extracted into an isolated workspace
+                  </small>
+                </label>
+              ) : (
+                <div className="source-upload-result">
+                  <div className="source-upload-file">
+                    <span className="source-upload-success">
+                      ✓
+                    </span>
+
+                    <div>
+                      <b>
+                        {sourceUploadName}
+                      </b>
+
+                      <span>
+                        {(sourceUploadSize / 1024)
+                          .toFixed(1)} KB
+                        {" · "}
+                        {sourceDiscovery?.detectedFiles ?? 0}
+                        {" files detected"}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="source-upload-replace"
+                      onClick={() => {
+                        setSourcePath("");
+                        setIacPath("");
+                        setSourceUploadName("");
+                        setSourceUploadSize(0);
+                        setSourceDiscovery(null);
+                      }}
+                    >
+                      Replace
+                    </button>
+                  </div>
+
+                  <div className="source-discovery-grid">
+                    <span
+                      className={
+                        sourceDiscovery?.sourceDetected
+                          ? "detected"
+                          : ""
+                      }
+                    >
+                      {sourceDiscovery?.sourceDetected
+                        ? "✓"
+                        : "—"}{" "}
+                      Source code
+                    </span>
+
+                    <span
+                      className={
+                        sourceDiscovery?.iacDetected
+                          ? "detected"
+                          : ""
+                      }
+                    >
+                      {sourceDiscovery?.iacDetected
+                        ? "✓"
+                        : "—"}{" "}
+                      Infrastructure as Code
+                    </span>
+
+                    <span
+                      className={
+                        sourceDiscovery?.dockerfileDetected
+                          ? "detected"
+                          : ""
+                      }
+                    >
+                      {sourceDiscovery?.dockerfileDetected
+                        ? "✓"
+                        : "—"}{" "}
+                      Dockerfile
+                    </span>
+
+                    <span
+                      className={
+                        (
+                          sourceDiscovery
+                            ?.dependencyFiles
+                            ?.length ?? 0
+                        ) > 0
+                          ? "detected"
+                          : ""
+                      }
+                    >
+                      {(
+                        sourceDiscovery
+                          ?.dependencyFiles
+                          ?.length ?? 0
+                      ) > 0
+                        ? "✓"
+                        : "—"}{" "}
+                      Dependencies
+                    </span>
+                  </div>
+
+                  <div className="source-workspace-note">
+                    <span>
+                      INTERNAL WORKSPACE
+                    </span>
+
+                    <code>
+                      {sourcePath}
+                    </code>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <label className="form-field">
               <span>DAST URL</span>
@@ -549,7 +801,10 @@ export default function AssetsInputs({
               <button
                 className="secondary-button"
                 type="button"
-                disabled={creatingAsset}
+                disabled={
+                  creatingAsset ||
+                  uploadingSource
+                }
                 onClick={() => {
                   resetForm();
                   setAssetError("");
@@ -562,11 +817,16 @@ export default function AssetsInputs({
               <button
                 className="primary-button"
                 type="submit"
-                disabled={creatingAsset}
+                disabled={
+                  creatingAsset ||
+                  uploadingSource
+                }
               >
                 {creatingAsset
                   ? "Creating..."
-                  : "Create asset"}
+                  : uploadingSource
+                    ? "Processing source..."
+                    : "Create asset"}
               </button>
             </div>
           </form>
@@ -832,14 +1092,45 @@ export default function AssetsInputs({
                 the release decision.
               </p>
 
+              {assessmentRunError && (
+                <div className="assessment-run-error">
+                  <b>Assessment failed</b>
+                  <span>
+                    {assessmentRunError}
+                  </span>
+                </div>
+              )}
+
+              {assessmentRunning && (
+                <div className="assessment-running-state">
+                  <span className="assessment-running-dot" />
+
+                  <div>
+                    <b>
+                      Security assessment running
+                    </b>
+
+                    <span>
+                      Executing applicable scanners
+                      against the selected asset.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
                 className="run-assessment-button"
                 onClick={
                   handleRunAssessment
                 }
+                disabled={
+                  assessmentRunning
+                }
               >
-                Run assessment →
+                {assessmentRunning
+                  ? "Running security assessment..."
+                  : "Run assessment →"}
               </button>
             </>
           ) : (

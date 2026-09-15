@@ -177,7 +177,20 @@ export default function Home() {
       }
     : null;
 
+  const [assessmentRunning, setAssessmentRunning] =
+    useState(false);
+
+  const [assessmentRunError, setAssessmentRunError] =
+    useState("");
+
   async function handleRunAssessment(asset: Asset) {
+    if (assessmentRunning) {
+      return;
+    }
+
+    setAssessmentRunning(true);
+    setAssessmentRunError("");
+
     try {
       const response = await fetch("/api/assessments", {
         method: "POST",
@@ -204,7 +217,19 @@ export default function Home() {
       setAssessmentCount((current) => current + 1);
       setView("assessments");
     } catch (error) {
-      console.error("Assessment execution failed:", error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to run assessment.";
+
+      console.error(
+        "Assessment execution failed:",
+        error
+      );
+
+      setAssessmentRunError(message);
+    } finally {
+      setAssessmentRunning(false);
     }
   }
 
@@ -588,6 +613,8 @@ export default function Home() {
         ) : view === "assets" ? (
           <AssetsInputs
             onRunAssessment={handleRunAssessment}
+            assessmentRunning={assessmentRunning}
+            assessmentRunError={assessmentRunError}
           />
         ) : view === "assessments" ? (
           <AssessmentRuns
