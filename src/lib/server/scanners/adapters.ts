@@ -6,6 +6,7 @@ import type {
 } from "./types";
 
 import { realGitleaksAdapter } from "./gitleaks-adapter";
+import { realSemgrepAdapter } from "./semgrep-adapter";
 
 function execution(
   category: string,
@@ -163,7 +164,7 @@ export const containerAdapter: ScannerAdapter = {
 };
 
 export const scannerAdapters: ScannerAdapter[] = [
-  semgrepAdapter,
+  realSemgrepAdapter,
   zapAdapter,
   realGitleaksAdapter,
   scaAdapter,

@@ -1,0 +1,18 @@
+rules:
+  - id: appsecgate-python-sql-injection
+    languages:
+      - python
+    severity: ERROR
+    message: User-controlled input reaches a dynamically constructed SQL query.
+    metadata:
+      category: security
+      cwe:
+        - "CWE-89"
+      appsecgate:
+        severity: CRITICAL
+    patterns:
+      - pattern-inside: |
+          $NAME = request.args.get(...)
+          ...
+      - pattern: |
+          $QUERY = "..." + $NAME + "..."
