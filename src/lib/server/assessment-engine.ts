@@ -46,17 +46,19 @@ function createRunId(): string {
   return `ASG-RUN-${timestamp}-${random}`;
 }
 
-export function executeAssessment(
+export async function executeAssessment(
   asset: Asset
-): PersistedAssessment {
+): Promise<PersistedAssessment> {
   const startedAt = new Date().toISOString();
   const id = createRunId();
 
   /*
    * Scanner stage
    */
-  const executions = scannerAdapters.map(
-    (adapter) => adapter.scan(asset)
+  const executions = await Promise.all(
+    scannerAdapters.map(
+      (adapter) => adapter.scan(asset)
+    )
   );
 
   const rawFindings = executions.flatMap(

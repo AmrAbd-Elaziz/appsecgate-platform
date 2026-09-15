@@ -27,5 +27,5 @@ export interface ScannerAdapter {
   name: string;
   category: string;
 
-  scan(asset: Asset): ScannerExecution;
+  scan(asset: Asset): Promise<ScannerExecution>;
 }

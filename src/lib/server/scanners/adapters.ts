@@ -5,6 +5,8 @@ import type {
   ScannerExecution,
 } from "./types";
 
+import { realGitleaksAdapter } from "./gitleaks-adapter";
+
 function execution(
   category: string,
   tool: string,
@@ -23,7 +25,7 @@ export const semgrepAdapter: ScannerAdapter = {
   name: "Semgrep",
   category: "SAST",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("SAST", "Semgrep", [
       {
         id: "SEM-001",
@@ -57,7 +59,7 @@ export const zapAdapter: ScannerAdapter = {
   name: "OWASP ZAP",
   category: "DAST",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("DAST", "OWASP ZAP", [
       {
         id: "ZAP-001",
@@ -79,7 +81,7 @@ export const gitleaksAdapter: ScannerAdapter = {
   name: "Gitleaks",
   category: "Secrets",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("Secrets", "Gitleaks", [
       {
         id: "GIT-001",
@@ -101,7 +103,7 @@ export const scaAdapter: ScannerAdapter = {
   name: "Trivy / pip-audit",
   category: "SCA",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("SCA", "Trivy / pip-audit", [
       {
         id: "SCA-001",
@@ -122,7 +124,7 @@ export const checkovAdapter: ScannerAdapter = {
   name: "Checkov",
   category: "IaC",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("IaC", "Checkov", [
       {
         id: "CKV-001",
@@ -143,7 +145,7 @@ export const containerAdapter: ScannerAdapter = {
   name: "Trivy",
   category: "Container",
 
-  scan(_asset: Asset): ScannerExecution {
+  async scan(_asset: Asset): Promise<ScannerExecution> {
     return execution("Container", "Trivy", [
       {
         id: "TRI-001",
@@ -163,7 +165,7 @@ export const containerAdapter: ScannerAdapter = {
 export const scannerAdapters: ScannerAdapter[] = [
   semgrepAdapter,
   zapAdapter,
-  gitleaksAdapter,
+  realGitleaksAdapter,
   scaAdapter,
   checkovAdapter,
   containerAdapter,

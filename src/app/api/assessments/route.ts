@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const assessment = executeAssessment(asset);
+    const assessment = await executeAssessment(asset);
 
     await saveAssessment(assessment);
 
