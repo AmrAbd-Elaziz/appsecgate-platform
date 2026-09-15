@@ -63,10 +63,15 @@ function FindingRows({
             </small>
           </span>
 
+          <span className="overview-risk-score">
+            <b>{finding.riskScore}</b>
+            <small>/100</small>
+          </span>
+
           <span
-            className={`badge ${finding.severity.toLowerCase()}`}
+            className={`badge ${finding.riskLevel.toLowerCase()}`}
           >
-            {finding.severity}
+            {finding.riskLevel.toUpperCase()}
           </span>
 
           <span className="finding-status">
@@ -218,6 +223,62 @@ export default function Home() {
   const overviewScanners =
     latestAssessment?.scannerExecutions ?? [];
 
+  const overviewRisks =
+    latestAssessment?.findings ?? [];
+
+  const highestRisk =
+    overviewRisks.reduce(
+      (highest, finding) =>
+        finding.riskScore > highest
+          ? finding.riskScore
+          : highest,
+      0
+    );
+
+  const highestRiskLevel =
+    overviewRisks.length > 0
+      ? overviewRisks[0].riskLevel
+      : "Low";
+
+  const confirmedRisks =
+    overviewRisks.filter(
+      (finding) =>
+        finding.status === "Confirmed"
+    ).length;
+
+  const highConfidenceRisks =
+    overviewRisks.filter(
+      (finding) =>
+        finding.confidence === "High"
+    ).length;
+
+  const riskDistribution = {
+    Critical: overviewRisks.filter(
+      (finding) =>
+        finding.riskLevel === "Critical"
+    ).length,
+
+    High: overviewRisks.filter(
+      (finding) =>
+        finding.riskLevel === "High"
+    ).length,
+
+    Medium: overviewRisks.filter(
+      (finding) =>
+        finding.riskLevel === "Medium"
+    ).length,
+
+    Low: overviewRisks.filter(
+      (finding) =>
+        finding.riskLevel === "Low"
+    ).length,
+  };
+
+  const riskPostureMessage =
+    latestAssessment
+      ? `${highestRiskLevel} contextual risk posture based on asset criticality, environment, confidence, and scanner evidence.`
+      : "Run an assessment to calculate contextual application risk.";
+
   const decisionMessage = latestAssessment
     ? overviewBlockers > 0
       ? `${overviewBlockers} confirmed critical finding(s) require action before production release.`
@@ -290,30 +351,107 @@ export default function Home() {
               </button>
             </section>
 
-            <section className="kpi-grid">
-              <article>
-                <small>Managed assets</small>
-                <b>{assetCount}</b>
-                <span>In active assessment scope</span>
+            <section className="risk-posture-grid">
+              <article className="risk-posture-card">
+                <small>Enterprise Risk Posture</small>
+
+                <div className="risk-score-line">
+                  <b>
+                    {overviewLoading
+                      ? "—"
+                      : highestRisk}
+                  </b>
+
+                  <span>/100</span>
+                </div>
+
+                <strong
+                  className={`risk-level-label ${highestRiskLevel.toLowerCase()}`}
+                >
+                  {overviewLoading
+                    ? "LOADING"
+                    : `${highestRiskLevel} Risk`}
+                </strong>
+
+                <p>{riskPostureMessage}</p>
               </article>
 
-              <article>
-                <small>Normalized findings</small>
+              <article className="executive-kpi-card">
+                <small>Release Decision</small>
+
+                <b
+                  className={
+                    overviewDecision === "BLOCK"
+                      ? "decision-block"
+                      : overviewDecision === "PASS"
+                        ? "decision-pass"
+                        : ""
+                  }
+                >
+                  {overviewLoading
+                    ? "LOADING"
+                    : overviewDecision}
+                </b>
+
+                <span>
+                  {overviewBlockers} release blocker(s)
+                </span>
+              </article>
+
+              <article className="executive-kpi-card">
+                <small>Security Risks</small>
                 <b>{overviewFindings}</b>
-                <span>Across scanner sources</span>
+                <span>
+                  {confirmedRisks} confirmed
+                </span>
               </article>
 
-              <article>
-                <small>Confirmed blockers</small>
-                <b>{overviewBlockers}</b>
-                <span>Release decision drivers</span>
+              <article className="executive-kpi-card">
+                <small>High Confidence</small>
+                <b>{highConfidenceRisks}</b>
+                <span>
+                  Correlated security intelligence
+                </span>
               </article>
+            </section>
 
-              <article>
-                <small>Evidence records</small>
-                <b>{overviewEvidence}</b>
-                <span>Auditable assessment proof</span>
-              </article>
+            <section className="risk-distribution-panel">
+              <div className="risk-distribution-header">
+                <div>
+                  <small>CONTEXTUAL RISK DISTRIBUTION</small>
+                  <h3>Application security posture</h3>
+                </div>
+
+                <span>
+                  {overviewEvidence} verified evidence record(s)
+                </span>
+              </div>
+
+              <div className="risk-distribution-grid">
+                <div>
+                  <span className="risk-distribution-dot critical" />
+                  <small>Critical</small>
+                  <b>{riskDistribution.Critical}</b>
+                </div>
+
+                <div>
+                  <span className="risk-distribution-dot high" />
+                  <small>High</small>
+                  <b>{riskDistribution.High}</b>
+                </div>
+
+                <div>
+                  <span className="risk-distribution-dot medium" />
+                  <small>Medium</small>
+                  <b>{riskDistribution.Medium}</b>
+                </div>
+
+                <div>
+                  <span className="risk-distribution-dot low" />
+                  <small>Low</small>
+                  <b>{riskDistribution.Low}</b>
+                </div>
+              </div>
             </section>
 
             <section className="content-grid">
