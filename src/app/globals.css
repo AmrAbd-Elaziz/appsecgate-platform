@@ -2790,3 +2790,131 @@ h3 { margin: 0; font-size: 14px; }
 .run-assessment-button:disabled {
   cursor: wait;
 }
+
+/* =========================================================
+   Source Acquisition — ZIP / Git Repository
+   ========================================================= */
+
+.source-acquisition-options {
+  display: grid;
+  gap: 14px;
+}
+
+.source-acquisition-divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+}
+
+.source-acquisition-divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(121, 142, 183, 0.16);
+}
+
+.source-acquisition-divider span {
+  position: relative;
+  z-index: 1;
+  padding: 0 10px;
+  background: #101827;
+  color: #637392;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.repository-import-box {
+  display: grid;
+  gap: 11px;
+  padding: 15px 16px;
+  border: 1px solid rgba(111, 135, 180, 0.18);
+  border-radius: 9px;
+  background: rgba(8, 15, 27, 0.32);
+}
+
+.repository-import-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.repository-import-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.repository-import-heading b {
+  color: #edf2ff;
+  font-size: 11px;
+}
+
+.repository-import-heading > span {
+  color: #7790c3;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.repository-import-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.repository-import-controls input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid rgba(113, 137, 182, 0.28);
+  border-radius: 6px;
+  outline: none;
+  background: #0c1422;
+  color: #dce6fb;
+  font: inherit;
+  font-size: 9px;
+}
+
+.repository-import-controls input:focus {
+  border-color: rgba(126, 148, 255, 0.62);
+}
+
+.repository-import-controls button {
+  min-width: 122px;
+  height: 36px;
+  padding: 0 13px;
+  border: 1px solid rgba(126, 148, 255, 0.38);
+  border-radius: 6px;
+  background: rgba(80, 101, 204, 0.24);
+  color: #dce5ff;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.repository-import-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.repository-import-box > small {
+  color: #667796;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+@media (max-width: 800px) {
+  .repository-import-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .repository-import-heading {
+    display: grid;
+  }
+}

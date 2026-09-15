@@ -62,6 +62,21 @@ export default function AssetsInputs({
       detectedFiles: number;
     } | null>(null);
 
+  const [repositoryUrl, setRepositoryUrl] =
+    useState("");
+
+  const [
+    importingRepository,
+    setImportingRepository,
+  ] = useState(false);
+
+  const [
+    sourceAcquisition,
+    setSourceAcquisition,
+  ] = useState<
+    "upload" | "repository" | null
+  >(null);
+
   const [name, setName] =
     useState("");
 
@@ -273,6 +288,12 @@ export default function AssetsInputs({
       setSourceDiscovery(
         upload.discovery
       );
+
+      setSourceAcquisition(
+        "upload"
+      );
+
+      setRepositoryUrl("");
     } catch (error) {
       setSourcePath("");
       setIacPath("");
@@ -290,6 +311,95 @@ export default function AssetsInputs({
     }
   }
 
+  async function handleRepositoryImport() {
+    const cleanUrl =
+      repositoryUrl.trim();
+
+    if (!cleanUrl) {
+      setAssetError(
+        "Repository URL is required."
+      );
+      return;
+    }
+
+    try {
+      setImportingRepository(true);
+      setAssetError("");
+
+      const response =
+        await fetch(
+          "/api/imports/repository",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              repositoryUrl:
+                cleanUrl,
+            }),
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to import repository."
+        );
+      }
+
+      const imported =
+        payload.data;
+
+      setSourcePath(
+        imported.sourcePath
+      );
+
+      setIacPath(
+        imported.discovery?.iacDetected
+          ? imported.sourcePath
+          : ""
+      );
+
+      setSourceUploadName(
+        imported.repositoryName
+      );
+
+      setSourceUploadSize(0);
+
+      setSourceDiscovery(
+        imported.discovery
+      );
+
+      setSourceAcquisition(
+        "repository"
+      );
+
+      setRepositoryUrl(
+        imported.repositoryUrl
+      );
+    } catch (error) {
+      setSourcePath("");
+      setIacPath("");
+      setSourceUploadName("");
+      setSourceUploadSize(0);
+      setSourceDiscovery(null);
+      setSourceAcquisition(null);
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to import repository."
+      );
+    } finally {
+      setImportingRepository(false);
+    }
+  }
+
   function resetForm() {
     setName("");
     setType("Web Application");
@@ -304,6 +414,10 @@ export default function AssetsInputs({
     setSourceUploadName("");
     setSourceUploadSize(0);
     setSourceDiscovery(null);
+
+    setRepositoryUrl("");
+    setSourceAcquisition(null);
+    setImportingRepository(false);
   }
 
   async function handleAddAsset(
@@ -606,48 +720,124 @@ export default function AssetsInputs({
               </div>
 
               {!sourcePath ? (
-                <label
-                  className={
-                    "source-upload-zone" +
-                    (uploadingSource
-                      ? " uploading"
-                      : "")
-                  }
-                >
-                  <input
-                    type="file"
-                    accept=".zip,application/zip"
-                    disabled={uploadingSource}
-                    onChange={(event) => {
-                      const file =
-                        event.target.files?.[0];
-
-                      if (file) {
-                        void handleSourceUpload(
-                          file
-                        );
+                <div className="source-acquisition-options">
+                  <label
+                    className={
+                      "source-upload-zone" +
+                      (uploadingSource
+                        ? " uploading"
+                        : "")
+                    }
+                  >
+                    <input
+                      type="file"
+                      accept=".zip,application/zip"
+                      disabled={
+                        uploadingSource ||
+                        importingRepository
                       }
+                      onChange={(event) => {
+                        const file =
+                          event.target.files?.[0];
 
-                      event.currentTarget.value =
-                        "";
-                    }}
-                  />
+                        if (file) {
+                          void handleSourceUpload(
+                            file
+                          );
+                        }
 
-                  <span className="source-upload-icon">
-                    ↑
-                  </span>
+                        event.currentTarget.value =
+                          "";
+                      }}
+                    />
 
-                  <b>
-                    {uploadingSource
-                      ? "Uploading & inspecting..."
-                      : "Drop source ZIP here or browse"}
-                  </b>
+                    <span className="source-upload-icon">
+                      ↑
+                    </span>
 
-                  <small>
-                    ZIP archive · Maximum 50 MB ·
-                    safely extracted into an isolated workspace
-                  </small>
-                </label>
+                    <b>
+                      {uploadingSource
+                        ? "Uploading & inspecting..."
+                        : "Drop source ZIP here or browse"}
+                    </b>
+
+                    <small>
+                      ZIP archive · Maximum 50 MB ·
+                      safely extracted into an isolated workspace
+                    </small>
+                  </label>
+
+                  <div className="source-acquisition-divider">
+                    <span>OR</span>
+                  </div>
+
+                  <div className="repository-import-box">
+                    <div className="repository-import-heading">
+                      <div>
+                        <span className="security-input-label">
+                          GIT REPOSITORY
+                        </span>
+
+                        <b>
+                          Import public repository
+                        </b>
+                      </div>
+
+                      <span>
+                        HTTPS · shallow clone
+                      </span>
+                    </div>
+
+                    <div className="repository-import-controls">
+                      <input
+                        type="url"
+                        value={repositoryUrl}
+                        disabled={
+                          importingRepository ||
+                          uploadingSource
+                        }
+                        onChange={(event) =>
+                          setRepositoryUrl(
+                            event.target.value
+                          )
+                        }
+                        onKeyDown={(event) => {
+                          if (
+                            event.key ===
+                            "Enter"
+                          ) {
+                            event.preventDefault();
+
+                            void handleRepositoryImport();
+                          }
+                        }}
+                        placeholder="https://github.com/org/project.git"
+                      />
+
+                      <button
+                        type="button"
+                        disabled={
+                          importingRepository ||
+                          uploadingSource ||
+                          !repositoryUrl.trim()
+                        }
+                        onClick={() =>
+                          void handleRepositoryImport()
+                        }
+                      >
+                        {importingRepository
+                          ? "Importing..."
+                          : "Import repository"}
+                      </button>
+                    </div>
+
+                    <small>
+                      Public HTTPS repositories only.
+                      Credentials and local repository
+                      URLs are rejected.
+                    </small>
+                  </div>
+                </div>
               ) : (
                 <div className="source-upload-result">
                   <div className="source-upload-file">
@@ -661,8 +851,13 @@ export default function AssetsInputs({
                       </b>
 
                       <span>
-                        {(sourceUploadSize / 1024)
-                          .toFixed(1)} KB
+                        {sourceAcquisition ===
+                        "repository"
+                          ? "Repository imported"
+                          : `${(
+                              sourceUploadSize /
+                              1024
+                            ).toFixed(1)} KB`}
                         {" · "}
                         {sourceDiscovery?.detectedFiles ?? 0}
                         {" files detected"}
@@ -678,6 +873,8 @@ export default function AssetsInputs({
                         setSourceUploadName("");
                         setSourceUploadSize(0);
                         setSourceDiscovery(null);
+                        setRepositoryUrl("");
+                        setSourceAcquisition(null);
                       }}
                     >
                       Replace
@@ -803,7 +1000,8 @@ export default function AssetsInputs({
                 type="button"
                 disabled={
                   creatingAsset ||
-                  uploadingSource
+                  uploadingSource ||
+                  importingRepository
                 }
                 onClick={() => {
                   resetForm();
@@ -819,14 +1017,17 @@ export default function AssetsInputs({
                 type="submit"
                 disabled={
                   creatingAsset ||
-                  uploadingSource
+                  uploadingSource ||
+                  importingRepository
                 }
               >
                 {creatingAsset
                   ? "Creating..."
                   : uploadingSource
                     ? "Processing source..."
-                    : "Create asset"}
+                    : importingRepository
+                      ? "Importing repository..."
+                      : "Create asset"}
               </button>
             </div>
           </form>
