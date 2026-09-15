@@ -186,6 +186,10 @@ ScannerAdapter = {
      * The image value is passed as a process argument,
      * never interpolated into a shell command.
      */
+    const archivePath =
+      asset.scanProfile
+        ?.containerArchivePath;
+
     const image =
       asset.scanProfile?.containerImage ??
       process.env
@@ -208,42 +212,52 @@ ScannerAdapter = {
       );
 
     const imageTar =
+      archivePath ??
       path.join(
         tempDir,
         "image.tar"
       );
 
     try {
-      const exported =
-        await runCommand(
-          "docker",
-          [
-            "save",
-            "-o",
-            imageTar,
-            image,
-          ],
-          {
-            cwd:
-              process.cwd(),
+      /*
+       * Uploaded archives are scanned directly.
+       *
+       * Local image references retain the existing
+       * docker-save flow. At no point is an uploaded
+       * archive loaded or executed.
+       */
+      if (!archivePath) {
+        const exported =
+          await runCommand(
+            "docker",
+            [
+              "save",
+              "-o",
+              imageTar,
+              image,
+            ],
+            {
+              cwd:
+                process.cwd(),
 
-            timeoutMs:
-              240_000,
-          }
-        );
+              timeoutMs:
+                240_000,
+            }
+          );
 
-      if (
-        exported.exitCode !== 0
-      ) {
-        throw new Error(
-          [
-            `Unable to export container image: ${image}`,
-            exported.stderr ||
-              exported.stdout,
-          ]
-            .filter(Boolean)
-            .join("\n")
-        );
+        if (
+          exported.exitCode !== 0
+        ) {
+          throw new Error(
+            [
+              `Unable to export container image: ${image}`,
+              exported.stderr ||
+                exported.stdout,
+            ]
+              .filter(Boolean)
+              .join("\n")
+          );
+        }
       }
 
       const scanned =

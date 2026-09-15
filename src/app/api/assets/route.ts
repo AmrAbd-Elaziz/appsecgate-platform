@@ -110,6 +110,9 @@ export async function POST(request: Request) {
       containerImage: cleanOptionalString(
         scanProfileInput.containerImage
       ),
+      containerArchivePath: cleanOptionalString(
+        scanProfileInput.containerArchivePath
+      ),
     };
 
     const hasScanProfile =

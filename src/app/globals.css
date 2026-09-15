@@ -3003,3 +3003,253 @@ h3 { margin: 0; font-size: 14px; }
   color: #769486;
   font-size: 8px;
 }
+
+/* =========================================================
+   Container Security Input
+   ========================================================= */
+
+.security-input-container {
+  display: grid;
+  gap: 12px;
+  padding: 15px 14px;
+  border: 1px solid rgba(111, 135, 180, 0.16);
+  border-radius: 9px;
+  background: rgba(10, 18, 31, 0.42);
+}
+
+.container-input-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.container-input-controls input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid rgba(113, 137, 182, 0.28);
+  border-radius: 6px;
+  outline: none;
+  background: #0c1422;
+  color: #dce6fb;
+  font: inherit;
+  font-size: 9px;
+}
+
+.container-input-controls input:focus {
+  border-color: rgba(126, 148, 255, 0.62);
+}
+
+.container-input-controls button {
+  min-width: 112px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(126, 148, 255, 0.38);
+  border-radius: 6px;
+  background: rgba(80, 101, 204, 0.24);
+  color: #dce5ff;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.container-input-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.container-input-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(70, 201, 154, 0.28);
+  border-radius: 8px;
+  background: rgba(28, 118, 91, 0.08);
+}
+
+.container-input-result > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.container-input-result > div > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.container-input-result b {
+  color: #dceee7;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.container-input-result span {
+  color: #769486;
+  font-size: 8px;
+}
+
+.container-input-result code {
+  max-width: 100%;
+  overflow: hidden;
+  color: #657b72;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.container-input-note {
+  color: #667796;
+  font-size: 8px;
+}
+
+@media (max-width: 800px) {
+  .container-input-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   Container Archive Acquisition
+   ========================================================= */
+
+.container-input-divider {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 16px;
+}
+
+.container-input-divider::before {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(111, 135, 180, 0.14);
+  content: "";
+}
+
+.container-input-divider span {
+  position: relative;
+  z-index: 1;
+  padding: 0 8px;
+  background: #0d1625;
+  color: #61718e;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.container-archive-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(112, 137, 187, 0.3);
+  border-radius: 7px;
+  background: rgba(7, 14, 25, 0.3);
+  cursor: pointer;
+}
+
+.container-archive-upload:hover {
+  border-color: rgba(126, 148, 255, 0.55);
+}
+
+.container-archive-upload.uploading {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.container-archive-upload input {
+  display: none;
+}
+
+.container-archive-upload > div {
+  display: grid;
+  gap: 3px;
+}
+
+.container-archive-upload b {
+  color: #dce6fb;
+  font-size: 9px;
+}
+
+.container-archive-upload small {
+  color: #667796;
+  font-size: 7px;
+}
+
+/* =========================================================
+   Container Archive Acquisition
+   ========================================================= */
+
+.container-input-divider {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 16px;
+}
+
+.container-input-divider::before {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(111, 135, 180, 0.14);
+  content: "";
+}
+
+.container-input-divider span {
+  position: relative;
+  z-index: 1;
+  padding: 0 8px;
+  background: #0d1625;
+  color: #61718e;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.container-archive-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(112, 137, 187, 0.3);
+  border-radius: 7px;
+  background: rgba(7, 14, 25, 0.3);
+  cursor: pointer;
+}
+
+.container-archive-upload:hover {
+  border-color: rgba(126, 148, 255, 0.55);
+}
+
+.container-archive-upload.uploading {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.container-archive-upload input {
+  display: none;
+}
+
+.container-archive-upload > div {
+  display: grid;
+  gap: 3px;
+}
+
+.container-archive-upload b {
+  color: #dce6fb;
+  font-size: 9px;
+}
+
+.container-archive-upload small {
+  color: #667796;
+  font-size: 7px;
+}

@@ -14,7 +14,10 @@ export class ScanProfileValidationError
 
 function validateLocalPath(
   value: string,
-  field: "sourcePath" | "iacPath"
+  field:
+    | "sourcePath"
+    | "iacPath"
+    | "containerArchivePath"
 ): string {
   if (value.includes("\0")) {
     throw new ScanProfileValidationError(
@@ -126,6 +129,23 @@ export function validateScanProfile(
       validateContainerImage(
         profile.containerImage
       );
+  }
+
+  if (profile.containerArchivePath) {
+    validated.containerArchivePath =
+      validateLocalPath(
+        profile.containerArchivePath,
+        "containerArchivePath"
+      );
+  }
+
+  if (
+    validated.containerImage &&
+    validated.containerArchivePath
+  ) {
+    throw new ScanProfileValidationError(
+      "Configure either containerImage or containerArchivePath, not both."
+    );
   }
 
   return validated;

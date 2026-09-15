@@ -41,7 +41,7 @@ function hasValue(
  * dastUrl:
  *   OWASP ZAP
  *
- * containerImage:
+ * containerImage / containerArchivePath:
  *   Trivy Container
  */
 export function resolveScannerApplicability(
@@ -72,8 +72,17 @@ export function resolveScannerApplicability(
   const hasDast =
     hasValue(profile.dastUrl);
 
-  const hasContainer =
+  const hasContainerImage =
     hasValue(profile.containerImage);
+
+  const hasContainerArchive =
+    hasValue(
+      profile.containerArchivePath
+    );
+
+  const hasContainer =
+    hasContainerImage ||
+    hasContainerArchive;
 
   return adapters.map((adapter) => {
     switch (adapter.name) {
@@ -129,9 +138,11 @@ export function resolveScannerApplicability(
         return {
           adapter,
           required: hasContainer,
-          reason: hasContainer
+          reason: hasContainerImage
             ? "containerImage configured."
-            : "containerImage not configured.",
+            : hasContainerArchive
+              ? "containerArchivePath configured."
+              : "No container input configured.",
         };
 
       default:

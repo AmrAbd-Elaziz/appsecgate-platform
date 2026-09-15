@@ -122,6 +122,48 @@ export default function AssetsInputs({
     setContainerImage,
   ] = useState("");
 
+  const [
+    validatingContainer,
+    setValidatingContainer,
+  ] = useState(false);
+
+  const [
+    containerValidated,
+    setContainerValidated,
+  ] = useState(false);
+
+  const [
+    containerImageId,
+    setContainerImageId,
+  ] = useState("");
+
+  const [
+    containerArchivePath,
+    setContainerArchivePath,
+  ] = useState("");
+
+  const [
+    containerArchiveName,
+    setContainerArchiveName,
+  ] = useState("");
+
+  const [
+    containerArchiveSize,
+    setContainerArchiveSize,
+  ] = useState(0);
+
+  const [
+    uploadingContainerArchive,
+    setUploadingContainerArchive,
+  ] = useState(false);
+
+  const [
+    containerAcquisition,
+    setContainerAcquisition,
+  ] = useState<
+    "image" | "archive" | null
+  >(null);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -217,7 +259,8 @@ export default function AssetsInputs({
         ) +
         (selectedProfile.dastUrl ? 1 : 0) +
         (
-          selectedProfile.containerImage
+          selectedProfile.containerImage ||
+          selectedProfile.containerArchivePath
             ? 1
             : 0
         );
@@ -333,6 +376,167 @@ export default function AssetsInputs({
       );
     } finally {
       setUploadingSource(false);
+    }
+  }
+
+  async function handleContainerArchiveUpload(
+    file: File
+  ) {
+    if (
+      !file.name
+        .toLowerCase()
+        .endsWith(".tar")
+    ) {
+      setAssetError(
+        "Container archive must be a Docker/OCI TAR file."
+      );
+      return;
+    }
+
+    try {
+      setUploadingContainerArchive(true);
+      setAssetError("");
+
+      const formData =
+        new FormData();
+
+      formData.append(
+        "file",
+        file
+      );
+
+      const response =
+        await fetch(
+          "/api/uploads/container",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to upload container archive."
+        );
+      }
+
+      const upload =
+        payload.data;
+
+      setContainerArchivePath(
+        upload.containerArchivePath
+      );
+
+      setContainerArchiveName(
+        upload.originalName
+      );
+
+      setContainerArchiveSize(
+        upload.uploadSize
+      );
+
+      setContainerAcquisition(
+        "archive"
+      );
+
+      /*
+       * Image reference and uploaded archive
+       * are mutually exclusive inputs.
+       */
+      setContainerImage("");
+      setContainerValidated(false);
+      setContainerImageId("");
+    } catch (error) {
+      setContainerArchivePath("");
+      setContainerArchiveName("");
+      setContainerArchiveSize(0);
+      setContainerAcquisition(null);
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to upload container archive."
+      );
+    } finally {
+      setUploadingContainerArchive(false);
+    }
+  }
+
+  async function handleContainerValidation() {
+    const cleanImage =
+      containerImage.trim();
+
+    if (!cleanImage) {
+      setAssetError(
+        "Container image reference is required."
+      );
+      return;
+    }
+
+    try {
+      setValidatingContainer(true);
+      setContainerValidated(false);
+      setContainerImageId("");
+      setAssetError("");
+
+      const response =
+        await fetch(
+          "/api/inputs/container/validate",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            body: JSON.stringify({
+              containerImage:
+                cleanImage,
+            }),
+          }
+        );
+
+      const payload =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          payload.error ||
+            "Unable to validate container image."
+        );
+      }
+
+      setContainerImage(
+        payload.data.containerImage
+      );
+
+      setContainerValidated(true);
+
+      setContainerImageId(
+        payload.data.imageId || ""
+      );
+
+      setContainerAcquisition(
+        "image"
+      );
+
+      setContainerArchivePath("");
+      setContainerArchiveName("");
+      setContainerArchiveSize(0);
+    } catch (error) {
+      setContainerValidated(false);
+      setContainerImageId("");
+
+      setAssetError(
+        error instanceof Error
+          ? error.message
+          : "Unable to validate container image."
+      );
+    } finally {
+      setValidatingContainer(false);
     }
   }
 
@@ -523,6 +727,15 @@ export default function AssetsInputs({
     setIacPath("");
     setDastUrl("");
     setContainerImage("");
+    setContainerValidated(false);
+    setContainerImageId("");
+    setValidatingContainer(false);
+
+    setContainerArchivePath("");
+    setContainerArchiveName("");
+    setContainerArchiveSize(0);
+    setUploadingContainerArchive(false);
+    setContainerAcquisition(null);
 
     setSourceUploadName("");
     setSourceUploadSize(0);
@@ -552,6 +765,16 @@ export default function AssetsInputs({
       return;
     }
 
+    if (
+      containerImage.trim() &&
+      !containerValidated
+    ) {
+      setAssetError(
+        "Validate the container image before creating the asset."
+      );
+      return;
+    }
+
     try {
       setCreatingAsset(true);
       setAssetError("");
@@ -568,6 +791,10 @@ export default function AssetsInputs({
 
         containerImage:
           containerImage.trim() ||
+          undefined,
+
+        containerArchivePath:
+          containerArchivePath.trim() ||
           undefined,
       };
 
@@ -1201,25 +1428,211 @@ export default function AssetsInputs({
               </small>
             </label>
 
-            <label className="form-field">
-              <span>
-                Container image
-              </span>
+            <div className="security-input-container">
+              <div className="security-input-source-head">
+                <div>
+                  <span className="security-input-label">
+                    CONTAINER IMAGE
+                  </span>
 
-              <input
-                value={containerImage}
-                onChange={(event) =>
-                  setContainerImage(
-                    event.target.value
-                  )
-                }
-                placeholder="app:latest"
-              />
+                  <b>
+                    Container vulnerability target
+                  </b>
+                </div>
 
-              <small>
-                Trivy Container target
+                <span className="security-input-tools">
+                  Trivy Container
+                </span>
+              </div>
+
+              {containerAcquisition === "archive" &&
+              containerArchivePath ? (
+                <div className="container-input-result">
+                  <div>
+                    <span className="source-upload-success">
+                      ✓
+                    </span>
+
+                    <div>
+                      <b>
+                        {containerArchiveName}
+                      </b>
+
+                      <span>
+                        {(
+                          containerArchiveSize /
+                          1024 /
+                          1024
+                        ).toFixed(2)} MB · Docker/OCI
+                        archive ready
+                      </span>
+
+                      <span>
+                        Scanned directly · Image is not
+                        loaded or executed
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="source-upload-replace"
+                    onClick={() => {
+                      setContainerArchivePath("");
+                      setContainerArchiveName("");
+                      setContainerArchiveSize(0);
+                      setContainerAcquisition(null);
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : containerValidated ? (
+                <div className="container-input-result">
+                  <div>
+                    <span className="source-upload-success">
+                      ✓
+                    </span>
+
+                    <div>
+                      <b>
+                        {containerImage}
+                      </b>
+
+                      <span>
+                        Local image verified · Ready for
+                        Trivy assessment
+                      </span>
+
+                      {containerImageId ? (
+                        <code>
+                          {containerImageId}
+                        </code>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="source-upload-replace"
+                    onClick={() => {
+                      setContainerValidated(false);
+                      setContainerImageId("");
+                      setContainerImage("");
+                      setContainerAcquisition(null);
+                    }}
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="container-input-controls">
+                    <input
+                      value={containerImage}
+                      disabled={
+                        validatingContainer ||
+                        uploadingContainerArchive ||
+                        creatingAsset
+                      }
+                      onChange={(event) => {
+                        setContainerImage(
+                          event.target.value
+                        );
+
+                        setContainerValidated(false);
+                        setContainerImageId("");
+                        setContainerAcquisition(null);
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter"
+                        ) {
+                          event.preventDefault();
+
+                          void handleContainerValidation();
+                        }
+                      }}
+                      placeholder="appsecgate-vulnerable-test:latest"
+                    />
+
+                    <button
+                      type="button"
+                      disabled={
+                        validatingContainer ||
+                        uploadingContainerArchive ||
+                        !containerImage.trim()
+                      }
+                      onClick={() =>
+                        void handleContainerValidation()
+                      }
+                    >
+                      {validatingContainer
+                        ? "Validating..."
+                        : "Validate image"}
+                    </button>
+                  </div>
+
+                  <div className="container-input-divider">
+                    <span>OR</span>
+                  </div>
+
+                  <label
+                    className={
+                      "container-archive-upload" +
+                      (uploadingContainerArchive
+                        ? " uploading"
+                        : "")
+                    }
+                  >
+                    <input
+                      type="file"
+                      accept=".tar,application/x-tar"
+                      disabled={
+                        uploadingContainerArchive ||
+                        validatingContainer ||
+                        creatingAsset
+                      }
+                      onChange={(event) => {
+                        const file =
+                          event.target.files?.[0];
+
+                        if (file) {
+                          void handleContainerArchiveUpload(
+                            file
+                          );
+                        }
+
+                        event.currentTarget.value =
+                          "";
+                      }}
+                    />
+
+                    <span className="source-upload-icon">
+                      ↑
+                    </span>
+
+                    <div>
+                      <b>
+                        {uploadingContainerArchive
+                          ? "Uploading container archive..."
+                          : "Upload Docker / OCI TAR"}
+                      </b>
+
+                      <small>
+                        Stored as an opaque artifact ·
+                        Maximum 1 GB
+                      </small>
+                    </div>
+                  </label>
+                </>
+              )}
+
+              <small className="container-input-note">
+                Image reference or Docker/OCI TAR · Trivy
+                vulnerability assessment
               </small>
-            </label>
+            </div>
 
             <div className="asset-form-actions">
               <button
@@ -1229,7 +1642,8 @@ export default function AssetsInputs({
                   creatingAsset ||
                   uploadingSource ||
                   importingRepository ||
-                  uploadingIac
+                  uploadingIac ||
+                  validatingContainer
                 }
                 onClick={() => {
                   resetForm();
@@ -1247,7 +1661,8 @@ export default function AssetsInputs({
                   creatingAsset ||
                   uploadingSource ||
                   importingRepository ||
-                  uploadingIac
+                  uploadingIac ||
+                  validatingContainer
                 }
               >
                 {creatingAsset
@@ -1258,7 +1673,9 @@ export default function AssetsInputs({
                       ? "Importing repository..."
                       : uploadingIac
                         ? "Processing IaC..."
-                        : "Create asset"}
+                        : validatingContainer
+                          ? "Validating container..."
+                          : "Create asset"}
               </button>
             </div>
           </form>
@@ -1510,6 +1927,8 @@ export default function AssetsInputs({
                     <code>
                       {selectedProfile
                         ?.containerImage ||
+                        selectedProfile
+                          ?.containerArchivePath ||
                         "Not configured"}
                     </code>
                   </div>

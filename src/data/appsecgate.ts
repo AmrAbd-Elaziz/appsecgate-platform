@@ -32,6 +32,7 @@ export type AssetScanProfile = {
   iacPath?: string;
   dastUrl?: string;
   containerImage?: string;
+  containerArchivePath?: string;
 };
 
 export type Asset = {
