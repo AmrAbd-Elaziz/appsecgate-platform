@@ -94,6 +94,27 @@ function parseLocation(
     scanner === "Trivy Image" ||
     scanner === "Trivy Container"
   ) {
+    /*
+     * Preserve the package identity reported by Trivy.
+     *
+     * Example:
+     * /scan/image.tar (debian 12.7):libssl3@3.0.14-1~deb12u2
+     */
+    const match =
+      raw.match(
+        /^(.*):([^:@]+)@(.+)$/
+      );
+
+    if (match) {
+      return {
+        raw,
+        kind: "Container",
+        file: normalizePath(match[1]),
+        package: match[2],
+        version: match[3],
+      };
+    }
+
     return {
       raw,
       kind: "Container",
@@ -173,9 +194,68 @@ function rawFindingFor(
   }
 
   /*
-   * Prefer a scanner record that matches the normalized
-   * finding's CWE and title. Correlated findings may have
-   * more than one raw scanner record.
+   * CVE findings are normalized using:
+   *
+   *   CVE:<CVE>:<component>
+   *
+   * Reconstruct that identity from each raw scanner
+   * fingerprint so evidence provenance stays attached
+   * to the exact package/component that produced the
+   * normalized finding.
+   */
+  for (const rawFinding of candidates) {
+    const parts =
+      rawFinding.fingerprint
+        .split(":")
+        .map((part) => part.trim());
+
+    const cveIndex =
+      parts.findIndex(
+        (part) =>
+          /^CVE-\d{4}-\d+$/i.test(part)
+      );
+
+    if (cveIndex < 0) {
+      continue;
+    }
+
+    const cve =
+      parts[cveIndex]
+        .toUpperCase();
+
+    const component =
+      parts[cveIndex + 1]
+        ?.toLowerCase();
+
+    if (!component) {
+      continue;
+    }
+
+    const correlationKey =
+      [
+        "CVE",
+        cve,
+        component,
+      ].join(":");
+
+    const digest =
+      createHash("sha256")
+        .update(correlationKey)
+        .digest("hex")
+        .slice(0, 8)
+        .toUpperCase();
+
+    if (
+      `ASG-${digest}` ===
+      finding.id
+    ) {
+      return rawFinding;
+    }
+  }
+
+  /*
+   * Non-CVE findings retain the existing
+   * CWE/title fallback.
    */
   return (
     candidates.find(

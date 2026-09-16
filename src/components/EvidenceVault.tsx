@@ -316,6 +316,27 @@ export default function EvidenceVault({
                   <span>
                     Finding {record.findingId} · {record.integrity}
                   </span>
+
+                  {(record.location?.package ||
+                    record.location?.version) && (
+                    <span className="evidence-component-context">
+                      {record.location?.package && (
+                        <>
+                          Package{" "}
+                          <strong>{record.location.package}</strong>
+                        </>
+                      )}
+                      {record.location?.package &&
+                        record.location?.version &&
+                        " · "}
+                      {record.location?.version && (
+                        <>
+                          Version{" "}
+                          <strong>{record.location.version}</strong>
+                        </>
+                      )}
+                    </span>
+                  )}
                 </div>
               </div>
 
