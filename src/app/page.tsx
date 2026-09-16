@@ -621,7 +621,9 @@ export default function Home() {
             ? "overview-main-content"
             : view === "assets"
               ? "assets-main-content"
-              : ""
+              : view === "assessments"
+                ? "assessments-main-content"
+                : ""
         }`}
       >
         {view === "overview" ? (

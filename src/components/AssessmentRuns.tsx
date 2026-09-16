@@ -167,9 +167,11 @@ export default function AssessmentRuns({
           <small>Confirmed blockers</small>
           <b>{blockerCount}</b>
           <span>
-            {blockerCount === 1
-              ? "Requires remediation"
-              : "Require remediation"}
+            {blockerCount === 0
+              ? "No policy blockers"
+              : blockerCount === 1
+                ? "Policy blocker detected"
+                : "Policy blockers detected"}
           </span>
         </article>
       </section>

@@ -10582,3 +10582,1021 @@ h3 { margin: 0; font-size: 14px; }
     align-self: auto !important;
   }
 }
+
+
+/* =========================================================
+   ASSESSMENT RUNS — WIDE PAGE LAYOUT
+   Keep original V1 design, widen only.
+   ========================================================= */
+
+.assessments-main-content {
+  width: min(1380px, calc(100% - 208px)) !important;
+  max-width: none !important;
+  padding-left: 48px !important;
+  padding-right: 48px !important;
+}
+
+.assessments-main-content .page-header,
+.assessments-main-content .assessment-run-hero,
+.assessments-main-content .assessment-run-kpis,
+.assessments-main-content .assessment-run-layout {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Give scanner execution more horizontal room */
+.assessments-main-content .assessment-run-layout {
+  grid-template-columns:
+    minmax(0, 1.75fr)
+    minmax(340px, .75fr) !important;
+  gap: 18px !important;
+}
+
+/* Do not force the two lower cards to become tall */
+.assessments-main-content .assessment-run-layout {
+  align-items: start !important;
+}
+
+@media (max-width: 1400px) {
+  .assessments-main-content {
+    width: calc(100% - 208px) !important;
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .assessments-main-content {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .assessments-main-content .assessment-run-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .assessments-main-content {
+    width: calc(100% - 175px) !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — V1 MODERN SKIN
+   Visual refinement only. Structure and logic unchanged.
+   ========================================================= */
+
+.assessments-main-content {
+  padding-top: 42px !important;
+}
+
+/* ---------- Page header ---------- */
+
+.assessments-main-content .page-header {
+  margin-bottom: 24px !important;
+}
+
+.assessments-main-content .page-header h1 {
+  margin-top: 5px;
+  letter-spacing: -.035em;
+}
+
+.assessments-main-content .page-description {
+  max-width: 650px;
+  color: #8495b7;
+}
+
+/* ---------- Assessment hero ---------- */
+
+.assessments-main-content .assessment-run-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 108px !important;
+  padding: 22px 25px !important;
+
+  border:
+    1px solid rgba(93, 111, 151, .34) !important;
+
+  border-radius: 13px !important;
+
+  background:
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(93, 108, 230, .13),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(21, 31, 49, .98),
+      rgba(15, 23, 38, .98)
+    ) !important;
+
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, .10);
+}
+
+.assessments-main-content
+.assessment-run-hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  width: 150px;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7887ff,
+      transparent
+    );
+}
+
+.assessments-main-content
+.assessment-run-hero h2 {
+  margin-top: 7px;
+  margin-bottom: 5px;
+
+  font-size: 23px;
+  letter-spacing: -.025em;
+}
+
+.assessments-main-content
+.assessment-run-decision {
+  min-width: 190px;
+
+  padding-left: 24px !important;
+
+  border-left:
+    1px solid rgba(91, 108, 143, .32) !important;
+}
+
+/* ---------- KPI cards ---------- */
+
+.assessments-main-content .assessment-run-kpis {
+  gap: 14px !important;
+  margin-top: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.assessments-main-content
+.assessment-run-kpis > * {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 100px !important;
+  padding: 16px 17px !important;
+
+  border:
+    1px solid rgba(80, 97, 132, .29) !important;
+
+  border-radius: 11px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 30, 46, .96),
+      rgba(15, 23, 37, .96)
+    ) !important;
+
+  box-shadow:
+    0 9px 25px rgba(0, 0, 0, .07);
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background .16s ease;
+}
+
+.assessments-main-content
+.assessment-run-kpis > *:hover {
+  transform: translateY(-2px);
+
+  border-color:
+    rgba(108, 124, 181, .42) !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(23, 34, 52, .98),
+      rgba(17, 26, 42, .98)
+    ) !important;
+}
+
+/* ---------- Lower workspace ---------- */
+
+.assessments-main-content
+.assessment-run-layout {
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+/*
+ * Important:
+ * remove the old stretched/tall appearance.
+ */
+.assessments-main-content
+.assessment-run-layout > * {
+  min-height: 0 !important;
+  height: auto !important;
+
+  border:
+    1px solid rgba(80, 97, 132, .31) !important;
+
+  border-radius: 12px !important;
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(18, 27, 42, .98),
+      rgba(14, 22, 35, .98)
+    ) !important;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, .08);
+}
+
+/* Scanner execution */
+
+.assessments-main-content
+.assessment-execution {
+  min-height: 270px !important;
+  padding: 19px 20px !important;
+}
+
+/*
+ * If the V1 scanner panel has a previous fixed/min height
+ * on its direct panel, neutralize it inside assessments only.
+ */
+.assessments-main-content
+.assessment-run-layout > .panel:first-child {
+  min-height: 270px !important;
+  height: 270px !important;
+}
+
+/* Scanner row */
+
+.assessments-main-content
+.scanner-row {
+  min-height: 56px !important;
+
+  padding-left: 4px;
+  padding-right: 4px;
+
+  border-top:
+    1px solid rgba(75, 91, 121, .24) !important;
+
+  border-bottom:
+    1px solid rgba(75, 91, 121, .24) !important;
+
+  background:
+    rgba(8, 15, 26, .12);
+
+  transition: background .15s ease;
+}
+
+.assessments-main-content
+.scanner-row:hover {
+  background:
+    rgba(70, 87, 135, .07);
+}
+
+/* ---------- Gate analysis ---------- */
+
+.assessments-main-content
+.assessment-gate {
+  padding: 19px !important;
+}
+
+.assessments-main-content
+.gate-result {
+  border:
+    1px solid rgba(255, 94, 127, .35) !important;
+
+  border-radius: 9px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(104, 24, 45, .30),
+      rgba(77, 20, 37, .23)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .015);
+}
+
+.assessments-main-content
+.gate-result strong,
+.assessments-main-content
+.gate-result b {
+  letter-spacing: -.01em;
+}
+
+/* Gate button */
+
+.assessments-main-content
+.assessment-gate .primary-button {
+  min-height: 42px;
+
+  border:
+    1px solid rgba(120, 137, 255, .40);
+
+  border-radius: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(72, 88, 188, .95),
+      rgba(63, 78, 169, .95)
+    );
+
+  box-shadow:
+    0 8px 18px rgba(39, 51, 130, .16);
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.assessments-main-content
+.assessment-gate .primary-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+/* ---------- Latest run badge ---------- */
+
+.assessments-main-content
+.latest-run-badge {
+  border:
+    1px solid rgba(84, 210, 144, .25) !important;
+
+  border-radius: 9px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 87, 57, .25),
+      rgba(16, 64, 45, .20)
+    ) !important;
+
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, .08);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1000px) {
+  .assessments-main-content
+  .assessment-run-layout > .panel:first-child {
+    height: auto !important;
+    min-height: 220px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .assessments-main-content {
+    padding-top: 28px !important;
+  }
+
+  .assessments-main-content
+  .assessment-run-hero {
+    padding: 18px !important;
+  }
+
+  .assessments-main-content
+  .assessment-run-kpis > * {
+    min-height: 90px !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — V1 MODERN FINAL
+   Real V1 selectors
+   ========================================================= */
+
+/* ---------- Main lower layout ---------- */
+
+.assessments-main-content .assessment-content-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1.65fr)
+    minmax(330px, .75fr) !important;
+
+  gap: 14px !important;
+
+  align-items: start !important;
+}
+
+/* ---------- Scanner panel ---------- */
+
+.assessments-main-content .scanner-panel {
+  min-height: 0 !important;
+  height: auto !important;
+
+  padding: 18px 20px 16px !important;
+
+  border:
+    1px solid rgba(82, 99, 134, .32) !important;
+
+  border-radius: 12px !important;
+
+  background:
+    radial-gradient(
+      circle at 4% 0%,
+      rgba(92, 108, 220, .045),
+      transparent 28%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(19, 29, 45, .98),
+      rgba(14, 22, 35, .98)
+    ) !important;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, .08);
+}
+
+.assessments-main-content
+.scanner-panel .panel-title {
+  margin-bottom: 13px !important;
+}
+
+.assessments-main-content
+.scanner-panel .panel-title h3 {
+  margin-bottom: 4px;
+}
+
+.assessments-main-content
+.scanner-panel .panel-subtitle {
+  color: #7586a8;
+}
+
+/* ---------- Scanner list ---------- */
+
+.assessments-main-content .scanner-list {
+  overflow: hidden;
+
+  border:
+    1px solid rgba(75, 92, 123, .25) !important;
+
+  border-radius: 8px;
+
+  background:
+    rgba(8, 15, 26, .18);
+}
+
+.assessments-main-content .scanner-row {
+  min-height: 56px !important;
+
+  padding:
+    10px 12px !important;
+
+  border: 0 !important;
+
+  background:
+    rgba(11, 18, 30, .24);
+
+  transition:
+    background .15s ease;
+}
+
+.assessments-main-content
+.scanner-row + .scanner-row {
+  border-top:
+    1px solid rgba(75, 92, 123, .24) !important;
+}
+
+.assessments-main-content
+.scanner-row:hover {
+  background:
+    rgba(74, 91, 145, .07);
+}
+
+.assessments-main-content
+.scanner-check {
+  box-shadow:
+    0 0 0 4px rgba(66, 196, 128, .05);
+}
+
+/* ---------- Gate panel ---------- */
+
+.assessments-main-content
+.assessment-result-panel {
+  min-height: 0 !important;
+  height: auto !important;
+
+  padding: 18px !important;
+
+  border:
+    1px solid rgba(82, 99, 134, .32) !important;
+
+  border-radius: 12px !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(93, 108, 220, .045),
+      transparent 32%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(19, 29, 45, .98),
+      rgba(14, 22, 35, .98)
+    ) !important;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, .08);
+}
+
+.assessments-main-content
+.assessment-result-panel > h3 {
+  margin:
+    5px 0 13px !important;
+}
+
+/* ---------- Gate decision ---------- */
+
+.assessments-main-content
+.gate-result-block {
+  padding:
+    14px 15px !important;
+
+  border:
+    1px solid rgba(255, 96, 130, .34) !important;
+
+  border-radius: 9px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(103, 24, 45, .31),
+      rgba(70, 19, 35, .24)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, .015);
+}
+
+.assessments-main-content
+.gate-result-block b {
+  display: block;
+
+  margin:
+    5px 0 7px !important;
+
+  font-size:
+    18px !important;
+
+  letter-spacing:
+    -.015em;
+}
+
+/* ---------- Result metrics ---------- */
+
+.assessments-main-content
+.result-metrics {
+  margin:
+    12px 0 !important;
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(73, 89, 119, .23);
+
+  border-radius: 8px;
+
+  background:
+    rgba(8, 15, 26, .17);
+}
+
+.assessments-main-content
+.result-metrics > div {
+  min-height: 31px !important;
+
+  padding:
+    0 2px !important;
+}
+
+.assessments-main-content
+.assessment-result-panel .muted {
+  margin:
+    11px 0 13px !important;
+
+  line-height:
+    1.5;
+}
+
+/* ---------- Findings button ---------- */
+
+.assessments-main-content
+.run-assessment-button {
+  min-height:
+    40px !important;
+
+  border:
+    1px solid
+      rgba(119, 135, 255, .38) !important;
+
+  border-radius:
+    8px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(72, 88, 188, .96),
+      rgba(62, 78, 169, .96)
+    ) !important;
+
+  box-shadow:
+    0 8px 20px
+      rgba(37, 49, 128, .15);
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.assessments-main-content
+.run-assessment-button:hover {
+  transform:
+    translateY(-1px);
+
+  filter:
+    brightness(1.08);
+}
+
+/* ---------- Hero refinement ---------- */
+
+.assessments-main-content
+.assessment-run-hero {
+  border-color:
+    rgba(94, 111, 153, .36) !important;
+}
+
+/* ---------- KPI refinement ---------- */
+
+.assessments-main-content
+.assessment-kpis {
+  gap:
+    12px !important;
+
+  margin:
+    12px 0 !important;
+}
+
+.assessments-main-content
+.assessment-kpis article {
+  min-height:
+    92px !important;
+
+  padding:
+    14px 16px !important;
+
+  border:
+    1px solid
+      rgba(80, 97, 132, .29) !important;
+
+  border-radius:
+    10px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20, 30, 46, .96),
+      rgba(15, 23, 37, .96)
+    ) !important;
+
+  box-shadow:
+    0 8px 22px
+      rgba(0, 0, 0, .06);
+
+  transition:
+    transform .16s ease,
+    border-color .16s ease;
+}
+
+.assessments-main-content
+.assessment-kpis article:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(108, 124, 181, .42) !important;
+}
+
+/* ---------- Latest run ---------- */
+
+.assessments-main-content
+.run-status-card {
+  border:
+    1px solid
+      rgba(83, 207, 143, .27) !important;
+
+  border-radius:
+    9px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 87, 57, .25),
+      rgba(15, 64, 44, .20)
+    ) !important;
+
+  box-shadow:
+    0 8px 22px
+      rgba(0, 0, 0, .07);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1050px) {
+  .assessments-main-content
+  .assessment-content-grid {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — FINAL LOWER ROW BALANCE
+   ========================================================= */
+
+@media (min-width: 1051px) {
+
+  .assessments-main-content .assessment-content-grid {
+    align-items: stretch !important;
+  }
+
+  .assessments-main-content .scanner-panel,
+  .assessments-main-content .assessment-result-panel {
+    height: 300px !important;
+    min-height: 300px !important;
+    box-sizing: border-box;
+  }
+
+  /* Scanner panel */
+  .assessments-main-content .scanner-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .assessments-main-content .scanner-list {
+    margin-top: 2px;
+  }
+
+  /* Gate panel: fit everything cleanly inside same height */
+  .assessments-main-content .assessment-result-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .assessments-main-content .assessment-result-panel > h3 {
+    margin: 4px 0 9px !important;
+  }
+
+  .assessments-main-content .gate-result-block {
+    padding: 10px 12px !important;
+  }
+
+  .assessments-main-content .gate-result-block b {
+    margin: 3px 0 4px !important;
+    font-size: 17px !important;
+  }
+
+  .assessments-main-content .gate-result-block span {
+    line-height: 1.4;
+  }
+
+  .assessments-main-content .result-metrics {
+    margin: 8px 0 !important;
+  }
+
+  .assessments-main-content .result-metrics > div {
+    min-height: 25px !important;
+  }
+
+  .assessments-main-content .assessment-result-panel .muted {
+    margin: 6px 0 8px !important;
+    line-height: 1.4;
+  }
+
+  .assessments-main-content .run-assessment-button {
+    margin-top: auto !important;
+    min-height: 36px !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — NATURAL EQUAL HEIGHT FIX
+   ========================================================= */
+
+@media (min-width: 1051px) {
+
+  .assessments-main-content .assessment-content-grid {
+    align-items: stretch !important;
+  }
+
+  .assessments-main-content .scanner-panel,
+  .assessments-main-content .assessment-result-panel {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .assessments-main-content .scanner-panel {
+    align-self: stretch !important;
+  }
+
+  .assessments-main-content .assessment-result-panel {
+    align-self: stretch !important;
+    overflow: visible !important;
+  }
+
+  .assessments-main-content .result-metrics {
+    overflow: visible !important;
+  }
+
+  .assessments-main-content .result-metrics > div {
+    min-height: 28px !important;
+  }
+
+  .assessments-main-content
+  .assessment-result-panel .muted {
+    margin: 9px 0 11px !important;
+  }
+
+  .assessments-main-content
+  .run-assessment-button {
+    margin-top: auto !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — GATE CARD FINAL POLISH
+   ========================================================= */
+
+.assessments-main-content .assessment-result-panel {
+  padding: 18px 18px 16px !important;
+}
+
+/* Header */
+.assessments-main-content
+.assessment-result-panel > .eyebrow {
+  margin-bottom: 8px !important;
+}
+
+.assessments-main-content
+.assessment-result-panel > h3 {
+  margin: 0 0 14px !important;
+  font-size: 16px !important;
+}
+
+/* Decision */
+.assessments-main-content .gate-result-block {
+  padding: 13px 14px !important;
+  margin-bottom: 12px !important;
+  border-radius: 9px !important;
+}
+
+.assessments-main-content .gate-result-block b {
+  margin: 4px 0 6px !important;
+  font-size: 18px !important;
+}
+
+.assessments-main-content .gate-result-block span {
+  display: block;
+  max-width: 100%;
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+}
+
+/* Turn old metric rows into modern 2x2 grid */
+.assessments-main-content .result-metrics {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+
+  margin: 0 0 12px !important;
+
+  overflow: hidden !important;
+
+  border:
+    1px solid rgba(79, 96, 128, .28) !important;
+
+  border-radius: 8px !important;
+
+  background:
+    rgba(7, 14, 25, .18) !important;
+}
+
+.assessments-main-content .result-metrics > div {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  min-height: 38px !important;
+  padding: 0 11px !important;
+
+  border: 0 !important;
+}
+
+/* vertical divider */
+.assessments-main-content
+.result-metrics > div:nth-child(odd) {
+  border-right:
+    1px solid rgba(79, 96, 128, .24) !important;
+}
+
+/* horizontal divider */
+.assessments-main-content
+.result-metrics > div:nth-child(-n+2) {
+  border-bottom:
+    1px solid rgba(79, 96, 128, .24) !important;
+}
+
+.assessments-main-content
+.result-metrics span {
+  font-size: 10px !important;
+  color: #8294b8 !important;
+}
+
+.assessments-main-content
+.result-metrics b {
+  font-size: 11px !important;
+}
+
+/* Explanation */
+.assessments-main-content
+.assessment-result-panel > .muted {
+  margin: 0 0 12px !important;
+
+  padding: 0 1px;
+
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+
+  color: #8296bd !important;
+}
+
+/* CTA */
+.assessments-main-content .run-assessment-button {
+  width: 100% !important;
+  min-height: 38px !important;
+
+  margin-top: 0 !important;
+
+  border-radius: 8px !important;
+
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+/* Let grid keep both lower cards naturally equal */
+@media (min-width: 1051px) {
+  .assessments-main-content .assessment-content-grid {
+    align-items: stretch !important;
+  }
+
+  .assessments-main-content .scanner-panel,
+  .assessments-main-content .assessment-result-panel {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   ASSESSMENT RUNS — FINAL NATURAL PANEL HEIGHTS
+   ========================================================= */
+
+@media (min-width: 1051px) {
+  .assessments-main-content .assessment-content-grid {
+    align-items: start !important;
+  }
+
+  .assessments-main-content .scanner-panel,
+  .assessments-main-content .assessment-result-panel {
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: start !important;
+  }
+
+  .assessments-main-content .scanner-panel {
+    padding-bottom: 18px !important;
+  }
+
+  .assessments-main-content .scanner-list {
+    margin-bottom: 0 !important;
+  }
+}
