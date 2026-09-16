@@ -618,14 +618,20 @@ export default function Home() {
       <main
         className={`main-content ${
           view === "overview"
-            ? "overview-main-content"
+            ? "overview-main-content wide-workspace-page"
             : view === "assets"
-              ? "assets-main-content"
+              ? "assets-main-content wide-workspace-page"
               : view === "assessments"
-                ? "assessments-main-content"
+                ? "assessments-main-content wide-workspace-page"
                 : view === "findings"
-                  ? "findings-main-content"
-                  : ""
+                  ? "findings-main-content wide-workspace-page"
+                  : view === "controls"
+                    ? "controls-main-content"
+                    : view === "evidence"
+                      ? "evidence-main-content wide-workspace-page"
+                      : view === "reports"
+                        ? "reports-main-content wide-workspace-page"
+                        : ""
         }`}
       >
         {view === "overview" ? (

@@ -119,7 +119,9 @@ export default function SecurityControls({
 
       try {
         const response = await fetch(
-          "/api/controls",
+          assessment?.id
+              ? `/api/controls?assessmentId=${encodeURIComponent(assessment.id)}`
+              : "/api/controls",
           {
             cache: "no-store",
           }
@@ -254,6 +256,11 @@ export default function SecurityControls({
     [scopedRecords]
   );
 
+  const CONTROLS_PER_PAGE = 10;
+
+  const [controlPage, setControlPage] =
+    useState(1);
+
   const filteredRecords = useMemo(() => {
     const query =
       search.trim().toLowerCase();
@@ -298,6 +305,39 @@ export default function SecurityControls({
     search,
     severityFilter,
     assetFilter,
+  ]);
+
+  const totalControlPages = Math.max(
+    1,
+    Math.ceil(
+      filteredRecords.length /
+        CONTROLS_PER_PAGE
+    )
+  );
+
+  const safeControlPage = Math.min(
+    controlPage,
+    totalControlPages
+  );
+
+  const controlPageStart =
+    (safeControlPage - 1) *
+    CONTROLS_PER_PAGE;
+
+  const paginatedRecords =
+    filteredRecords.slice(
+      controlPageStart,
+      controlPageStart +
+        CONTROLS_PER_PAGE
+    );
+
+  useEffect(() => {
+    setControlPage(1);
+  }, [
+    search,
+    severityFilter,
+    assetFilter,
+    selectedFindingId,
   ]);
 
   const summary = useMemo(
@@ -389,7 +429,7 @@ export default function SecurityControls({
           <small>Assets covered</small>
           <b>{summary.assetsCovered}</b>
           <span>
-            Across assessments
+            Assessment asset coverage
           </span>
         </article>
 
@@ -480,6 +520,7 @@ export default function SecurityControls({
             scope or filters.
           </div>
         ) : (
+          <>
           <div className="controls-v2-table-wrap">
             <table className="controls-v2-table">
               <thead>
@@ -494,7 +535,7 @@ export default function SecurityControls({
               </thead>
 
               <tbody>
-                {filteredRecords.map(
+                {paginatedRecords.map(
                   (record) => (
                     <tr
                       key={`${record.asset.id}:${record.finding.id}`}
@@ -583,6 +624,91 @@ export default function SecurityControls({
               </tbody>
             </table>
           </div>
+
+            {totalControlPages > 1 && (
+              <div className="control-pagination">
+                <div className="control-pagination-summary">
+                  Showing{" "}
+                  <b>{controlPageStart + 1}</b>
+                  {" – "}
+                  <b>
+                    {Math.min(
+                      controlPageStart +
+                        CONTROLS_PER_PAGE,
+                      filteredRecords.length
+                    )}
+                  </b>
+                  {" of "}
+                  <b>{filteredRecords.length}</b>
+                </div>
+
+                <div className="control-pagination-controls">
+                  <button
+                    type="button"
+                    className="control-page-nav"
+                    disabled={safeControlPage === 1}
+                    onClick={() =>
+                      setControlPage(
+                        Math.max(
+                          1,
+                          safeControlPage - 1
+                        )
+                      )
+                    }
+                    aria-label="Previous page"
+                  >
+                    ←
+                  </button>
+
+                  {Array.from(
+                    { length: totalControlPages },
+                    (_, index) => index + 1
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={`control-page-number ${
+                        page === safeControlPage
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setControlPage(page)
+                      }
+                      aria-current={
+                        page === safeControlPage
+                          ? "page"
+                          : undefined
+                      }
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="control-page-nav"
+                    disabled={
+                      safeControlPage ===
+                      totalControlPages
+                    }
+                    onClick={() =>
+                      setControlPage(
+                        Math.min(
+                          totalControlPages,
+                          safeControlPage + 1
+                        )
+                      )
+                    }
+                    aria-label="Next page"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+
         )}
       </section>
 

@@ -11,7 +11,12 @@ import {
   listFindingLifecycles,
 } from "../../../lib/server/store";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } =
+    new URL(request.url);
+
+  const assessmentId =
+    searchParams.get("assessmentId");
   const [
     assessments,
     controlLifecycles,
@@ -21,6 +26,110 @@ export async function GET() {
     listControlLifecycles(),
     listFindingLifecycles(),
   ]);
+
+  if (assessmentId) {
+    const assessment = assessments.find(
+      (item) => item.id === assessmentId
+    );
+
+    if (!assessment) {
+      return NextResponse.json(
+        { error: "Assessment not found." },
+        { status: 404 }
+      );
+    }
+
+    const records: ControlIntelligenceRecord[] =
+      [];
+
+    for (const control of assessment.controls) {
+      const finding =
+        assessment.findings.find(
+          (item) =>
+            item.id === control.findingId
+        );
+
+      const lifecycle =
+        controlLifecycles.find(
+          (item) =>
+            item.assetId ===
+              assessment.assetId &&
+            item.findingId ===
+              control.findingId
+        );
+
+      const findingLifecycle =
+        findingLifecycles.find(
+          (item) =>
+            item.assetId ===
+              assessment.assetId &&
+            item.findingId ===
+              control.findingId
+        );
+
+      if (
+        !finding ||
+        !lifecycle ||
+        !findingLifecycle
+      ) {
+        continue;
+      }
+
+      records.push({
+        control,
+        lifecycle,
+        finding,
+        findingLifecycle,
+        asset: assessment.asset,
+        assessmentId: assessment.id,
+        completedAt: assessment.completedAt,
+      });
+    }
+
+    records.sort(
+      (a, b) =>
+        b.lifecycle.lastUpdatedAt.localeCompare(
+          a.lifecycle.lastUpdatedAt
+        )
+    );
+
+    return NextResponse.json({
+      data: records,
+      count: records.length,
+
+      summary: {
+        required: records.filter(
+          (record) =>
+            record.lifecycle.status ===
+            "Required"
+        ).length,
+
+        implemented: records.filter(
+          (record) =>
+            record.lifecycle.status ===
+            "Implemented"
+        ).length,
+
+        verified: records.filter(
+          (record) =>
+            record.lifecycle.status ===
+            "Verified"
+        ).length,
+
+        critical: records.filter(
+          (record) =>
+            record.control.severity ===
+            "CRITICAL"
+        ).length,
+
+        assets: new Set(
+          records.map(
+            (record) => record.asset.id
+          )
+        ).size,
+      },
+    });
+  }
 
   /*
    * Keep the newest known representation of each
