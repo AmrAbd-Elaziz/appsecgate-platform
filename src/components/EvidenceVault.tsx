@@ -33,6 +33,13 @@ export default function EvidenceVault({
     null
   );
 
+  const [evidenceSearch, setEvidenceSearch] = useState("");
+  const [evidenceSourceFilter, setEvidenceSourceFilter] =
+    useState("All");
+  const [evidencePage, setEvidencePage] = useState(1);
+
+  const EVIDENCE_PER_PAGE = 10;
+
   function openEvidenceDetail(
     record: EvidenceRecord
   ) {
@@ -148,6 +155,15 @@ export default function EvidenceVault({
     };
   }, [selectedEvidence]);
 
+  useEffect(() => {
+    setEvidencePage(1);
+  }, [
+    evidenceSearch,
+    evidenceSourceFilter,
+    selectedFindingId,
+    assessment?.id,
+  ]);
+
   if (!run) {
     return (
       <>
@@ -189,6 +205,133 @@ export default function EvidenceVault({
 
   const controls =
     assessment?.controls ?? [];
+
+  const evidenceSourceOptions = Array.from(
+    new Set(
+      evidenceRecords
+        .map((record) => record.source)
+        .filter(Boolean)
+    )
+  ).sort();
+
+  const normalizedEvidenceSearch =
+    evidenceSearch.trim().toLowerCase();
+
+  const filteredEvidenceRecords =
+    evidenceRecords.filter((record) => {
+      const control = controls.find(
+        (item) => item.id === record.controlId
+      );
+
+      const searchableText = [
+        record.id,
+        record.title,
+        record.findingId,
+        record.type,
+        record.source,
+        record.status,
+        record.controlId,
+        control?.name,
+        record.integrity,
+        record.location?.package,
+        record.location?.version,
+        record.location?.file,
+        record.location?.url,
+        record.location?.resource,
+        record.location?.parameter,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch =
+        !normalizedEvidenceSearch ||
+        searchableText.includes(normalizedEvidenceSearch);
+
+      const matchesSource =
+        evidenceSourceFilter === "All" ||
+        record.source === evidenceSourceFilter;
+
+      return (
+        matchesSearch &&
+        matchesSource
+      );
+    });
+
+  const totalEvidencePages = Math.max(
+    1,
+    Math.ceil(
+      filteredEvidenceRecords.length /
+        EVIDENCE_PER_PAGE
+    )
+  );
+
+  const safeEvidencePage = Math.min(
+    evidencePage,
+    totalEvidencePages
+  );
+
+  const evidencePageStart =
+    (safeEvidencePage - 1) *
+    EVIDENCE_PER_PAGE;
+
+  const paginatedEvidenceRecords =
+    filteredEvidenceRecords.slice(
+      evidencePageStart,
+      evidencePageStart +
+        EVIDENCE_PER_PAGE
+    );
+
+  function evidencePageItems() {
+    const pages: Array<number | "ellipsis"> = [];
+
+    if (totalEvidencePages <= 5) {
+      for (
+        let page = 1;
+        page <= totalEvidencePages;
+        page += 1
+      ) {
+        pages.push(page);
+      }
+
+      return pages;
+    }
+
+    pages.push(1);
+
+    if (safeEvidencePage > 3) {
+      pages.push("ellipsis");
+    }
+
+    const start = Math.max(
+      2,
+      safeEvidencePage - 1
+    );
+
+    const end = Math.min(
+      totalEvidencePages - 1,
+      safeEvidencePage + 1
+    );
+
+    for (
+      let page = start;
+      page <= end;
+      page += 1
+    ) {
+      pages.push(page);
+    }
+
+    if (
+      safeEvidencePage <
+      totalEvidencePages - 2
+    ) {
+      pages.push("ellipsis");
+    }
+
+    pages.push(totalEvidencePages);
+
+    return pages;
+  }
 
   const evidenceSources = new Set(
     evidenceRecords
@@ -281,6 +424,50 @@ export default function EvidenceVault({
           </div>
         )}
 
+        <div className="evidence-table-toolbar">
+          <label className="evidence-search-field">
+            <span>SEARCH</span>
+
+            <input
+              type="search"
+              value={evidenceSearch}
+              onChange={(event) =>
+                setEvidenceSearch(event.target.value)
+              }
+              placeholder="Evidence ID, finding, scanner, package, control..."
+            />
+          </label>
+
+          <label className="evidence-filter-field">
+            <span>SOURCE</span>
+
+            <select
+              value={evidenceSourceFilter}
+              onChange={(event) =>
+                setEvidenceSourceFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="All">
+                All sources
+              </option>
+
+              {evidenceSourceOptions.map(
+                (source) => (
+                  <option
+                    key={source}
+                    value={source}
+                  >
+                    {source}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
+
+        </div>
+
         <div className="evidence-table">
           <div className="evidence-table-header">
             <span>EVIDENCE</span>
@@ -289,86 +476,249 @@ export default function EvidenceVault({
             <span>STATUS</span>
           </div>
 
-          {evidenceRecords.map((record) => (
-            <article
-              className="evidence-row evidence-row-clickable"
-              key={record.id}
-              role="button"
-              tabIndex={0}
-              onClick={() =>
-                openEvidenceDetail(record)
-              }
-              onKeyDown={(event) => {
-                if (
-                  event.key === "Enter" ||
-                  event.key === " "
-                ) {
-                  event.preventDefault();
-                  openEvidenceDetail(record);
-                }
-              }}
-            >
-              <div className="evidence-title">
-                <span className="evidence-icon">✓</span>
-                <div>
-                  <small>{record.id}</small>
-                  <b>{record.title}</b>
-                  <span>
-                    Finding {record.findingId} · {record.integrity}
-                  </span>
+          <div className="evidence-table-body">
+            {paginatedEvidenceRecords.length > 0 ? (
+              paginatedEvidenceRecords.map(
+                (record) => (
+                  <article
+                    className="evidence-row evidence-row-clickable"
+                    key={record.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() =>
+                      openEvidenceDetail(record)
+                    }
+                    onKeyDown={(event) => {
+                      if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                      ) {
+                        event.preventDefault();
+                        openEvidenceDetail(record);
+                      }
+                    }}
+                  >
+                    <div className="evidence-title">
+                      <span className="evidence-icon">
+                        ✓
+                      </span>
 
-                  {(record.location?.package ||
-                    record.location?.version) && (
-                    <span className="evidence-component-context">
-                      {record.location?.package && (
-                        <>
-                          Package{" "}
-                          <strong>{record.location.package}</strong>
-                        </>
-                      )}
-                      {record.location?.package &&
-                        record.location?.version &&
-                        " · "}
-                      {record.location?.version && (
-                        <>
-                          Version{" "}
-                          <strong>{record.location.version}</strong>
-                        </>
-                      )}
-                    </span>
-                  )}
-                </div>
-              </div>
+                      <div>
+                        <small>{record.id}</small>
 
-              <div className="evidence-source">
-                <b>{record.type}</b>
-                <span>{record.source}</span>
-              </div>
+                        <b>{record.title}</b>
 
-              <div className="evidence-control">
-                {(() => {
-                  const control = controls.find(
-                    (item) => item.id === record.controlId
-                  );
+                        <span>
+                          Finding {record.findingId} ·{" "}
+                          {record.integrity}
+                        </span>
 
-                  return control
-                    ? `${control.id} · ${control.name}`
-                    : record.controlId;
-                })()}
-              </div>
+                        {(record.location?.package ||
+                          record.location?.version) && (
+                          <span className="evidence-component-context">
+                            {record.location?.package && (
+                              <>
+                                Package{" "}
+                                <strong>
+                                  {
+                                    record.location
+                                      .package
+                                  }
+                                </strong>
+                              </>
+                            )}
 
-              <div>
-                <span
-                  className={`evidence-status ${record.status
-                    .toLowerCase()
-                    .replaceAll(" ", "-")}`}
-                >
-                  {record.status}
+                            {record.location?.package &&
+                              record.location
+                                ?.version &&
+                              " · "}
+
+                            {record.location?.version && (
+                              <>
+                                Version{" "}
+                                <strong>
+                                  {
+                                    record.location
+                                      .version
+                                  }
+                                </strong>
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="evidence-source">
+                      <b>{record.type}</b>
+                      <span>{record.source}</span>
+                    </div>
+
+                    <div className="evidence-control">
+                      {(() => {
+                        const control =
+                          controls.find(
+                            (item) =>
+                              item.id ===
+                              record.controlId
+                          );
+
+                        return control
+                          ? `${control.id} · ${control.name}`
+                          : record.controlId;
+                      })()}
+                    </div>
+
+                    <div>
+                      <span
+                        className={`evidence-status ${record.status
+                          .toLowerCase()
+                          .replaceAll(" ", "-")}`}
+                      >
+                        {record.status}
+                      </span>
+                    </div>
+                  </article>
+                )
+              )
+            ) : (
+              <div className="evidence-table-empty">
+                <b>No evidence records found</b>
+
+                <span>
+                  Adjust the search or filters to
+                  view assessment evidence.
                 </span>
               </div>
-            </article>
-          ))}
+            )}
+          </div>
         </div>
+
+        {filteredEvidenceRecords.length > 0 && (
+          <div className="evidence-pagination">
+            <div className="evidence-pagination-summary">
+              Showing{" "}
+              <b>
+                {evidencePageStart + 1}
+              </b>
+              {" – "}
+              <b>
+                {Math.min(
+                  evidencePageStart +
+                    EVIDENCE_PER_PAGE,
+                  filteredEvidenceRecords.length
+                )}
+              </b>
+              {" of "}
+              <b>
+                {filteredEvidenceRecords.length}
+              </b>
+            </div>
+
+            {totalEvidencePages > 1 && (
+              <div className="evidence-pagination-controls">
+                <button
+                  type="button"
+                  className="evidence-page-nav"
+                  disabled={
+                    safeEvidencePage === 1
+                  }
+                  onClick={() =>
+                    setEvidencePage(1)
+                  }
+                  aria-label="First page"
+                >
+                  «
+                </button>
+
+                <button
+                  type="button"
+                  className="evidence-page-nav"
+                  disabled={
+                    safeEvidencePage === 1
+                  }
+                  onClick={() =>
+                    setEvidencePage(
+                      Math.max(
+                        1,
+                        safeEvidencePage - 1
+                      )
+                    )
+                  }
+                  aria-label="Previous page"
+                >
+                  ‹
+                </button>
+
+                {evidencePageItems().map(
+                  (item, index) =>
+                    item === "ellipsis" ? (
+                      <span
+                        key={`ellipsis-${index}`}
+                        className="evidence-page-ellipsis"
+                      >
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`evidence-page-number ${
+                          item ===
+                          safeEvidencePage
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setEvidencePage(item)
+                        }
+                      >
+                        {item}
+                      </button>
+                    )
+                )}
+
+                <button
+                  type="button"
+                  className="evidence-page-nav"
+                  disabled={
+                    safeEvidencePage ===
+                    totalEvidencePages
+                  }
+                  onClick={() =>
+                    setEvidencePage(
+                      Math.min(
+                        totalEvidencePages,
+                        safeEvidencePage + 1
+                      )
+                    )
+                  }
+                  aria-label="Next page"
+                >
+                  ›
+                </button>
+
+                <button
+                  type="button"
+                  className="evidence-page-nav"
+                  disabled={
+                    safeEvidencePage ===
+                    totalEvidencePages
+                  }
+                  onClick={() =>
+                    setEvidencePage(
+                      totalEvidencePages
+                    )
+                  }
+                  aria-label="Last page"
+                >
+                  »
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
       </section>
 
       <section className="evidence-trace panel">
@@ -635,9 +985,7 @@ export default function EvidenceVault({
                         <small>
                           EVIDENCE METADATA
                         </small>
-                        <h3>
-                          Traceability
-                        </h3>
+                        <h3>Traceability</h3>
                       </div>
                     </div>
 
@@ -739,7 +1087,9 @@ export default function EvidenceVault({
 
                   <div className="evidence-risk-flow">
                     <div className="evidence-risk-node">
-                      <small>ASSET</small>
+                      <div className="evidence-node-head">
+                        <small>ASSET</small>
+                      </div>
                       <b>{run.asset.name}</b>
                       <span>
                         {run.asset.environment}
@@ -753,7 +1103,9 @@ export default function EvidenceVault({
                     </div>
 
                     <div className="evidence-risk-node">
-                      <small>FINDING</small>
+                      <div className="evidence-node-head">
+                        <small>FINDING</small>
+                      </div>
                       <b>
                         {finding?.title ||
                           selectedEvidence.findingId}
@@ -769,7 +1121,9 @@ export default function EvidenceVault({
                     </div>
 
                     <div className="evidence-risk-node risk-context">
-                      <small>RISK CONTEXT</small>
+                      <div className="evidence-node-head">
+                        <small>RISK CONTEXT</small>
+                      </div>
                       <b>
                         {selectedEvidence.cwe ||
                           finding?.category ||
@@ -787,7 +1141,9 @@ export default function EvidenceVault({
                     </div>
 
                     <div className="evidence-risk-node">
-                      <small>CONTROL</small>
+                      <div className="evidence-node-head">
+                        <small>CONTROL</small>
+                      </div>
                       <b>
                         {control?.name ||
                           selectedEvidence.controlId}
@@ -813,7 +1169,9 @@ export default function EvidenceVault({
                             : "passed"
                       }`}
                     >
-                      <small>SECURITY GATE</small>
+                      <div className="evidence-node-head">
+                        <small>SECURITY GATE</small>
+                      </div>
                       <b>
                         {assessment?.decision ||
                           run.decision}

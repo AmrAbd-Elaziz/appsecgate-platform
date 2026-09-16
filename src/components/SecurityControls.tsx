@@ -60,9 +60,6 @@ export default function SecurityControls({
   const [severityFilter, setSeverityFilter] =
     useState("All");
 
-  const [assetFilter, setAssetFilter] =
-    useState("All");
-
   const [
     selectedRecord,
     setSelectedRecord,
@@ -288,15 +285,9 @@ export default function SecurityControls({
           record.control.severity ===
             severityFilter;
 
-        const matchesAsset =
-          assetFilter === "All" ||
-          record.asset.name ===
-            assetFilter;
-
         return (
           matchesSearch &&
-          matchesSeverity &&
-          matchesAsset
+          matchesSeverity
         );
       }
     );
@@ -304,7 +295,6 @@ export default function SecurityControls({
     scopedRecords,
     search,
     severityFilter,
-    assetFilter,
   ]);
 
   const totalControlPages = Math.max(
@@ -336,7 +326,6 @@ export default function SecurityControls({
   }, [
     search,
     severityFilter,
-    assetFilter,
     selectedFindingId,
   ]);
 
@@ -488,27 +477,7 @@ export default function SecurityControls({
             <option>MEDIUM</option>
             <option>LOW</option>
           </select>
-
-          <select
-            value={assetFilter}
-            onChange={(event) =>
-              setAssetFilter(
-                event.target.value
-              )
-            }
-          >
-            <option>All</option>
-
-            {assets.map((asset) => (
-              <option
-                key={asset}
-                value={asset}
-              >
-                {asset}
-              </option>
-            ))}
-          </select>
-        </div>
+</div>
 
         {loading ? (
           <div className="controls-v2-empty">
@@ -646,48 +615,119 @@ export default function SecurityControls({
                   <button
                     type="button"
                     className="control-page-nav"
+                    aria-label="First page"
+                    title="First page"
                     disabled={safeControlPage === 1}
-                    onClick={() =>
-                      setControlPage(
-                        Math.max(
-                          1,
-                          safeControlPage - 1
-                        )
-                      )
-                    }
-                    aria-label="Previous page"
+                    onClick={() => setControlPage(1)}
                   >
-                    ←
+                    «
                   </button>
-
-                  {Array.from(
-                    { length: totalControlPages },
-                    (_, index) => index + 1
-                  ).map((page) => (
-                    <button
-                      key={page}
-                      type="button"
-                      className={`control-page-number ${
-                        page === safeControlPage
-                          ? "active"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        setControlPage(page)
-                      }
-                      aria-current={
-                        page === safeControlPage
-                          ? "page"
-                          : undefined
-                      }
-                    >
-                      {page}
-                    </button>
-                  ))}
 
                   <button
                     type="button"
                     className="control-page-nav"
+                    aria-label="Previous page"
+                    title="Previous page"
+                    disabled={safeControlPage === 1}
+                    onClick={() =>
+                      setControlPage(
+                        Math.max(1, safeControlPage - 1)
+                      )
+                    }
+                  >
+                    ‹
+                  </button>
+
+                  {(() => {
+                    const pages: Array<
+                      number | "ellipsis-left" | "ellipsis-right"
+                    > = [];
+
+                    const windowStart = Math.max(
+                      2,
+                      safeControlPage - 1
+                    );
+
+                    const windowEnd = Math.min(
+                      totalControlPages - 1,
+                      safeControlPage + 1
+                    );
+
+                    pages.push(1);
+
+                    if (windowStart > 2) {
+                      pages.push("ellipsis-left");
+                    }
+
+                    for (
+                      let page = windowStart;
+                      page <= windowEnd;
+                      page += 1
+                    ) {
+                      if (
+                        page !== 1 &&
+                        page !== totalControlPages
+                      ) {
+                        pages.push(page);
+                      }
+                    }
+
+                    if (
+                      windowEnd <
+                      totalControlPages - 1
+                    ) {
+                      pages.push("ellipsis-right");
+                    }
+
+                    if (totalControlPages > 1) {
+                      pages.push(totalControlPages);
+                    }
+
+                    return pages.map((item) => {
+                      if (
+                        item === "ellipsis-left" ||
+                        item === "ellipsis-right"
+                      ) {
+                        return (
+                          <span
+                            key={item}
+                            className="control-page-ellipsis"
+                            aria-hidden="true"
+                          >
+                            …
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          className={`control-page-number ${
+                            item === safeControlPage
+                              ? "active"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            setControlPage(item)
+                          }
+                          aria-current={
+                            item === safeControlPage
+                              ? "page"
+                              : undefined
+                          }
+                        >
+                          {item}
+                        </button>
+                      );
+                    });
+                  })()}
+
+                  <button
+                    type="button"
+                    className="control-page-nav"
+                    aria-label="Next page"
+                    title="Next page"
                     disabled={
                       safeControlPage ===
                       totalControlPages
@@ -700,9 +740,24 @@ export default function SecurityControls({
                         )
                       )
                     }
-                    aria-label="Next page"
                   >
-                    →
+                    ›
+                  </button>
+
+                  <button
+                    type="button"
+                    className="control-page-nav"
+                    aria-label="Last page"
+                    title="Last page"
+                    disabled={
+                      safeControlPage ===
+                      totalControlPages
+                    }
+                    onClick={() =>
+                      setControlPage(totalControlPages)
+                    }
+                  >
+                    »
                   </button>
                 </div>
               </div>

@@ -810,9 +810,22 @@ export default function FindingIntelligence({
                   <button
                     type="button"
                     className="finding-page-nav"
-                    disabled={
-                      safeFindingPage === 1
+                    aria-label="First page"
+                    title="First page"
+                    disabled={safeFindingPage === 1}
+                    onClick={() =>
+                      setFindingPage(1)
                     }
+                  >
+                    «
+                  </button>
+
+                  <button
+                    type="button"
+                    className="finding-page-nav"
+                    aria-label="Previous page"
+                    title="Previous page"
+                    disabled={safeFindingPage === 1}
                     onClick={() =>
                       setFindingPage(
                         Math.max(
@@ -822,37 +835,98 @@ export default function FindingIntelligence({
                       )
                     }
                   >
-                    ←
+                    ‹
                   </button>
 
-                  {Array.from(
-                    {
-                      length:
-                        totalFindingPages,
-                    },
-                    (_, index) =>
-                      index + 1
-                  ).map((page) => (
-                    <button
-                      key={page}
-                      type="button"
-                      className={`finding-page-number ${
-                        page ===
-                        safeFindingPage
-                          ? "active"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        setFindingPage(page)
+                  {(() => {
+                    const pages: Array<
+                      number | "ellipsis-left" | "ellipsis-right"
+                    > = [];
+
+                    const windowStart = Math.max(
+                      2,
+                      safeFindingPage - 2
+                    );
+
+                    const windowEnd = Math.min(
+                      totalFindingPages - 1,
+                      safeFindingPage + 2
+                    );
+
+                    pages.push(1);
+
+                    if (windowStart > 2) {
+                      pages.push("ellipsis-left");
+                    }
+
+                    for (
+                      let page = windowStart;
+                      page <= windowEnd;
+                      page += 1
+                    ) {
+                      pages.push(page);
+                    }
+
+                    if (
+                      windowEnd <
+                      totalFindingPages - 1
+                    ) {
+                      pages.push("ellipsis-right");
+                    }
+
+                    if (totalFindingPages > 1) {
+                      pages.push(
+                        totalFindingPages
+                      );
+                    }
+
+                    return pages.map((page) => {
+                      if (
+                        page === "ellipsis-left" ||
+                        page === "ellipsis-right"
+                      ) {
+                        return (
+                          <span
+                            key={page}
+                            className="finding-page-ellipsis"
+                            aria-hidden="true"
+                          >
+                            …
+                          </span>
+                        );
                       }
-                    >
-                      {page}
-                    </button>
-                  ))}
+
+                      return (
+                        <button
+                          key={page}
+                          type="button"
+                          className={`finding-page-number ${
+                            page ===
+                            safeFindingPage
+                              ? "active"
+                              : ""
+                          }`}
+                          aria-current={
+                            page ===
+                            safeFindingPage
+                              ? "page"
+                              : undefined
+                          }
+                          onClick={() =>
+                            setFindingPage(page)
+                          }
+                        >
+                          {page}
+                        </button>
+                      );
+                    });
+                  })()}
 
                   <button
                     type="button"
                     className="finding-page-nav"
+                    aria-label="Next page"
+                    title="Next page"
                     disabled={
                       safeFindingPage ===
                       totalFindingPages
@@ -866,7 +940,25 @@ export default function FindingIntelligence({
                       )
                     }
                   >
-                    →
+                    ›
+                  </button>
+
+                  <button
+                    type="button"
+                    className="finding-page-nav"
+                    aria-label="Last page"
+                    title="Last page"
+                    disabled={
+                      safeFindingPage ===
+                      totalFindingPages
+                    }
+                    onClick={() =>
+                      setFindingPage(
+                        totalFindingPages
+                      )
+                    }
+                  >
+                    »
                   </button>
                 </div>
               </div>
