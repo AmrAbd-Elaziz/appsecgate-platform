@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  assertBackendAvailable,
+  getAssets,
+} from "../lib/client/appsecgate-api";
+
+
+import {
   FormEvent,
   useEffect,
   useState,
@@ -239,19 +245,8 @@ export default function AssetsInputs({
         setLoadingAssets(true);
         setAssetError("");
 
-        const response =
-          await fetch("/api/assets", {
-            cache: "no-store",
-          });
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to load assets."
-          );
-        }
-
         const payload =
-          await response.json();
+          await getAssets();
 
         const loadedAssets =
           payload.data as Asset[];
@@ -508,6 +503,10 @@ export default function AssetsInputs({
         file
       );
 
+      assertBackendAvailable(
+        "Source upload"
+      );
+
       const response =
         await fetch(
           "/api/uploads/source",
@@ -619,6 +618,10 @@ export default function AssetsInputs({
 
       formData.append("file", file);
 
+      assertBackendAvailable(
+        "OpenAPI upload"
+      );
+
       const response =
         await fetch(
           "/api/uploads/openapi",
@@ -689,6 +692,10 @@ export default function AssetsInputs({
     try {
       setValidatingDast(true);
       setAssetError("");
+
+      assertBackendAvailable(
+        "DAST target validation"
+      );
 
       const response =
         await fetch(
@@ -769,6 +776,10 @@ export default function AssetsInputs({
         file
       );
 
+      assertBackendAvailable(
+        "Container archive upload"
+      );
+
       const response =
         await fetch(
           "/api/uploads/container",
@@ -846,6 +857,10 @@ export default function AssetsInputs({
       setContainerValidated(false);
       setContainerImageId("");
       setAssetError("");
+
+      assertBackendAvailable(
+        "Container image validation"
+      );
 
       const response =
         await fetch(
@@ -930,6 +945,10 @@ export default function AssetsInputs({
         file
       );
 
+      assertBackendAvailable(
+        "IaC upload"
+      );
+
       const response =
         await fetch(
           "/api/uploads/iac",
@@ -997,6 +1016,10 @@ export default function AssetsInputs({
     try {
       setImportingRepository(true);
       setAssetError("");
+
+      assertBackendAvailable(
+        "Repository import"
+      );
 
       const response =
         await fetch(
@@ -1207,6 +1230,10 @@ export default function AssetsInputs({
         Object.values(
           scanProfile
         ).some(Boolean);
+
+      assertBackendAvailable(
+        "Creating a new assessment input"
+      );
 
       const response =
         await fetch("/api/assets", {

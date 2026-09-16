@@ -1,5 +1,8 @@
 "use client";
 
+import { getAssessments } from "../lib/client/appsecgate-api";
+
+
 import {
   useEffect,
   useMemo,
@@ -165,20 +168,8 @@ export default function Reports({
 
     async function loadAssessments() {
       try {
-        const response = await fetch(
-          "/api/assessments",
-          {
-            cache: "no-store",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to load assessments."
-          );
-        }
-
-        const payload = await response.json();
+        const payload =
+          await getAssessments();
 
         const loaded = Array.isArray(payload.data)
           ? (payload.data as PersistedAssessment[])

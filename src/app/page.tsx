@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  assertBackendAvailable,
+  getAssessment,
+  getAssessments,
+  getAssets,
+} from "../lib/client/appsecgate-api";
+
+
 import { useEffect, useState } from "react";
 import AssetsInputs from "../components/AssetsInputs";
 import AssessmentRuns from "../components/AssessmentRuns";
@@ -205,29 +213,12 @@ export default function Home() {
         )
       ) {
         try {
-          const response = await fetch(
-            `/api/assessments/${assessmentId}`,
-            {
-              cache: "no-store",
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error(
-              "Unable to restore assessment context."
-            );
-          }
-
-          const payload =
-            await response.json();
+          const contextualAssessment =
+            await getAssessment(assessmentId);
 
           if (cancelled) {
             return;
           }
-
-          const contextualAssessment =
-            (payload.data ??
-              payload) as PersistedAssessment;
 
           setFocusedFindingId(
             findingId
@@ -255,29 +246,12 @@ export default function Home() {
         )
       ) {
         try {
-          const response = await fetch(
-            `/api/assessments/${assessmentId}`,
-            {
-              cache: "no-store",
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error(
-              "Unable to restore control context."
-            );
-          }
-
-          const payload =
-            await response.json();
+          const contextualAssessment =
+            await getAssessment(assessmentId);
 
           if (cancelled) {
             return;
           }
-
-          const contextualAssessment =
-            (payload.data ??
-              payload) as PersistedAssessment;
 
           setFocusedFindingId(null);
           setFocusedControlId(controlId);
@@ -342,25 +316,11 @@ export default function Home() {
       try {
         setOverviewLoading(true);
 
-        const [assetsResponse, assessmentsResponse] =
+        const [assetsPayload, assessmentsPayload] =
           await Promise.all([
-            fetch("/api/assets", {
-              cache: "no-store",
-            }),
-            fetch("/api/assessments", {
-              cache: "no-store",
-            }),
+            getAssets(),
+            getAssessments(),
           ]);
-
-        if (!assetsResponse.ok || !assessmentsResponse.ok) {
-          throw new Error(
-            "Unable to hydrate persisted AppSecGate state."
-          );
-        }
-
-        const assetsPayload = await assetsResponse.json();
-        const assessmentsPayload =
-          await assessmentsResponse.json();
 
         if (cancelled) {
           return;
@@ -400,24 +360,8 @@ export default function Home() {
     assessmentId: string
   ) {
     try {
-      const response = await fetch(
-        `/api/assessments/${assessmentId}`,
-        {
-          cache: "no-store",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Unable to load finding assessment context."
-        );
-      }
-
-      const payload = await response.json();
-
       const contextualAssessment =
-        (payload.data ??
-          payload) as PersistedAssessment;
+        await getAssessment(assessmentId);
 
       setFocusedFindingId(findingId);
       setFocusedAssessment(
@@ -441,24 +385,8 @@ export default function Home() {
     assessmentId: string
   ) {
     try {
-      const response = await fetch(
-        `/api/assessments/${assessmentId}`,
-        {
-          cache: "no-store",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          "Unable to load control assessment context."
-        );
-      }
-
-      const payload = await response.json();
-
       const contextualAssessment =
-        (payload.data ??
-          payload) as PersistedAssessment;
+        await getAssessment(assessmentId);
 
       setFocusedFindingId(null);
       setFocusedControlId(controlId);
@@ -523,6 +451,10 @@ export default function Home() {
     setAssessmentRunError("");
 
     try {
+      assertBackendAvailable(
+        "Running a new security assessment"
+      );
+
       const response = await fetch("/api/assessments", {
         method: "POST",
         headers: {

@@ -1,5 +1,8 @@
 "use client";
 
+import { getControls } from "../lib/client/appsecgate-api";
+
+
 import {
   useEffect,
   useMemo,
@@ -133,23 +136,8 @@ export default function SecurityControls({
       setLoading(true);
 
       try {
-        const response = await fetch(
-          assessment?.id
-              ? `/api/controls?assessmentId=${encodeURIComponent(assessment.id)}`
-              : "/api/controls",
-          {
-            cache: "no-store",
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            "Unable to load controls."
-          );
-        }
-
         const payload =
-          (await response.json()) as ControlsResponse;
+          await getControls(assessment?.id);
 
         if (!cancelled) {
           setRecords(payload.data ?? []);

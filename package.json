@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:demo": "node scripts/build-static-demo.mjs"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

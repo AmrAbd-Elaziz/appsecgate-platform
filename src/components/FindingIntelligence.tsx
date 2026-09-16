@@ -1,5 +1,8 @@
 "use client";
 
+import { getFindings } from "../lib/client/appsecgate-api";
+
+
 import {
   useEffect,
   useMemo,
@@ -143,32 +146,8 @@ export default function FindingIntelligence({
       setError("");
 
       try {
-        const findingsUrl =
-          assessment?.id
-            ? `/api/findings?assessmentId=${encodeURIComponent(
-                assessment.id
-              )}`
-            : "/api/findings";
-
-        const response = await fetch(
-          findingsUrl,
-          {
-            cache: "no-store",
-          }
-        );
-
         const payload =
-          (await response.json()) as
-            FindingsResponse & {
-              error?: string;
-            };
-
-        if (!response.ok) {
-          throw new Error(
-            payload.error ??
-              "Unable to load finding intelligence."
-          );
-        }
+          await getFindings(assessment?.id);
 
         if (!cancelled) {
           setRecords(
