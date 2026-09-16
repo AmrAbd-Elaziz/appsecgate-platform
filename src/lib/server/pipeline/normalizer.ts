@@ -80,29 +80,51 @@ function extractComponent(
   finding: RawFinding
 ): string {
   /*
-   * Trivy adapters expose dependency context as:
+   * Dependency/container correlation identity:
+   *
+   *   CVE + package/component
+   *
+   * Both Trivy FS and Trivy Container encode their
+   * package immediately after the CVE in fingerprint:
+   *
+   *   FS:        CVE:package:target
+   *   Container: CVE:package:installed:type
+   *
+   * Prefer this structured scanner identity before
+   * parsing the human-readable location.
+   */
+  const cve = extractCve(finding);
+
+  if (cve && finding.fingerprint) {
+    const parts = finding.fingerprint
+      .split(":")
+      .map((part) => part.trim());
+
+    const cveIndex = parts.findIndex(
+      (part) => part.toUpperCase() === cve
+    );
+
+    const candidate =
+      cveIndex >= 0
+        ? parts[cveIndex + 1]
+        : undefined;
+
+    if (candidate) {
+      return candidate.toLowerCase();
+    }
+  }
+
+  /*
+   * Fallback for adapters exposing dependency context
+   * only through:
    *
    *   target:package@version
-   *
-   * Keep the package/component in the correlation
-   * identity so unrelated components sharing a CVE
-   * are not collapsed into one risk.
    */
-  const location =
-    finding.location?.trim();
+  const location = finding.location?.trim();
 
   if (location) {
-    const tail =
-      location.includes(":")
-        ? location.slice(
-            location.lastIndexOf(":") + 1
-          )
-        : location;
-
     const packageMatch =
-      tail.match(
-        /^([^@\s]+)@[^\s]+$/
-      );
+      location.match(/:([^:@\s]+)@[^@\s]+$/);
 
     if (packageMatch?.[1]) {
       return packageMatch[1]
@@ -112,42 +134,14 @@ function extractComponent(
   }
 
   /*
-   * Fallback for scanner fingerprints that encode
-   * CVE:package:context.
+   * Do not accidentally correlate unknown components
+   * solely because they share a CVE.
    */
-  const cve =
-    extractCve(finding);
-
-  if (
-    cve &&
-    finding.fingerprint
-  ) {
-    const parts =
-      finding.fingerprint
-        .split(":")
-        .map(
-          (part) =>
-            part.trim()
-        );
-
-    const cveIndex =
-      parts.findIndex(
-        (part) =>
-          part.toUpperCase() === cve
-      );
-
-    const candidate =
-      cveIndex >= 0
-        ? parts[cveIndex + 1]
-        : undefined;
-
-    if (candidate) {
-      return candidate
-        .toLowerCase();
-    }
-  }
-
-  return "unknown-component";
+  return [
+    "unknown-component",
+    finding.scanner.toLowerCase(),
+    finding.fingerprint.toLowerCase(),
+  ].join(":");
 }
 
 function normalizedLocation(
