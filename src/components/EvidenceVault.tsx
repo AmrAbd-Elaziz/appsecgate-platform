@@ -17,6 +17,7 @@ type Props = {
   onGoToControls: () => void;
   onViewReports: () => void;
   selectedFindingId?: string | null;
+  selectedControlId?: string | null;
 };
 
 export default function EvidenceVault({
@@ -25,6 +26,7 @@ export default function EvidenceVault({
   onGoToControls,
   onViewReports,
   selectedFindingId,
+  selectedControlId,
 }: Props) {
   const [
     selectedEvidence,
@@ -161,6 +163,7 @@ export default function EvidenceVault({
     evidenceSearch,
     evidenceSourceFilter,
     selectedFindingId,
+    selectedControlId,
     assessment?.id,
   ]);
 
@@ -194,6 +197,50 @@ export default function EvidenceVault({
   const allEvidenceRecords =
     assessment?.evidence ?? [];
 
+  const controls =
+    assessment?.controls ?? [];
+
+  /*
+   * A persisted control ID represents one
+   * finding-to-control mapping instance.
+   *
+   * When navigation comes from Security Controls,
+   * resolve that instance to its stable control
+   * definition, then include every finding mapped
+   * to the same definition.
+   */
+  const selectedControl =
+    selectedControlId
+      ? controls.find(
+          (control) =>
+            control.id === selectedControlId
+        ) ?? null
+      : null;
+
+  const selectedControlFindingIds =
+    selectedControl
+      ? new Set(
+          controls
+            .filter(
+              (control) =>
+                control.domain ===
+                  selectedControl.domain &&
+                control.name ===
+                  selectedControl.name &&
+                control.owner ===
+                  selectedControl.owner &&
+                control.remediation ===
+                  selectedControl.remediation &&
+                control.requiredEvidence ===
+                  selectedControl.requiredEvidence
+            )
+            .map(
+              (control) => control.findingId
+            )
+            .filter(Boolean)
+        )
+      : null;
+
   const evidenceRecords =
     selectedFindingId
       ? allEvidenceRecords.filter(
@@ -201,10 +248,14 @@ export default function EvidenceVault({
             record.findingId ===
             selectedFindingId
         )
-      : allEvidenceRecords;
-
-  const controls =
-    assessment?.controls ?? [];
+      : selectedControlFindingIds
+        ? allEvidenceRecords.filter(
+            (record) =>
+              selectedControlFindingIds.has(
+                record.findingId
+              )
+          )
+        : allEvidenceRecords;
 
   const evidenceSourceOptions = Array.from(
     new Set(
@@ -390,9 +441,21 @@ export default function EvidenceVault({
         </article>
 
         <article>
-          <small>Controls mapped</small>
-          <b>{controlsMapped}</b>
-          <span>Evidence-linked</span>
+          <small>
+            {selectedControl
+              ? "Controls in scope"
+              : "Controls mapped"}
+          </small>
+          <b>
+            {selectedControl
+              ? 1
+              : controlsMapped}
+          </b>
+          <span>
+            {selectedControl
+              ? "Selected control definition"
+              : "Evidence-linked"}
+          </span>
         </article>
       </section>
 
@@ -406,6 +469,17 @@ export default function EvidenceVault({
           </div>
           <span>{evidenceRecords.length} records</span>
         </div>
+
+        {selectedControl && (
+          <div className="control-scope-banner">
+            <small>CONTROL SCOPE</small>
+            <b>{selectedControl.name}</b>
+            <span>
+              {findingsCovered} linked findings ·{" "}
+              {evidenceRecords.length} evidence records
+            </span>
+          </div>
+        )}
 
         {selectedFindingId && (
           <div className="finding-context-banner">

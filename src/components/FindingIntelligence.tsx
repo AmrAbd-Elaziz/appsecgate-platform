@@ -15,6 +15,7 @@ import type {
 type Props = {
   run: AssessmentRun | null;
   assessment: PersistedAssessment | null;
+  selectedControlId?: string | null;
   onGoToAssessment: () => void;
   onViewControls: (
     findingId: string,
@@ -63,6 +64,7 @@ function formatDate(value?: string) {
 export default function FindingIntelligence({
   run,
   assessment,
+  selectedControlId,
   onGoToAssessment,
   onViewControls,
   onViewEvidence,
@@ -290,6 +292,78 @@ export default function FindingIntelligence({
     );
   }, [records]);
 
+  const selectedControl =
+    useMemo(() => {
+      if (!selectedControlId) {
+        return null;
+      }
+
+      return (
+        (assessment?.controls ?? []).find(
+          (control) =>
+            control.id ===
+            selectedControlId
+        ) ?? null
+      );
+    }, [
+      assessment,
+      selectedControlId,
+    ]);
+
+  const selectedControlFindingIds =
+    useMemo(() => {
+      if (!selectedControl) {
+        return selectedControlId
+          ? new Set<string>()
+          : null;
+      }
+
+      const controls =
+        assessment?.controls ?? [];
+
+      return new Set(
+        controls
+          .filter(
+            (control) =>
+              control.domain ===
+                selectedControl.domain &&
+              control.name ===
+                selectedControl.name &&
+              control.owner ===
+                selectedControl.owner &&
+              control.remediation ===
+                selectedControl.remediation &&
+              control.requiredEvidence ===
+                selectedControl.requiredEvidence
+          )
+          .map(
+            (control) =>
+              control.findingId
+          )
+          .filter(Boolean)
+      );
+    }, [
+      assessment,
+      selectedControl,
+      selectedControlId,
+    ]);
+
+  const controlScopedRecords =
+    useMemo(
+      () =>
+        selectedControlFindingIds
+          ? records.filter((record) =>
+              selectedControlFindingIds.has(
+                record.finding.id
+              )
+            )
+          : records,
+      [
+        records,
+        selectedControlFindingIds,
+      ]
+    );
+
   const filteredRecords =
     useMemo(() => {
       const query =
@@ -302,6 +376,12 @@ export default function FindingIntelligence({
 
           const lifecycle =
             record.lifecycle;
+
+          const matchesControl =
+            !selectedControlFindingIds ||
+            selectedControlFindingIds.has(
+              finding.id
+            );
 
           const matchesSearch =
             !query ||
@@ -336,7 +416,8 @@ export default function FindingIntelligence({
             String(record.asset.id) ===
               assetId;
 
-  return (
+          return (
+            matchesControl &&
             matchesSearch &&
             matchesSeverity &&
             matchesStatus &&
@@ -346,12 +427,12 @@ export default function FindingIntelligence({
       );
     }, [
       records,
+      selectedControlFindingIds,
       search,
       severity,
       status,
       assetId,
     ]);
-
 
   const FINDINGS_PER_PAGE = 10;
 
@@ -392,21 +473,21 @@ export default function FindingIntelligence({
   ]);
 
   const openCount =
-    records.filter(
+    controlScopedRecords.filter(
       (record) =>
         record.lifecycle.status ===
         "Open"
     ).length;
 
   const closedCount =
-    records.filter(
+    controlScopedRecords.filter(
       (record) =>
         record.lifecycle.status ===
         "Closed"
     ).length;
 
   const criticalCount =
-    records.filter(
+    controlScopedRecords.filter(
       (record) =>
         record.finding.severity ===
         "CRITICAL"
@@ -498,13 +579,23 @@ export default function FindingIntelligence({
         </div>
       </header>
 
+      {selectedControl && (
+        <div className="control-scope-banner">
+          <small>CONTROL SCOPE</small>
+          <b>{selectedControl.name}</b>
+          <span>
+            {controlScopedRecords.length} linked findings
+          </span>
+        </div>
+      )}
+
       <section className="finding-kpis">
         <article>
           <small>
             Total findings
           </small>
 
-          <b>{records.length}</b>
+          <b>{controlScopedRecords.length}</b>
 
           <span>
             Persistent intelligence

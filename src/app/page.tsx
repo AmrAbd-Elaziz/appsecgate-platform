@@ -110,6 +110,7 @@ export default function Home() {
     context?: {
       findingId?: string | null;
       assessmentId?: string | null;
+      controlId?: string | null;
     }
   ) {
     setViewState(nextView);
@@ -144,12 +145,23 @@ export default function Home() {
       url.searchParams.delete("assessment");
     }
 
+    if (context?.controlId) {
+      url.searchParams.set(
+        "control",
+        context.controlId
+      );
+    } else {
+      url.searchParams.delete("control");
+    }
+
     window.history.pushState(
       {
         view: nextView,
         finding: context?.findingId ?? null,
         assessment:
           context?.assessmentId ?? null,
+        control:
+          context?.controlId ?? null,
       },
       "",
       `${url.pathname}${url.search}${url.hash}`
@@ -172,6 +184,9 @@ export default function Home() {
 
       const assessmentId =
         params.get("assessment");
+
+      const controlId =
+        params.get("control");
 
       const nextView = isValidView(
         requestedView
@@ -231,7 +246,56 @@ export default function Home() {
         }
       }
 
+      if (
+        controlId &&
+        assessmentId &&
+        (
+          nextView === "findings" ||
+          nextView === "evidence"
+        )
+      ) {
+        try {
+          const response = await fetch(
+            `/api/assessments/${assessmentId}`,
+            {
+              cache: "no-store",
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              "Unable to restore control context."
+            );
+          }
+
+          const payload =
+            await response.json();
+
+          if (cancelled) {
+            return;
+          }
+
+          const contextualAssessment =
+            (payload.data ??
+              payload) as PersistedAssessment;
+
+          setFocusedFindingId(null);
+          setFocusedControlId(controlId);
+          setFocusedAssessment(
+            contextualAssessment
+          );
+
+          return;
+        } catch (error) {
+          console.error(
+            "Control navigation context restore failed:",
+            error
+          );
+        }
+      }
+
       setFocusedFindingId(null);
+      setFocusedControlId(null);
       setFocusedAssessment(null);
     }
 
@@ -263,6 +327,9 @@ export default function Home() {
 
   const [focusedAssessment, setFocusedAssessment] =
     useState<PersistedAssessment | null>(null);
+
+  const [focusedControlId, setFocusedControlId] =
+    useState<string | null>(null);
 
   const [assetCount, setAssetCount] = useState(0);
   const [assessmentCount, setAssessmentCount] = useState(0);
@@ -363,6 +430,49 @@ export default function Home() {
     } catch (error) {
       console.error(
         "Finding context navigation failed:",
+        error
+      );
+    }
+  }
+
+  async function openControlContext(
+    targetView: "findings" | "evidence",
+    controlId: string,
+    assessmentId: string
+  ) {
+    try {
+      const response = await fetch(
+        `/api/assessments/${assessmentId}`,
+        {
+          cache: "no-store",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Unable to load control assessment context."
+        );
+      }
+
+      const payload = await response.json();
+
+      const contextualAssessment =
+        (payload.data ??
+          payload) as PersistedAssessment;
+
+      setFocusedFindingId(null);
+      setFocusedControlId(controlId);
+      setFocusedAssessment(
+        contextualAssessment
+      );
+
+      setView(targetView, {
+        assessmentId,
+        controlId,
+      });
+    } catch (error) {
+      console.error(
+        "Control context navigation failed:",
         error
       );
     }
@@ -1285,6 +1395,9 @@ export default function Home() {
             run={latestRun}
             assessment={latestAssessment}
             onGoToAssessment={() => setView("assessments")}
+            selectedControlId={
+              focusedControlId
+            }
             onViewControls={(findingId, assessmentId) =>
               void openFindingContext(
                 "controls",
@@ -1315,18 +1428,26 @@ export default function Home() {
             selectedFindingId={
               focusedFindingId
             }
-            onGoToFindings={() => {
-              setFocusedFindingId(null);
-              setFocusedAssessment(null);
-              setView("findings");
+            onGoToFindings={(
+              controlId,
+              assessmentId
+            ) => {
+              void openControlContext(
+                "findings",
+                controlId,
+                assessmentId
+              );
             }}
-            onViewEvidence={() =>
-              setView("evidence", {
-                findingId: focusedFindingId,
-                assessmentId:
-                  focusedAssessment?.id ?? null,
-              })
-            }
+            onViewEvidence={(
+              controlId,
+              assessmentId
+            ) => {
+              void openControlContext(
+                "evidence",
+                controlId,
+                assessmentId
+              );
+            }}
           />
         ) : view === "evidence" ? (
           <EvidenceVault
@@ -1342,6 +1463,9 @@ export default function Home() {
             }
             selectedFindingId={
               focusedFindingId
+            }
+            selectedControlId={
+              focusedControlId
             }
             onGoToControls={() =>
               setView("controls", {

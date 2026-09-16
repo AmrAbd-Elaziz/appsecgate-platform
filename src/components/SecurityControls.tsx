@@ -15,8 +15,14 @@ import {
 type Props = {
   run: AssessmentRun | null;
   assessment: PersistedAssessment | null;
-  onGoToFindings: () => void;
-  onViewEvidence: () => void;
+  onGoToFindings: (
+    controlId: string,
+    assessmentId: string
+  ) => void;
+  onViewEvidence: (
+    controlId: string,
+    assessmentId: string
+  ) => void;
   selectedFindingId?: string | null;
 };
 
@@ -30,6 +36,18 @@ type ControlsResponse = {
     critical: number;
     assets: number;
   };
+};
+
+type ControlGroup = {
+  key: string;
+  representative: ControlIntelligenceRecord;
+  records: ControlIntelligenceRecord[];
+  linkedFindingCount: number;
+  openFindingCount: number;
+  closedFindingCount: number;
+  highestSeverity: string;
+  latestUpdatedAt: string;
+  earliestMappedAt: string;
 };
 
 function formatDate(value?: string) {
@@ -61,30 +79,30 @@ export default function SecurityControls({
     useState("All");
 
   const [
-    selectedRecord,
-    setSelectedRecord,
-  ] =
-    useState<ControlIntelligenceRecord | null>(
-      null
-    );
+    selectedGroup,
+    setSelectedGroup,
+  ] = useState<ControlGroup | null>(null);
+
+  const selectedRecord =
+    selectedGroup?.representative ?? null;
 
   function openControlDetail(
-    record: ControlIntelligenceRecord
+    group: ControlGroup
   ) {
-    setSelectedRecord(record);
+    setSelectedGroup(group);
 
     const url = new URL(window.location.href);
 
     url.searchParams.set("view", "controls");
     url.searchParams.set(
       "control",
-      record.control.id
+      group.key
     );
 
     window.history.pushState(
       {
         view: "controls",
-        control: record.control.id,
+        control: group.key,
       },
       "",
       `${url.pathname}${url.search}${url.hash}`
@@ -92,7 +110,7 @@ export default function SecurityControls({
   }
 
   function closeControlDetail() {
-    setSelectedRecord(null);
+    setSelectedGroup(null);
 
     const url = new URL(window.location.href);
 
@@ -154,44 +172,7 @@ export default function SecurityControls({
     };
   }, [assessment?.id]);
 
-  useEffect(() => {
-    function syncControlFromUrl() {
-      const params = new URLSearchParams(
-        window.location.search
-      );
 
-      const controlId =
-        params.get("control");
-
-      if (!controlId) {
-        setSelectedRecord(null);
-        return;
-      }
-
-      const matchingRecord = records.find(
-        (record) =>
-          record.control.id === controlId
-      );
-
-      setSelectedRecord(
-        matchingRecord ?? null
-      );
-    }
-
-    syncControlFromUrl();
-
-    window.addEventListener(
-      "popstate",
-      syncControlFromUrl
-    );
-
-    return () => {
-      window.removeEventListener(
-        "popstate",
-        syncControlFromUrl
-      );
-    };
-  }, [records]);
 
   useEffect(() => {
     if (!selectedRecord) {
@@ -240,6 +221,188 @@ export default function SecurityControls({
     );
   }, [records, selectedFindingId]);
 
+  const groupedControls = useMemo<ControlGroup[]>(() => {
+    const severityRank: Record<string, number> = {
+      CRITICAL: 4,
+      HIGH: 3,
+      MEDIUM: 2,
+      LOW: 1,
+    };
+
+    const groups = new Map<
+      string,
+      ControlIntelligenceRecord[]
+    >();
+
+    for (const record of scopedRecords) {
+      /*
+       * The persisted control ID represents a
+       * finding-to-control mapping instance.
+       *
+       * Group by the stable control definition
+       * instead of the generated instance ID.
+       */
+      const key = [
+        record.control.domain,
+        record.control.name,
+        record.control.owner,
+        record.control.remediation,
+        record.control.requiredEvidence,
+      ].join("::");
+
+      const items = groups.get(key) ?? [];
+
+      items.push(record);
+      groups.set(key, items);
+    }
+
+    return Array.from(groups.entries())
+      .map(([key, items]) => {
+        const representative =
+          items.reduce((best, current) => {
+            const bestRank =
+              severityRank[
+                best.control.severity
+              ] ?? 0;
+
+            const currentRank =
+              severityRank[
+                current.control.severity
+              ] ?? 0;
+
+            return currentRank > bestRank
+              ? current
+              : best;
+          });
+
+        const linkedFindingIds = new Set(
+          items.map(
+            (item) => item.finding.id
+          )
+        );
+
+        const openFindingIds = new Set(
+          items
+            .filter(
+              (item) =>
+                item.findingLifecycle.status ===
+                "Open"
+            )
+            .map(
+              (item) => item.finding.id
+            )
+        );
+
+        const closedFindingIds = new Set(
+          items
+            .filter(
+              (item) =>
+                item.findingLifecycle.status ===
+                "Closed"
+            )
+            .map(
+              (item) => item.finding.id
+            )
+        );
+
+        const updatedDates = items
+          .map(
+            (item) =>
+              item.lifecycle.lastUpdatedAt
+          )
+          .filter(Boolean)
+          .sort();
+
+        const mappedDates = items
+          .map(
+            (item) =>
+              item.lifecycle.firstRequiredAt
+          )
+          .filter(Boolean)
+          .sort();
+
+        return {
+          key,
+          representative,
+          records: items,
+
+          linkedFindingCount:
+            linkedFindingIds.size,
+
+          openFindingCount:
+            openFindingIds.size,
+
+          closedFindingCount:
+            closedFindingIds.size,
+
+          highestSeverity:
+            representative.control.severity,
+
+          latestUpdatedAt:
+            updatedDates.at(-1) ?? "",
+
+          earliestMappedAt:
+            mappedDates.at(0) ?? "",
+        };
+      })
+      .sort(
+        (a, b) =>
+          (severityRank[b.highestSeverity] ?? 0) -
+            (severityRank[a.highestSeverity] ?? 0) ||
+          b.linkedFindingCount -
+            a.linkedFindingCount ||
+          a.representative.control.name.localeCompare(
+            b.representative.control.name
+          )
+      );
+  }, [scopedRecords]);
+
+  useEffect(() => {
+    function syncControlFromUrl() {
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const controlKey =
+        params.get("control");
+
+      if (!controlKey) {
+        setSelectedGroup(null);
+        return;
+      }
+
+      const matchingGroup =
+        groupedControls.find(
+          (group) =>
+            group.key === controlKey ||
+            group.records.some(
+              (record) =>
+                record.control.id ===
+                controlKey
+            )
+        );
+
+      setSelectedGroup(
+        matchingGroup ?? null
+      );
+    }
+
+    syncControlFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncControlFromUrl
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncControlFromUrl
+      );
+    };
+  }, [groupedControls]);
+
   const assets = useMemo(
     () =>
       Array.from(
@@ -258,22 +421,30 @@ export default function SecurityControls({
   const [controlPage, setControlPage] =
     useState(1);
 
-  const filteredRecords = useMemo(() => {
+  const filteredGroups = useMemo(() => {
     const query =
       search.trim().toLowerCase();
 
-    return scopedRecords.filter(
-      (record) => {
+    return groupedControls.filter(
+      (group) => {
+        const record =
+          group.representative;
+
         const matchesSearch =
           !query ||
           [
             record.control.id,
             record.control.name,
             record.control.domain,
-            record.finding.id,
-            record.finding.title,
             record.asset.name,
             record.control.owner,
+
+            ...group.records.flatMap(
+              (item) => [
+                item.finding.id,
+                item.finding.title,
+              ]
+            ),
           ].some((value) =>
             value
               .toLowerCase()
@@ -282,7 +453,7 @@ export default function SecurityControls({
 
         const matchesSeverity =
           severityFilter === "All" ||
-          record.control.severity ===
+          group.highestSeverity ===
             severityFilter;
 
         return (
@@ -292,7 +463,7 @@ export default function SecurityControls({
       }
     );
   }, [
-    scopedRecords,
+    groupedControls,
     search,
     severityFilter,
   ]);
@@ -300,7 +471,7 @@ export default function SecurityControls({
   const totalControlPages = Math.max(
     1,
     Math.ceil(
-      filteredRecords.length /
+      filteredGroups.length /
         CONTROLS_PER_PAGE
     )
   );
@@ -314,11 +485,21 @@ export default function SecurityControls({
     (safeControlPage - 1) *
     CONTROLS_PER_PAGE;
 
-  const paginatedRecords =
-    filteredRecords.slice(
+  const paginatedGroups =
+    filteredGroups.slice(
       controlPageStart,
       controlPageStart +
         CONTROLS_PER_PAGE
+    );
+
+  /*
+   * Temporary compatibility aliases.
+   * Step 3B will move the JSX to groups
+   * and remove these aliases.
+   */
+  const filteredRecords =
+    filteredGroups.map(
+      (group) => group.representative
     );
 
   useEffect(() => {
@@ -331,7 +512,7 @@ export default function SecurityControls({
 
   const summary = useMemo(
     () => ({
-      total: scopedRecords.length,
+      total: groupedControls.length,
 
       findingsMapped: new Set(
         scopedRecords.map(
@@ -345,13 +526,17 @@ export default function SecurityControls({
         )
       ).size,
 
-      criticalControls: scopedRecords.filter(
-        (record) =>
-          record.control.severity ===
-          "CRITICAL"
-      ).length,
+      criticalControls:
+        groupedControls.filter(
+          (group) =>
+            group.highestSeverity ===
+            "CRITICAL"
+        ).length,
     }),
-    [scopedRecords]
+    [
+      groupedControls,
+      scopedRecords,
+    ]
   );
 
   return (
@@ -390,7 +575,59 @@ export default function SecurityControls({
           <button
             type="button"
             className="secondary-button"
-            onClick={onGoToFindings}
+            onClick={() => {
+              const assessmentId =
+                assessment?.id;
+
+              if (
+                !selectedFindingId ||
+                !assessmentId
+              ) {
+                return;
+              }
+
+              const url =
+                new URL(
+                  window.location.href
+                );
+
+              url.searchParams.set(
+                "view",
+                "findings"
+              );
+              url.searchParams.delete(
+                "control"
+              );
+              url.searchParams.delete(
+                "evidence"
+              );
+              url.searchParams.set(
+                "finding",
+                selectedFindingId
+              );
+              url.searchParams.set(
+                "assessment",
+                assessmentId
+              );
+
+              window.history.pushState(
+                {
+                  view: "findings",
+                  finding:
+                    selectedFindingId,
+                  assessment:
+                    assessmentId,
+                },
+                "",
+                `${url.pathname}${url.search}${url.hash}`
+              );
+
+              window.dispatchEvent(
+                new PopStateEvent(
+                  "popstate"
+                )
+              );
+            }}
           >
             Back to Finding Intelligence
           </button>
@@ -492,106 +729,109 @@ export default function SecurityControls({
           <>
           <div className="controls-v2-table-wrap">
             <table className="controls-v2-table">
-              <thead>
-                <tr>
-                  <th>Control</th>
-                  <th>Severity</th>
-                  <th>Asset</th>
-                  <th>Finding</th>
-                  <th>Owner</th>
-                  <th>Updated</th>
-                </tr>
-              </thead>
+                <thead>
+                  <tr>
+                    <th>Control</th>
+                    <th>Severity</th>
+                    <th>Asset</th>
+                    <th>Linked Findings</th>
+                    <th>Owner</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {paginatedRecords.map(
-                  (record) => (
-                    <tr
-                      key={`${record.asset.id}:${record.finding.id}`}
-                      onClick={() =>
-                        openControlDetail(
-                          record
-                        )
-                      }
-                    >
-                      <td>
-                        <span className="controls-v2-id">
-                          {
-                            record.control
-                              .id
+                <tbody>
+                  {paginatedGroups.map(
+                    (group) => {
+                      const record =
+                        group.representative;
+
+                      return (
+                        <tr
+                          key={group.key}
+                          onClick={() =>
+                            openControlDetail(
+                              group
+                            )
                           }
-                        </span>
-
-                        <b>
-                          {
-                            record.control
-                              .name
-                          }
-                        </b>
-
-                        <small>
-                          {
-                            record.control
-                              .domain
-                          }
-                        </small>
-                      </td>
-
-
-                      <td>
-                        <span
-                          className={`badge ${record.control.severity.toLowerCase()}`}
                         >
-                          {
-                            record.control
-                              .severity
-                          }
-                        </span>
-                      </td>
+                          <td>
+                            <span className="controls-v2-id">
+                              {
+                                record.control.id
+                              }
+                            </span>
 
-                      <td>
-                        <b>
-                          {record.asset.name}
-                        </b>
-                        <small>
-                          {
-                            record.asset
-                              .environment
-                          }
-                        </small>
-                      </td>
+                            <b>
+                              {
+                                record.control.name
+                              }
+                            </b>
 
-                      <td>
-                        <span className="controls-v2-finding">
-                          {record.finding.id}
-                        </span>
+                            <small>
+                              {
+                                record.control.domain
+                              }
+                            </small>
+                          </td>
 
-                        <small>
-                          {
-                            record.finding
-                              .title
-                          }
-                        </small>
-                      </td>
+                          <td>
+                            <span
+                              className={`badge ${group.highestSeverity.toLowerCase()}`}
+                            >
+                              {
+                                group.highestSeverity
+                              }
+                            </span>
+                          </td>
 
-                      <td>
-                        {
-                          record.control
-                            .owner
-                        }
-                      </td>
+                          <td>
+                            <b>
+                              {record.asset.name}
+                            </b>
 
-                      <td>
-                        {formatDate(
-                          record.lifecycle
-                            .lastUpdatedAt
-                        )}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
+                            <small>
+                              {
+                                record.asset
+                                  .environment
+                              }
+                            </small>
+                          </td>
+
+                          <td>
+                            <span className="controls-v2-finding">
+                              {
+                                group.linkedFindingCount
+                              } linked
+                            </span>
+
+                            <small>
+                              {
+                                group.openFindingCount
+                              } open
+                              {group.closedFindingCount > 0
+                                ? ` · ${group.closedFindingCount} closed`
+                                : ""}
+                            </small>
+                          </td>
+
+                          <td>
+                            {
+                              record.control.owner
+                            }
+                          </td>
+
+                          <td>
+                            {formatDate(
+                              group.latestUpdatedAt
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    }
+                  )}
+                </tbody>
+              </table>
           </div>
 
             {totalControlPages > 1 && (
@@ -767,7 +1007,7 @@ export default function SecurityControls({
         )}
       </section>
 
-      {selectedRecord && (
+      {selectedGroup && selectedRecord && (
         <div
           className="controls-v2-modal-overlay"
           onMouseDown={(event) => {
@@ -821,83 +1061,59 @@ export default function SecurityControls({
 
             <div className="controls-v2-modal-badges">
               <span
-                className={`badge ${selectedRecord.control.severity.toLowerCase()}`}
+                className={`badge ${selectedGroup.highestSeverity.toLowerCase()}`}
               >
-                {
-                  selectedRecord.control
-                    .severity
-                }
-              </span>
-
-              <span className="controls-v2-finding-state">
-                Finding{" "}
-                {
-                  selectedRecord
-                    .findingLifecycle.status
-                }
+                {selectedGroup.highestSeverity}
               </span>
             </div>
 
             <div className="controls-v2-modal-grid">
               <section>
                 <small>ASSET</small>
+
                 <b>
-                  {
-                    selectedRecord.asset
-                      .name
-                  }
+                  {selectedRecord.asset.name}
                 </b>
+
                 <span>
-                  {
-                    selectedRecord.asset
-                      .environment
-                  }{" "}
-                  ·{" "}
-                  {
-                    selectedRecord.asset
-                      .criticality
-                  }
+                  {selectedRecord.asset.environment}
+                  {" · "}
+                  {selectedRecord.asset.criticality}
                 </span>
               </section>
 
               <section>
                 <small>OWNER</small>
+
                 <b>
-                  {
-                    selectedRecord.control
-                      .owner
-                  }
+                  {selectedRecord.control.owner}
                 </b>
               </section>
 
               <section>
-                <small>
-                  LINKED FINDING
-                </small>
+                <small>LINKED FINDINGS</small>
+
                 <b>
-                  {
-                    selectedRecord.finding
-                      .id
-                  }
+                  {selectedGroup.linkedFindingCount}
                 </b>
+
                 <span>
-                  {
-                    selectedRecord.finding
-                      .title
-                  }
+                  Findings mapped to this control
                 </span>
               </section>
 
               <section>
-                <small>
-                  FINDING STATUS
-                </small>
+                <small>FINDING COVERAGE</small>
+
                 <b>
-                  {
-                    selectedRecord
-                      .findingLifecycle.status
-                  }
+                  {selectedGroup.openFindingCount} Open
+                  {" · "}
+                  {selectedGroup.closedFindingCount} Closed
                 </b>
+
+                <span>
+                  Scanner-controlled lifecycle
+                </span>
               </section>
             </div>
 
@@ -927,45 +1143,28 @@ export default function SecurityControls({
 
             <div className="controls-v2-timeline">
               <section>
-                <small>
-                  FIRST MAPPED
-                </small>
+                <small>FIRST MAPPED</small>
+
                 <b>
                   {formatDate(
-                    selectedRecord.lifecycle
-                      .firstRequiredAt
+                    selectedGroup.earliestMappedAt
                   )}
                 </b>
               </section>
 
               <section>
-                <small>
-                  FINDING STATE CHANGED
-                </small>
+                <small>LAST UPDATED</small>
+
                 <b>
                   {formatDate(
-                    selectedRecord.lifecycle
-                      .statusChangedAt
+                    selectedGroup.latestUpdatedAt
                   )}
                 </b>
               </section>
 
               <section>
-                <small>
-                  LAST UPDATED
-                </small>
-                <b>
-                  {formatDate(
-                    selectedRecord.lifecycle
-                      .lastUpdatedAt
-                  )}
-                </b>
-              </section>
+                <small>LAST ASSESSED</small>
 
-              <section>
-                <small>
-                  LAST ASSESSED
-                </small>
                 <b>
                   {formatDate(
                     selectedRecord.completedAt
@@ -979,8 +1178,12 @@ export default function SecurityControls({
                 type="button"
                 className="primary-button"
                 onClick={() => {
-                  setSelectedRecord(null);
-                  onViewEvidence();
+                  setSelectedGroup(null);
+
+                  onViewEvidence(
+                    selectedRecord.control.id,
+                    selectedRecord.assessmentId
+                  );
                 }}
               >
                 View Evidence →
@@ -990,11 +1193,15 @@ export default function SecurityControls({
                 type="button"
                 className="secondary-button"
                 onClick={() => {
-                  setSelectedRecord(null);
-                  onGoToFindings();
+                  setSelectedGroup(null);
+
+                  onGoToFindings(
+                    selectedRecord.control.id,
+                    selectedRecord.assessmentId
+                  );
                 }}
               >
-                Finding Intelligence
+                View Linked Findings →
               </button>
             </div>
           </article>
