@@ -520,6 +520,47 @@ export default function Home() {
     ).length,
   };
 
+  const overviewCompletedScanners =
+    overviewScanners.filter(
+      (scanner) =>
+        scanner.status === "Completed"
+    ).length;
+
+  const overviewControls =
+    latestAssessment?.controls.length ?? 0;
+
+  const overviewRawFindings =
+    latestAssessment?.rawFindingCount ?? 0;
+
+  const overviewDeduped =
+    Math.max(
+      0,
+      overviewRawFindings -
+        overviewFindings
+    );
+
+  const overviewAsset =
+    latestAssessment?.asset ?? null;
+
+  const overviewRiskTotal =
+    Math.max(overviewFindings, 1);
+
+  const mediumRiskPercent =
+    Math.round(
+      (
+        riskDistribution.Medium /
+        overviewRiskTotal
+      ) * 100
+    );
+
+  const lowRiskPercent =
+    Math.round(
+      (
+        riskDistribution.Low /
+        overviewRiskTotal
+      ) * 100
+    );
+
   const riskPostureMessage =
     latestAssessment
       ? `${highestRiskLevel} contextual risk posture based on asset criticality, environment, confidence, and scanner evidence.`
@@ -551,7 +592,10 @@ export default function Home() {
 
         <div className="workspace">
           <small>WORKSPACE</small>
-          <b>Retail Platform</b>
+          <b>
+            {latestAssessment?.asset.name ??
+              "No assessment"}
+          </b>
         </div>
 
         <nav>
@@ -571,265 +615,650 @@ export default function Home() {
         </small>
       </aside>
 
-      <main className="main-content">
+      <main
+        className={`main-content ${
+          view === "overview"
+            ? "overview-main-content"
+            : ""
+        }`}
+      >
         {view === "overview" ? (
           <>
-            <header className="page-header">
+            <header className="showcase-header">
               <div>
-                <p className="eyebrow">INTELLIGENT DEVSECOPS SECURITY GATE</p>
-                <h1>Security posture, with context.</h1>
+                <h1 className="showcase-product-title">
+                  Intelligent{" "}
+                  <span>DevSecOps</span>{" "}
+                  Security Gate
+                </h1>
+
+                <p className="showcase-product-subtitle">
+                  Security posture, with context. Turn security
+                  findings into confident release decisions.
+                </p>
               </div>
 
-              <div className="gate-mini">
-                <b>{overviewLoading ? "LOADING" : overviewDecision}</b>
-                <span>{decisionMessage}</span>
-              </div>
-            </header>
+              <div className="showcase-last-assessment">
+                <small>LAST ASSESSMENT</small>
 
-            <section className="decision-card">
-              <p className="eyebrow">
-                RELEASE DECISION · LATEST ASSESSMENT
-              </p>
-
-              <h2>
-                {overviewLoading
-                  ? "LOADING"
-                  : overviewDecision}
-              </h2>
-
-              <p>{decisionMessage}</p>
-
-              <button onClick={() => setView("assessments")}>
-                View assessment runs →
-              </button>
-            </section>
-
-            <section className="risk-posture-grid">
-              <article className="risk-posture-card">
-                <small>Enterprise Risk Posture</small>
-
-                <div className="risk-score-line">
-                  <b>
-                    {overviewLoading
-                      ? "—"
-                      : highestRisk}
-                  </b>
-
-                  <span>/100</span>
-                </div>
-
-                <strong
-                  className={`risk-level-label ${highestRiskLevel.toLowerCase()}`}
-                >
-                  {overviewLoading
-                    ? "LOADING"
-                    : `${highestRiskLevel} Risk`}
-                </strong>
-
-                <p>{riskPostureMessage}</p>
-              </article>
-
-              <article className="executive-kpi-card">
-                <small>Release Decision</small>
-
-                <b
-                  className={
-                    overviewDecision === "BLOCK"
-                      ? "decision-block"
-                      : overviewDecision === "PASS"
-                        ? "decision-pass"
-                        : overviewDecision === "INCOMPLETE"
-                          ? "decision-incomplete"
-                          : ""
-                  }
-                >
-                  {overviewLoading
-                    ? "LOADING"
-                    : overviewDecision}
+                <b>
+                  {latestAssessment?.completedAt
+                    ? new Intl.DateTimeFormat(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      ).format(
+                        new Date(
+                          latestAssessment.completedAt
+                        )
+                      )
+                    : "—"}
                 </b>
 
                 <span>
-                  {overviewBlockers} release blocker(s)
+                  {latestAssessment?.completedAt
+                    ? new Intl.DateTimeFormat(
+                        "en-US",
+                        {
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        }
+                      ).format(
+                        new Date(
+                          latestAssessment.completedAt
+                        )
+                      )
+                    : "No completed assessment"}
                 </span>
-              </article>
+              </div>
+            </header>
 
-              <article className="executive-kpi-card">
-                <small>Security Risks</small>
-                <b>{overviewFindings}</b>
-                <span>
-                  {confirmedRisks} confirmed
-                </span>
-              </article>
+            <section
+              className={`showcase-release ${
+                overviewDecision === "BLOCK"
+                  ? "block"
+                  : overviewDecision === "INCOMPLETE"
+                    ? "incomplete"
+                    : "pass"
+              }`}
+            >
+              <div className="showcase-release-shield">
+                <span>✓</span>
+              </div>
 
-              <article className="executive-kpi-card">
-                <small>High Confidence</small>
-                <b>{highConfidenceRisks}</b>
-                <span>
-                  Correlated security intelligence
-                </span>
-              </article>
-            </section>
+              <div className="showcase-release-copy">
+                <small>FINAL RELEASE DECISION</small>
 
-            <section className="risk-distribution-panel">
-              <div className="risk-distribution-header">
                 <div>
-                  <small>CONTEXTUAL RISK DISTRIBUTION</small>
-                  <h3>Application security posture</h3>
+                  <h2>
+                    {overviewLoading
+                      ? "LOADING"
+                      : overviewDecision}
+                  </h2>
+
+                  <span className="showcase-release-check">
+                    ✓
+                  </span>
                 </div>
+              </div>
+
+              <div className="showcase-release-context">
+                <b>
+                  {overviewBlockers} release blocker
+                  {overviewBlockers === 1 ? "" : "s"}
+                </b>
 
                 <span>
-                  {overviewEvidence} verified evidence record(s)
+                  {latestAssessment
+                    ? `Assessment ${latestAssessment.id} · ${latestAssessment.asset.name}`
+                    : "No persisted assessment available"}
                 </span>
               </div>
 
-              <div className="risk-distribution-grid">
-                <div>
-                  <span className="risk-distribution-dot critical" />
-                  <small>Critical</small>
-                  <b>{riskDistribution.Critical}</b>
-                </div>
-
-                <div>
-                  <span className="risk-distribution-dot high" />
-                  <small>High</small>
-                  <b>{riskDistribution.High}</b>
-                </div>
-
-                <div>
-                  <span className="risk-distribution-dot medium" />
-                  <small>Medium</small>
-                  <b>{riskDistribution.Medium}</b>
-                </div>
-
-                <div>
-                  <span className="risk-distribution-dot low" />
-                  <small>Low</small>
-                  <b>{riskDistribution.Low}</b>
-                </div>
+              <div className="showcase-release-quote">
+                <span />
+                <blockquote>
+                  “Built for secure delivery
+                  <br />
+                  at the speed of development.”
+                </blockquote>
               </div>
             </section>
 
-            <section className="content-grid">
-              <article className="panel">
-                <div className="panel-title">
-                  <h3>Prioritized findings</h3>
-                  <button onClick={() => setView("findings")}>View all →</button>
+            <section className="showcase-kpis">
+              <article className="showcase-kpi">
+                <div className="showcase-kpi-icon risk">
+                  ⚡
                 </div>
-                <FindingRows assessment={latestAssessment} />
-              </article>
 
-              <article className="panel scanner-health-panel">
-                <div className="scanner-health-header">
-                  <div>
-                    <small>SCANNER HEALTH</small>
-                    <h3>Assessment coverage</h3>
+                <div className="showcase-kpi-body">
+                  <small>HIGHEST FINDING RISK</small>
+
+                  <div className="showcase-kpi-value">
+                    <b>{overviewLoading ? "—" : highestRisk}</b>
+                    <span>/100</span>
+
+                    <strong
+                      className={`showcase-risk-badge ${highestRiskLevel.toLowerCase()}`}
+                    >
+                      {highestRiskLevel}
+                    </strong>
                   </div>
 
-                  {overviewScanners.length > 0 ? (
-                    <div
-                      className={`scanner-health-summary ${
-                        overviewScanners.some(
-                          (scanner) => scanner.status === "Failed"
-                        )
-                          ? "degraded"
-                          : "healthy"
-                      }`}
-                    >
-                      <b>
-                        {
-                          overviewScanners.filter(
-                            (scanner) =>
-                              scanner.status === "Completed"
-                          ).length
-                        }
-                        /{overviewScanners.length}
-                      </b>
+                  <p>
+                    Maximum contextual risk in the
+                    latest assessment.
+                  </p>
+                </div>
+              </article>
 
-                      <span>
-                        {overviewScanners.some(
-                          (scanner) => scanner.status === "Failed"
-                        )
-                          ? "DEGRADED"
-                          : "HEALTHY"}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="scanner-health-summary">
-                      <b>0/0</b>
-                      <span>NO DATA</span>
-                    </div>
-                  )}
+              <article className="showcase-kpi">
+                <div className="showcase-kpi-icon findings">
+                  ▤
                 </div>
 
-                <div className="scanner-health-list">
-                  {overviewScanners.length > 0 ? (
-                    overviewScanners.map((scanner) => {
-                      const failed =
-                        scanner.status === "Failed";
+                <div className="showcase-kpi-body">
+                  <small>SECURITY FINDINGS</small>
 
-                      const duration =
-                        typeof scanner.durationMs === "number"
-                          ? scanner.durationMs >= 1000
-                            ? `${(
-                                scanner.durationMs / 1000
-                              ).toFixed(1)}s`
-                            : `${scanner.durationMs}ms`
-                          : "—";
+                  <div className="showcase-kpi-value">
+                    <b>{overviewFindings}</b>
+                  </div>
 
-                      return (
-                        <div
-                          className={`scanner-health-row ${
-                            failed ? "failed" : "completed"
-                          }`}
-                          key={`${scanner.category}-${scanner.tool}`}
-                        >
-                          <span className="scanner-health-icon">
-                            {failed ? "×" : "✓"}
-                          </span>
+                  <strong className="showcase-positive">
+                    {confirmedRisks} confirmed
+                  </strong>
 
-                          <div className="scanner-health-name">
-                            <b>{scanner.tool}</b>
-                            <small>{scanner.category}</small>
+                  <p>
+                    Normalized findings after correlation
+                    and deduplication.
+                  </p>
+                </div>
+              </article>
 
-                            {failed && scanner.error ? (
-                              <em title={scanner.error}>
-                                {scanner.error}
-                              </em>
-                            ) : null}
-                          </div>
-
-                          <span className="scanner-health-status">
-                            {scanner.status}
-                          </span>
-
-                          <div className="scanner-health-metrics">
-                            <b>{scanner.findings}</b>
-                            <small>findings</small>
-                          </div>
-
-                          <time>{duration}</time>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="scanner-health-empty">
-                      No scanner execution yet
-                    </div>
-                  )}
+              <article className="showcase-kpi">
+                <div className="showcase-kpi-icon scanner">
+                  ◉
                 </div>
 
-                <div className="scanner-health-footer">
-                  <span>
-                    {assessmentCount} completed run(s)
-                  </span>
+                <div className="showcase-kpi-body">
+                  <small>SCANNER COVERAGE</small>
 
-                  <span>
-                    Scanner evidence is normalized before the
-                    release decision is calculated.
-                  </span>
+                  <div className="showcase-kpi-value">
+                    <b>{overviewCompletedScanners}</b>
+                    <span>/{overviewScanners.length}</span>
+                  </div>
+
+                  <strong className="showcase-positive">
+                    {overviewScanners.length > 0 &&
+                    overviewCompletedScanners ===
+                      overviewScanners.length
+                      ? "All completed"
+                      : "Coverage degraded"}
+                  </strong>
+
+                  <p>
+                    Required scanner executions in the
+                    latest assessment.
+                  </p>
+                </div>
+              </article>
+
+              <article className="showcase-kpi">
+                <div className="showcase-kpi-icon evidence">
+                  ◇
+                </div>
+
+                <div className="showcase-kpi-body">
+                  <small>EVIDENCE COVERAGE</small>
+
+                  <div className="showcase-kpi-value">
+                    <b>{overviewEvidence}</b>
+                    <span>/{overviewFindings}</span>
+                  </div>
+
+                  <strong className="showcase-positive">
+                    {overviewFindings > 0 &&
+                    overviewEvidence >= overviewFindings
+                      ? "Full coverage"
+                      : "Coverage gap"}
+                  </strong>
+
+                  <p>
+                    Assessment evidence mapped to
+                    normalized findings.
+                  </p>
                 </div>
               </article>
             </section>
+
+            <section className="showcase-context-grid">
+              <article className="showcase-risk-panel">
+                <div className="showcase-section-title">
+                  <span className="showcase-section-icon">
+                    ◉
+                  </span>
+
+                  <div>
+                    <small>
+                      CONTEXTUAL RISK DISTRIBUTION
+                    </small>
+                    <h3>
+                      Risk after asset and environment
+                      context
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="showcase-risk-content">
+                  <div
+                    className="showcase-donut"
+                    style={{
+                      background: `conic-gradient(
+                        #f3bd36 0 ${mediumRiskPercent}%,
+                        #55d6b1 ${mediumRiskPercent}% ${
+                          mediumRiskPercent +
+                          lowRiskPercent
+                        }%,
+                        #ff8a4c ${
+                          mediumRiskPercent +
+                          lowRiskPercent
+                        }% 100%
+                      )`,
+                    }}
+                  >
+                    <div>
+                      <b>{overviewFindings}</b>
+                      <span>Findings</span>
+                    </div>
+                  </div>
+
+                  <div className="showcase-risk-legend">
+                    {(
+                      [
+                        [
+                          "Critical",
+                          riskDistribution.Critical,
+                          "critical",
+                        ],
+                        [
+                          "High",
+                          riskDistribution.High,
+                          "high",
+                        ],
+                        [
+                          "Medium",
+                          riskDistribution.Medium,
+                          "medium",
+                        ],
+                        [
+                          "Low",
+                          riskDistribution.Low,
+                          "low",
+                        ],
+                      ] as const
+                    ).map(
+                      ([level, count, className]) => (
+                        <div key={level}>
+                          <span
+                            className={`showcase-risk-dot ${className}`}
+                          />
+                          <small>{level}</small>
+                          <b>{count}</b>
+                          <em>
+                            {overviewFindings > 0
+                              ? Math.round(
+                                  (count /
+                                    overviewFindings) *
+                                    100
+                                )
+                              : 0}
+                            %
+                          </em>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </article>
+
+              <article className="showcase-asset">
+                <div className="showcase-asset-main">
+                  <small>ASSET CONTEXT</small>
+
+                  <h3>
+                    {overviewAsset?.name ??
+                      "No assessed asset"}
+                  </h3>
+
+                  <span className="showcase-asset-pill">
+                    {overviewAsset
+                      ? `${overviewAsset.environment} · ${overviewAsset.criticality} Criticality`
+                      : "No context"}
+                  </span>
+
+                  <div className="showcase-asset-facts">
+                    <div>
+                      <span className="asset-fact-icon">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M4 12h16" />
+                          <path d="M12 4c2.2 2.2 3.4 4.9 3.4 8S14.2 17.8 12 20" />
+                          <path d="M12 4C9.8 6.2 8.6 8.9 8.6 12S9.8 17.8 12 20" />
+                        </svg>
+                      </span>
+
+                      <small>Asset type</small>
+                      <b>
+                        {overviewAsset?.type ?? "—"}
+                      </b>
+                    </div>
+
+                    <div>
+                      <span className="asset-fact-icon">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            x="4"
+                            y="5"
+                            width="16"
+                            height="6"
+                            rx="1.5"
+                          />
+                          <rect
+                            x="4"
+                            y="13"
+                            width="16"
+                            height="6"
+                            rx="1.5"
+                          />
+                          <path d="M7 8h.01" />
+                          <path d="M7 16h.01" />
+                        </svg>
+                      </span>
+
+                      <small>Environment</small>
+                      <b>
+                        {overviewAsset?.environment ??
+                          "—"}
+                      </b>
+                    </div>
+
+                    <div>
+                      <span className="asset-fact-icon">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            x="4"
+                            y="14"
+                            width="3"
+                            height="6"
+                            rx="1"
+                          />
+                          <rect
+                            x="10.5"
+                            y="9"
+                            width="3"
+                            height="11"
+                            rx="1"
+                          />
+                          <rect
+                            x="17"
+                            y="4"
+                            width="3"
+                            height="16"
+                            rx="1"
+                          />
+                        </svg>
+                      </span>
+
+                      <small>Criticality</small>
+                      <b>
+                        {overviewAsset?.criticality ??
+                          "—"}
+                      </b>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="showcase-asset-quote">
+                  <span />
+                  <blockquote>
+                    “Context turns
+                    <br />
+                    findings into
+                    <br />
+                    real risk.”
+                  </blockquote>
+                </div>
+              </article>
+            </section>
+
+            <section className="showcase-bottom-grid">
+              <article className="showcase-findings panel">
+                <div className="showcase-panel-header">
+                  <div>
+                    <small>PRIORITIZED FINDINGS</small>
+                    <h3>
+                      Top 5 highest-risk findings from
+                      the latest assessment
+                    </h3>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setView("findings")
+                    }
+                  >
+                    View all findings →
+                  </button>
+                </div>
+
+                <div className="showcase-findings-head">
+                  <span>#</span>
+                  <span>FINDING</span>
+                  <span>RISK</span>
+                  <span>SCORE</span>
+                  <span>STATUS</span>
+                </div>
+
+                <div className="showcase-findings-list">
+                  {latestAssessment?.findings
+                    .slice()
+                    .sort(
+                      (a, b) =>
+                        b.riskScore -
+                        a.riskScore
+                    )
+                    .slice(0, 5)
+                    .map((finding, index) => (
+                      <div
+                        className="showcase-finding"
+                        key={finding.id}
+                      >
+                        <span className="showcase-index">
+                          {index + 1}
+                        </span>
+
+                        <div className="showcase-finding-name">
+                          <span
+                            className={`risk-dot ${finding.severity.toLowerCase()}`}
+                          />
+
+                          <div>
+                            <b>{finding.title}</b>
+                            <small>
+                              {finding.id} ·{" "}
+                              {finding.source}
+                            </small>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`showcase-risk-badge ${finding.riskLevel.toLowerCase()}`}
+                        >
+                          {finding.riskLevel}
+                        </span>
+
+                        <div className="showcase-finding-score">
+                          <b>{finding.riskScore}</b>
+                          <span>/100</span>
+                        </div>
+
+                        <span className="showcase-finding-status">
+                          <i />
+                          {finding.status}
+                        </span>
+
+                      </div>
+                    ))}
+
+                  {!latestAssessment ||
+                  latestAssessment.findings.length === 0 ? (
+                    <p className="muted">
+                      No assessment findings available.
+                    </p>
+                  ) : null}
+                </div>
+              </article>
+
+              <article className="showcase-integrity panel">
+                <div className="showcase-panel-header">
+                  <div className="showcase-integrity-title">
+                    <span className="showcase-section-icon">
+                      ◈
+                    </span>
+
+                    <div>
+                      <small>
+                        ASSESSMENT INTEGRITY
+                      </small>
+                      <h3>
+                        End-to-end pipeline assurance
+                      </h3>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`showcase-health ${
+                      overviewScanners.length > 0 &&
+                      overviewCompletedScanners ===
+                        overviewScanners.length
+                        ? "healthy"
+                        : "degraded"
+                    }`}
+                  >
+                    ●{" "}
+                    {overviewScanners.length > 0 &&
+                    overviewCompletedScanners ===
+                      overviewScanners.length
+                      ? "HEALTHY"
+                      : "DEGRADED"}
+                  </span>
+                </div>
+
+                <div className="showcase-integrity-list">
+                  <div>
+                    <span>Scanner coverage</span>
+                    <b>
+                      {overviewCompletedScanners}/
+                      {overviewScanners.length}
+                    </b>
+                  </div>
+
+                  <div>
+                    <span>Normalized findings</span>
+                    <b>{overviewFindings}</b>
+                  </div>
+
+                  <div>
+                    <span>Controls mapped</span>
+                    <b>
+                      {overviewControls}/
+                      {overviewFindings}
+                    </b>
+                  </div>
+
+                  <div>
+                    <span>Evidence coverage</span>
+                    <b>
+                      {overviewEvidence}/
+                      {overviewFindings}
+                    </b>
+                  </div>
+
+                  <div>
+                    <span>Raw scanner findings</span>
+                    <b>{overviewRawFindings}</b>
+                  </div>
+
+                  <div>
+                    <span>Correlated / deduped</span>
+                    <b>{overviewDeduped}</b>
+                  </div>
+                </div>
+
+                <small className="showcase-scanner-label">
+                  SCANNER EXECUTIONS
+                </small>
+
+                <div className="showcase-scanners">
+                  {overviewScanners.map(
+                    (scanner) => (
+                      <div
+                        key={`${scanner.category}-${scanner.tool}`}
+                      >
+                        <span
+                          className={
+                            scanner.status ===
+                            "Completed"
+                              ? "completed"
+                              : "failed"
+                          }
+                        >
+                          {scanner.status ===
+                          "Completed"
+                            ? "✓"
+                            : "×"}
+                        </span>
+
+                        <div>
+                          <b>{scanner.tool}</b>
+                          <small>
+                            {scanner.findings} raw
+                            finding
+                            {scanner.findings === 1
+                              ? ""
+                              : "s"}
+                          </small>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </article>
+            </section>
+
+            <footer className="showcase-footer">
+              <span>
+                AppSecGate · Intelligent DevSecOps
+                Security Gate
+              </span>
+
+              <b>
+                Security today. Stronger tomorrow.
+              </b>
+            </footer>
           </>
         ) : view === "assets" ? (
           <AssetsInputs
