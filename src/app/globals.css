@@ -22364,3 +22364,2584 @@ select option {
     margin-left: 0;
   }
 }
+
+
+/* ============================================================
+   APPSECGATE SIDEBAR — PURPLE BUILDER SIGNATURE
+   ============================================================ */
+
+.sidebar .side-note {
+  margin-top: auto;
+  padding: 18px 4px 2px;
+
+  color: #607493;
+
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+
+/* ------------------------------------------------------------
+   Existing product description
+   ------------------------------------------------------------ */
+
+.sidebar .side-note-product {
+  display: block;
+
+  max-width: 168px;
+
+  color: #607493;
+
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+
+/* ------------------------------------------------------------
+   Builder signature
+   ------------------------------------------------------------ */
+
+.sidebar-built-by {
+  position: relative;
+
+  margin-top: 17px;
+
+  text-align: center;
+}
+
+
+/* ------------------------------------------------------------
+   Purple divider
+   LINE — TARGET — LINE
+   ------------------------------------------------------------ */
+
+.sidebar-built-divider {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  width: 100%;
+
+  margin-bottom: 9px;
+}
+
+
+.sidebar-built-divider > span {
+  display: block;
+
+  width: 46px;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(168, 85, 247, 0.35) 30%,
+      #a855f7 100%
+    );
+
+  box-shadow:
+    0 0 4px rgba(168, 85, 247, 0.75),
+    0 0 10px rgba(139, 92, 246, 0.35);
+}
+
+
+.sidebar-built-divider > span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      #a855f7 0%,
+      rgba(168, 85, 247, 0.35) 70%,
+      transparent 100%
+    );
+}
+
+
+/* ------------------------------------------------------------
+   Purple glowing target
+   ------------------------------------------------------------ */
+
+.sidebar-built-divider i {
+  position: relative;
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 23px;
+  height: 23px;
+
+  border:
+    1px solid rgba(216, 180, 254, 0.95);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(168, 85, 247, 0.13) 0%,
+      rgba(126, 34, 206, 0.06) 45%,
+      transparent 72%
+    );
+
+  box-shadow:
+    0 0 5px rgba(216, 180, 254, 0.85),
+    0 0 11px rgba(168, 85, 247, 0.65),
+    0 0 20px rgba(126, 34, 206, 0.35);
+}
+
+
+/* Inner target ring */
+
+.sidebar-built-divider i::before {
+  content: "";
+
+  width: 12px;
+  height: 12px;
+
+  border:
+    1px solid rgba(192, 132, 252, 0.95);
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 5px rgba(168, 85, 247, 0.55);
+}
+
+
+/* Center target */
+
+.sidebar-built-divider i b {
+  position: absolute;
+
+  width: 4px;
+  height: 4px;
+
+  border-radius: 50%;
+
+  background: #f3e8ff;
+
+  box-shadow:
+    0 0 4px #f3e8ff,
+    0 0 8px #d8b4fe,
+    0 0 13px #a855f7;
+}
+
+
+/* ------------------------------------------------------------
+   BUILT BY
+   ------------------------------------------------------------ */
+
+.sidebar-built-by > small {
+  display: block;
+
+  margin: 0 0 4px;
+
+  color: #c084fc;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  line-height: 1;
+
+  letter-spacing: 0.2em;
+
+  text-shadow:
+    0 0 5px rgba(216, 180, 254, 0.75),
+    0 0 10px rgba(168, 85, 247, 0.5),
+    0 0 16px rgba(126, 34, 206, 0.25);
+}
+
+
+/* ------------------------------------------------------------
+   AMR ABDELAZIZ
+   ------------------------------------------------------------ */
+
+.sidebar-built-by > strong {
+  display: block;
+
+  color: #f3e8ff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  letter-spacing: 0.025em;
+
+  text-shadow:
+    0 0 4px rgba(243, 232, 255, 0.8),
+    0 0 9px rgba(216, 180, 254, 0.6),
+    0 0 15px rgba(168, 85, 247, 0.4),
+    0 0 24px rgba(126, 34, 206, 0.2);
+}
+
+
+/* ------------------------------------------------------------
+   Subtle ambient purple glow behind signature
+   ------------------------------------------------------------ */
+
+.sidebar-built-by::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: -8px;
+
+  width: 125px;
+  height: 32px;
+
+  transform: translateX(-50%);
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(126, 34, 206, 0.12),
+      transparent 70%
+    );
+
+  filter: blur(8px);
+
+  z-index: -1;
+}
+
+
+
+/* ============================================================
+   APPSECGATE SIDEBAR SIGNATURE V2
+   ============================================================ */
+
+/* Make platform description larger and easier to read */
+.sidebar .side-note-product {
+  display: block !important;
+
+  max-width: 178px !important;
+
+  color: #8292ad !important;
+
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+
+  line-height: 1.55 !important;
+  letter-spacing: 0.005em !important;
+
+  text-shadow: none !important;
+}
+
+
+/* Give the signature a little more separation */
+.sidebar-built-by {
+  margin-top: 18px !important;
+}
+
+
+/* Divider layout */
+.sidebar-built-divider {
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+
+/* Purple glowing lines */
+.sidebar-built-divider > span {
+  width: 42px !important;
+  height: 1px !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(160, 105, 255, 0.55),
+      #a873ff
+    ) !important;
+
+  box-shadow:
+    0 0 5px rgba(168, 115, 255, 0.55),
+    0 0 12px rgba(139, 92, 246, 0.25) !important;
+}
+
+.sidebar-built-divider > span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      #a873ff,
+      rgba(160, 105, 255, 0.55),
+      transparent
+    ) !important;
+}
+
+
+/* ============================================================
+   AppSecGate A signature logo
+   Mirrors the identity of the main logo above
+   ============================================================ */
+
+.sidebar-signature-logo {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  width: 25px;
+  height: 25px;
+
+  border-radius: 7px;
+
+  color: #121830;
+
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+
+  background:
+    linear-gradient(
+      135deg,
+      #c4caff 0%,
+      #a7a8ff 42%,
+      #806fff 100%
+    );
+
+  border:
+    1px solid rgba(199, 202, 255, 0.65);
+
+  box-shadow:
+    0 0 5px rgba(177, 158, 255, 0.65),
+    0 0 12px rgba(139, 92, 246, 0.45),
+    0 0 22px rgba(124, 58, 237, 0.22);
+}
+
+
+/* BUILT BY */
+.sidebar-built-by > small {
+  margin-bottom: 5px !important;
+
+  color: #b889ff !important;
+
+  font-size: 8px !important;
+  font-weight: 800 !important;
+
+  letter-spacing: 0.2em !important;
+
+  text-shadow:
+    0 0 5px rgba(192, 132, 252, 0.65),
+    0 0 12px rgba(168, 85, 247, 0.35) !important;
+}
+
+
+/* Name */
+.sidebar-built-by > strong {
+  color: #f5efff !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  letter-spacing: 0.02em !important;
+
+  text-shadow:
+    0 0 4px rgba(245, 239, 255, 0.75),
+    0 0 9px rgba(192, 132, 252, 0.55),
+    0 0 17px rgba(139, 92, 246, 0.35) !important;
+}
+
+
+/* Old target is no longer used */
+.sidebar-built-divider > i {
+  display: none !important;
+}
+
+
+
+/* ============================================================
+   APPSECGATE SIDEBAR SIGNATURE V3
+   ORIGINAL TARGET + DEVSECOPS PURPLE/BLUE
+   ============================================================ */
+
+/*
+   Accent family:
+   #5965ff  primary DevSecOps violet-blue
+   #6d63ff  highlight
+   #8790ff  light glow
+*/
+
+
+/* Keep platform description clear */
+.sidebar .side-note-product {
+  display: block !important;
+  max-width: 178px !important;
+
+  color: #8292ad !important;
+
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  line-height: 1.55 !important;
+
+  text-shadow: none !important;
+}
+
+
+/* Signature spacing */
+.sidebar-built-by {
+  margin-top: 17px !important;
+  text-align: center !important;
+}
+
+
+/* Target row */
+.sidebar-built-divider {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 9px !important;
+
+  width: 100% !important;
+
+  margin-bottom: 9px !important;
+}
+
+
+/* Lines */
+.sidebar-built-divider > span {
+  display: block !important;
+
+  width: 46px !important;
+  height: 1px !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(89, 101, 255, 0.45) 30%,
+      #5965ff 100%
+    ) !important;
+
+  box-shadow:
+    0 0 5px rgba(89, 101, 255, 0.80),
+    0 0 11px rgba(89, 101, 255, 0.45),
+    0 0 18px rgba(89, 101, 255, 0.20) !important;
+}
+
+
+.sidebar-built-divider > span:last-child {
+  background:
+    linear-gradient(
+      90deg,
+      #5965ff 0%,
+      rgba(89, 101, 255, 0.45) 70%,
+      transparent 100%
+    ) !important;
+}
+
+
+/* ============================================================
+   ORIGINAL CIRCULAR TARGET
+   ============================================================ */
+
+.sidebar-built-divider > i {
+  position: relative !important;
+
+  display: grid !important;
+  place-items: center !important;
+
+  flex: 0 0 auto !important;
+
+  width: 23px !important;
+  height: 23px !important;
+
+  border:
+    1px solid #8790ff !important;
+
+  border-radius: 50% !important;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(89, 101, 255, 0.18) 0%,
+      rgba(89, 101, 255, 0.08) 48%,
+      transparent 72%
+    ) !important;
+
+  box-shadow:
+    0 0 5px rgba(135, 144, 255, 0.95),
+    0 0 11px rgba(89, 101, 255, 0.75),
+    0 0 20px rgba(89, 101, 255, 0.38) !important;
+}
+
+
+/* Inner ring */
+.sidebar-built-divider > i::before {
+  content: "" !important;
+
+  width: 12px !important;
+  height: 12px !important;
+
+  border:
+    1px solid #6d75ff !important;
+
+  border-radius: 50% !important;
+
+  box-shadow:
+    0 0 5px rgba(89, 101, 255, 0.75) !important;
+}
+
+
+/* Target center */
+.sidebar-built-divider > i > b {
+  position: absolute !important;
+
+  display: block !important;
+
+  width: 4px !important;
+  height: 4px !important;
+
+  border-radius: 50% !important;
+
+  background: #dfe2ff !important;
+
+  box-shadow:
+    0 0 4px #dfe2ff,
+    0 0 8px #8790ff,
+    0 0 14px #5965ff !important;
+}
+
+
+/* Remove the temporary A logo completely */
+.sidebar-signature-logo {
+  display: none !important;
+}
+
+
+/* BUILT BY */
+.sidebar-built-by > small {
+  display: block !important;
+
+  margin: 0 0 4px !important;
+
+  color: #737cff !important;
+
+  font-size: 8px !important;
+  font-weight: 800 !important;
+
+  letter-spacing: 0.20em !important;
+
+  text-shadow:
+    0 0 5px rgba(115, 124, 255, 0.85),
+    0 0 10px rgba(89, 101, 255, 0.60),
+    0 0 18px rgba(89, 101, 255, 0.30) !important;
+}
+
+
+/* Amr Abdelaziz */
+.sidebar-built-by > strong {
+  display: block !important;
+
+  color: #f2f3ff !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.25 !important;
+  letter-spacing: 0.02em !important;
+
+  text-shadow:
+    0 0 4px rgba(242, 243, 255, 0.85),
+    0 0 8px rgba(135, 144, 255, 0.70),
+    0 0 15px rgba(89, 101, 255, 0.50),
+    0 0 23px rgba(89, 101, 255, 0.25) !important;
+}
+
+
+/* Ambient glow */
+.sidebar-built-by::after {
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(89, 101, 255, 0.13),
+      transparent 70%
+    ) !important;
+}
+
+
+/* ============================================================
+   APPSECGATE HORIZON BRAND — LOGO 04
+   ============================================================ */
+
+.app-shell .brand.brand-horizon {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 0;
+
+  width: 100%;
+  min-height: 82px;
+
+  margin: 0 0 25px;
+  padding: 0;
+
+  overflow: visible;
+}
+
+
+/* ============================================================
+   HORIZON ARC
+   ============================================================ */
+
+.horizon-brand-mark {
+  position: relative;
+
+  width: 150px;
+  height: 29px;
+
+  margin: 0 0 -2px;
+
+  pointer-events: none;
+}
+
+
+.horizon-arc {
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 138px;
+  height: 31px;
+
+  transform: translateX(-50%);
+
+  overflow: hidden;
+}
+
+
+/*
+   Main Horizon shape
+   Blue -> DevSecOps violet -> purple
+*/
+
+.horizon-arc::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      105deg,
+      #1767ff 0%,
+      #345fff 27%,
+      #5361ff 50%,
+      #755fff 72%,
+      #a866ff 88%,
+      #cb76ff 100%
+    );
+
+  clip-path:
+    polygon(
+      0% 92%,
+      8% 72%,
+      18% 53%,
+      30% 38%,
+      42% 29%,
+      50% 27%,
+      58% 29%,
+      70% 38%,
+      82% 53%,
+      92% 72%,
+      100% 92%,
+
+      100% 100%,
+      92% 83%,
+      82% 66%,
+      70% 52%,
+      58% 44%,
+      50% 42%,
+      42% 44%,
+      30% 52%,
+      18% 66%,
+      8% 83%,
+      0% 100%
+    );
+
+  filter:
+    drop-shadow(
+      0 0 4px
+      rgba(88, 98, 255, 0.55)
+    );
+}
+
+
+/* subtle purple glow */
+
+.horizon-arc::after {
+  content: "";
+
+  position: absolute;
+
+  left: 22%;
+  right: 22%;
+  bottom: -2px;
+
+  height: 8px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(108, 92, 255, 0.50),
+      rgba(155, 95, 255, 0.18) 45%,
+      transparent 72%
+    );
+
+  filter: blur(4px);
+}
+
+
+/* ============================================================
+   BRAND COPY
+   ============================================================ */
+
+.app-shell
+.brand-horizon
+.horizon-brand-copy {
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+
+  min-width: 0;
+
+  overflow: visible;
+
+  opacity: 1;
+}
+
+
+/* ============================================================
+   APPSECGATE WORDMARK
+   ============================================================ */
+
+.app-shell
+.brand-horizon
+.horizon-wordmark {
+  display: flex;
+
+  align-items: baseline;
+  justify-content: center;
+
+  margin: 0;
+
+  font-size: 21px;
+  font-weight: 800;
+
+  line-height: 1;
+
+  letter-spacing: -0.06em;
+
+  white-space: nowrap;
+
+  text-shadow:
+    0 2px 10px
+    rgba(0, 0, 0, 0.45);
+}
+
+
+.horizon-appsec {
+  color: #f5f7ff;
+}
+
+
+.horizon-gate {
+  background:
+    linear-gradient(
+      100deg,
+      #5965ff 0%,
+      #6b62ff 38%,
+      #8a63ff 68%,
+      #b168ff 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  color: #6b63ff;
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(89, 101, 255, 0.32)
+    );
+}
+
+
+/* ============================================================
+   TAGLINE
+   ============================================================ */
+
+.app-shell
+.brand-horizon
+.horizon-tagline {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #7796dc;
+
+  font-size: 6.6px;
+  font-weight: 600;
+
+  line-height: 1;
+
+  letter-spacing: 0.17em;
+
+  white-space: nowrap;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   SMALL HORIZON LIGHT
+   ============================================================ */
+
+.horizon-accent {
+  display: block;
+
+  width: 40px;
+  height: 1px;
+
+  margin-top: 9px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      #3e68ff 24%,
+      #6263ff 46%,
+      #8c64ff 68%,
+      #c36eff 84%,
+      transparent 100%
+    );
+
+  box-shadow:
+    0 0 4px rgba(101, 98, 255, 0.65),
+    0 0 9px rgba(145, 94, 255, 0.30);
+}
+
+
+/* ============================================================
+   COLLAPSED SIDEBAR
+   ============================================================ */
+
+.app-shell.sidebar-collapsed
+.brand.brand-horizon {
+  min-height: 32px;
+
+  margin-bottom: 24px;
+
+  padding: 0;
+}
+
+
+.app-shell.sidebar-collapsed
+.horizon-brand-mark {
+  width: 34px;
+  height: 27px;
+
+  margin: 0;
+}
+
+
+.app-shell.sidebar-collapsed
+.horizon-arc {
+  width: 31px;
+  height: 19px;
+}
+
+
+.app-shell.sidebar-collapsed
+.brand-horizon
+.horizon-brand-copy {
+  display: none !important;
+}
+
+
+/* ============================================================
+   HOVER
+   ============================================================ */
+
+@media (hover: hover) {
+
+  .horizon-arc {
+    transition:
+      transform 180ms ease,
+      filter 180ms ease;
+  }
+
+  .brand-horizon:hover
+  .horizon-arc {
+    transform:
+      translateX(-50%)
+      translateY(-1px);
+
+    filter:
+      brightness(1.08);
+  }
+
+}
+
+
+/* ============================================================
+   SHORT VIEWPORT
+   ============================================================ */
+
+@media (max-height: 720px) {
+
+  .app-shell
+  .brand.brand-horizon {
+    min-height: 70px;
+
+    margin-bottom: 18px;
+  }
+
+  .horizon-brand-mark {
+    width: 135px;
+    height: 24px;
+  }
+
+  .horizon-arc {
+    width: 124px;
+    height: 27px;
+  }
+
+  .app-shell
+  .brand-horizon
+  .horizon-wordmark {
+    font-size: 19px;
+  }
+
+  .app-shell
+  .brand-horizon
+  .horizon-tagline {
+    margin-top: 5px;
+
+    font-size: 6px;
+  }
+
+  .horizon-accent {
+    margin-top: 7px;
+  }
+
+}
+
+/* ============================================================
+   APPSECGATE HORIZON BRAND — SIZE TUNING
+   ============================================================ */
+
+/* More presence for the full logo */
+.app-shell .brand.brand-horizon {
+  min-height: 96px !important;
+  margin-bottom: 27px !important;
+}
+
+/* Bigger horizon */
+.horizon-brand-mark {
+  width: 176px !important;
+  height: 34px !important;
+  margin-bottom: -2px !important;
+}
+
+.horizon-arc {
+  width: 164px !important;
+  height: 36px !important;
+}
+
+/* Bigger AppSecGate */
+.app-shell
+.brand-horizon
+.horizon-wordmark {
+  font-size: 25px !important;
+  font-weight: 800 !important;
+}
+
+/* Bigger subtitle */
+.app-shell
+.brand-horizon
+.horizon-tagline {
+  margin-top: 7px !important;
+  font-size: 7.3px !important;
+  letter-spacing: 0.15em !important;
+}
+
+/* Slightly stronger underline */
+.horizon-accent {
+  width: 46px !important;
+  margin-top: 10px !important;
+}
+
+/* Keep collapsed sidebar compact */
+.app-shell.sidebar-collapsed
+.brand.brand-horizon {
+  min-height: 32px !important;
+  margin-bottom: 24px !important;
+}
+
+.app-shell.sidebar-collapsed
+.horizon-brand-mark {
+  width: 34px !important;
+  height: 27px !important;
+  margin: 0 !important;
+}
+
+.app-shell.sidebar-collapsed
+.horizon-arc {
+  width: 31px !important;
+  height: 19px !important;
+}
+
+
+/* ============================================================
+   APPSECGATE — SYSTEM ARCHITECTURE PIPELINE
+   ============================================================ */
+
+.architecture-pipeline {
+  position: relative;
+  overflow: hidden;
+
+  width: 100%;
+  margin-top: 18px;
+  padding: 24px 28px 27px;
+
+  border: 1px solid rgba(73, 103, 160, 0.24);
+  border-radius: 14px;
+
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(76, 91, 255, 0.075),
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 17, 34, 0.96),
+      rgba(6, 14, 28, 0.98)
+    );
+}
+
+
+/* subtle technical grid */
+
+.architecture-pipeline::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.16;
+
+  background-image:
+    linear-gradient(
+      rgba(84, 117, 177, 0.09) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(84, 117, 177, 0.09) 1px,
+      transparent 1px
+    );
+
+  background-size: 32px 32px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent,
+      black 30%,
+      black 75%,
+      transparent
+    );
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.architecture-header {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 38px;
+}
+
+
+.architecture-header small {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #708cff;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+}
+
+
+.architecture-header h3 {
+  margin: 0;
+
+  color: #f2f6ff;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  letter-spacing: -0.015em;
+}
+
+
+.architecture-header p {
+  margin: 6px 0 0;
+
+  color: #7185a8;
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+
+.architecture-live {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin-top: 3px;
+  padding: 6px 9px;
+
+  border: 1px solid rgba(92, 116, 174, 0.2);
+  border-radius: 999px;
+
+  color: #7188b6;
+
+  background: rgba(9, 18, 36, 0.72);
+
+  font-size: 7px;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+
+  white-space: nowrap;
+}
+
+
+.architecture-live i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #5f68ff;
+
+  box-shadow:
+    0 0 5px rgba(95, 104, 255, 0.9),
+    0 0 10px rgba(95, 104, 255, 0.45);
+
+  animation:
+    architecture-live-pulse 1.8s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   PIPELINE
+   ============================================================ */
+
+.architecture-flow {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, minmax(0, 1fr));
+
+  align-items: start;
+
+  gap: 12px;
+
+  width: 100%;
+
+  padding: 0 4px 8px;
+}
+
+
+/* ============================================================
+   CONNECTING RAIL
+   ============================================================ */
+
+.architecture-rail {
+  position: absolute;
+
+  top: 25px;
+  left: 7%;
+  right: 7%;
+
+  height: 1px;
+
+  z-index: 0;
+
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(52, 102, 255, 0.18),
+      rgba(72, 105, 255, 0.62) 20%,
+      rgba(96, 97, 255, 0.62) 48%,
+      rgba(135, 92, 255, 0.62) 72%,
+      rgba(64, 204, 224, 0.28)
+    );
+
+  box-shadow:
+    0 0 7px rgba(82, 98, 255, 0.22);
+}
+
+
+/* moving security signal */
+
+.architecture-signal {
+  position: absolute;
+
+  top: 50%;
+  left: 0;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  transform: translate(-50%, -50%);
+
+  background: #dfe5ff;
+
+  box-shadow:
+    0 0 4px #dfe5ff,
+    0 0 9px #7881ff,
+    0 0 17px rgba(88, 101, 255, 0.95),
+    0 0 27px rgba(116, 86, 255, 0.48);
+
+  animation:
+    architecture-signal-travel
+    7s
+    linear
+    infinite;
+}
+
+
+.architecture-signal::after {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  right: 2px;
+
+  width: 42px;
+  height: 2px;
+
+  transform: translateY(-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(111, 119, 255, 0.55)
+    );
+
+  filter: blur(1px);
+}
+
+
+.architecture-signal.signal-two {
+  animation-delay: -3.5s;
+
+  opacity: 0.48;
+}
+
+
+/* ============================================================
+   SIMPLE NODES
+   ============================================================ */
+
+.architecture-node {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 0;
+
+  text-align: center;
+}
+
+
+.architecture-node-icon {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 50px;
+  height: 50px;
+
+  margin-bottom: 13px;
+
+  border: 1px solid rgba(101, 123, 181, 0.38);
+  border-radius: 50%;
+
+  color: #9eabff;
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(83, 98, 255, 0.15),
+      rgba(9, 19, 39, 0.98) 64%
+    );
+
+  box-shadow:
+    0 0 0 5px rgba(13, 25, 49, 0.62),
+    0 0 16px rgba(67, 87, 177, 0.08);
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+
+.architecture-node-icon::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 5px;
+
+  border: 1px solid rgba(104, 120, 255, 0.12);
+  border-radius: inherit;
+}
+
+
+.architecture-node-icon span {
+  position: relative;
+  z-index: 2;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+/* subtle color progression */
+
+.architecture-node-icon.input,
+.architecture-node-icon.scan {
+  color: #6f9dff;
+}
+
+
+.architecture-node-icon.normalize,
+.architecture-node-icon.correlate {
+  color: #7b7cff;
+}
+
+
+.architecture-node-icon.intelligence,
+.architecture-node-icon.policy {
+  color: #a477ff;
+}
+
+
+.architecture-node-icon.decision {
+  color: #61d9c3;
+
+  border-color: rgba(76, 206, 181, 0.38);
+
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(50, 194, 169, 0.13),
+      rgba(9, 24, 37, 0.98) 64%
+    );
+
+  box-shadow:
+    0 0 0 5px rgba(10, 28, 42, 0.62),
+    0 0 17px rgba(56, 201, 178, 0.10);
+}
+
+
+.architecture-node b {
+  display: block;
+
+  max-width: 130px;
+
+  color: #dce6fa;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  line-height: 1.25;
+}
+
+
+.architecture-node > small {
+  display: block;
+
+  max-width: 128px;
+
+  margin-top: 5px;
+
+  color: #637796;
+
+  font-size: 7.5px;
+  font-weight: 500;
+
+  line-height: 1.45;
+
+  letter-spacing: 0.015em;
+}
+
+
+/* ============================================================
+   NODE INTERACTION
+   ============================================================ */
+
+@media (hover: hover) {
+
+  .architecture-node:hover
+  .architecture-node-icon {
+    transform: translateY(-2px);
+
+    border-color: rgba(119, 126, 255, 0.72);
+
+    box-shadow:
+      0 0 0 5px rgba(13, 25, 49, 0.68),
+      0 0 13px rgba(91, 99, 255, 0.26),
+      0 0 24px rgba(104, 85, 255, 0.10);
+  }
+
+}
+
+
+/* ============================================================
+   PIPELINE STAGES
+   ============================================================ */
+
+.architecture-caption {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto
+    1fr auto
+    1fr auto
+    1fr;
+
+  align-items: center;
+
+  gap: 9px;
+
+  max-width: 610px;
+
+  margin: 25px auto 0;
+}
+
+
+.architecture-caption span {
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(82, 105, 174, 0.30),
+      transparent
+    );
+}
+
+
+.architecture-caption small {
+  color: #536987;
+
+  font-size: 6.5px;
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+}
+
+
+/* ============================================================
+   ANIMATION
+   ============================================================ */
+
+@keyframes architecture-signal-travel {
+
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  96% {
+    opacity: 1;
+  }
+
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+
+}
+
+
+@keyframes architecture-live-pulse {
+
+  0%,
+  100% {
+    opacity: 0.45;
+
+    box-shadow:
+      0 0 4px rgba(95, 104, 255, 0.55);
+  }
+
+  50% {
+    opacity: 1;
+
+    box-shadow:
+      0 0 5px rgba(95, 104, 255, 1),
+      0 0 12px rgba(95, 104, 255, 0.7);
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1050px) {
+
+  .architecture-flow {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+
+    row-gap: 28px;
+  }
+
+  .architecture-rail {
+    display: none;
+  }
+
+  .architecture-node:nth-of-type(6),
+  .architecture-node:nth-of-type(7),
+  .architecture-node:nth-of-type(8) {
+    grid-row: 2;
+  }
+
+}
+
+
+@media (max-width: 720px) {
+
+  .architecture-pipeline {
+    padding:
+      20px
+      16px
+      23px;
+  }
+
+  .architecture-header {
+    display: block;
+
+    margin-bottom: 28px;
+  }
+
+  .architecture-live {
+    margin-top: 13px;
+  }
+
+  .architecture-flow {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 28px 14px;
+  }
+
+  .architecture-node-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .architecture-caption {
+    display: none;
+  }
+
+}
+
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .architecture-signal,
+  .architecture-live i {
+    animation: none !important;
+  }
+
+}
+
+/* ============================================================
+   APPSECGATE — OVERVIEW COLOR UNIFICATION
+   Dark Navy + DevSecOps Blue/Violet
+   ============================================================ */
+
+/*
+   Unify the existing Overview panels with the new
+   System Architecture visual language.
+
+   Status colors (Critical / Healthy / etc.) remain untouched.
+*/
+
+
+/* ------------------------------------------------------------
+   MAIN OVERVIEW PANELS
+   ------------------------------------------------------------ */
+
+.overview-main-content .panel,
+.overview-main-content .showcase-release,
+.overview-main-content .showcase-kpi,
+.overview-main-content .showcase-asset {
+  border-color: rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    radial-gradient(
+      circle at 88% 10%,
+      rgba(105, 82, 255, 0.055),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 48%,
+      #0b1228 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(124, 118, 255, 0.025),
+    0 10px 32px rgba(3, 7, 20, 0.10);
+}
+
+
+/* ------------------------------------------------------------
+   PRIORITIZED FINDINGS
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-findings {
+  border-color: rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+}
+
+
+/* Findings table header */
+
+.overview-main-content .showcase-findings-head {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(37, 68, 126, 0.34),
+      rgba(66, 59, 143, 0.22)
+    ) !important;
+
+  border-color:
+    rgba(91, 96, 210, 0.18) !important;
+}
+
+
+/* Finding rows */
+
+.overview-main-content .showcase-finding {
+  border-color:
+    rgba(92, 104, 177, 0.20) !important;
+}
+
+
+/* ------------------------------------------------------------
+   ASSESSMENT INTEGRITY
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-integrity {
+  border-color:
+    rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(103, 80, 255, 0.07),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+}
+
+
+/* Integrity metric separators */
+
+.overview-main-content
+.showcase-integrity-list > div {
+  border-color:
+    rgba(92, 104, 177, 0.20) !important;
+}
+
+
+/* ------------------------------------------------------------
+   SCANNER EXECUTION CARDS
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-scanners > div {
+  border-color:
+    rgba(94, 99, 205, 0.32) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(13, 29, 57, 0.96),
+      rgba(15, 22, 52, 0.96)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(121, 115, 255, 0.025);
+}
+
+
+/* ------------------------------------------------------------
+   SYSTEM ARCHITECTURE
+   Match the same panel family exactly
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.architecture-pipeline {
+  border-color:
+    rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(94, 78, 255, 0.065),
+      transparent 36%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 48%,
+      #0b1228 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(124, 118, 255, 0.025),
+    0 10px 32px
+      rgba(3, 7, 20, 0.10);
+}
+
+
+/* ------------------------------------------------------------
+   COMMON SECTION LABEL ACCENT
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-panel-header > div > small,
+.overview-main-content
+.showcase-integrity-title small,
+.overview-main-content
+.architecture-header > div > small {
+  color: #737cff !important;
+}
+
+
+/* ------------------------------------------------------------
+   Buttons / small technical borders
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-panel-header button {
+  border-color:
+    rgba(99, 105, 220, 0.36) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(24, 46, 88, 0.76),
+      rgba(35, 32, 82, 0.72)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   Keep functional status colors intact
+   ------------------------------------------------------------ */
+
+/*
+   Intentionally NOT overriding:
+   .critical
+   .high
+   .healthy
+   .completed
+   .pass
+   .block
+
+   Those communicate security state and should remain semantic.
+*/
+
+
+/* ============================================================
+   APPSECGATE — OVERVIEW FINAL VISUAL SYSTEM
+   Navy + DevSecOps Blue/Violet
+   Preserve semantic status colors
+   Restore architecture imagery
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   1. COMMON PANEL SURFACE
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-kpi,
+.overview-main-content .showcase-risk-panel,
+.overview-main-content .showcase-findings,
+.overview-main-content .showcase-integrity,
+.overview-main-content .architecture-pipeline {
+  border-color: rgba(91, 96, 210, 0.34) !important;
+
+  background:
+    radial-gradient(
+      circle at 88% 8%,
+      rgba(104, 79, 255, 0.07),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 50%,
+      #0b1228 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(133, 126, 255, 0.035),
+    0 10px 30px rgba(2, 6, 18, 0.11);
+}
+
+
+/* ------------------------------------------------------------
+   2. FINAL RELEASE DECISION
+   Restore mountain image + violet/navy overlay
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-release {
+  border-color: rgba(91, 96, 210, 0.38) !important;
+
+  background:
+    radial-gradient(
+      circle at 76% 35%,
+      rgba(111, 75, 255, 0.10),
+      transparent 32%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(8, 24, 49, 0.97) 0%,
+      rgba(10, 23, 49, 0.90) 30%,
+      rgba(18, 18, 55, 0.66) 58%,
+      rgba(9, 13, 35, 0.76) 100%
+    ),
+    url("/appsecgate-mountains.png")
+      center 52% / cover no-repeat !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(125, 118, 255, 0.045),
+    0 10px 32px rgba(3, 7, 20, 0.12);
+}
+
+
+/* Keep release status semantic.
+   BLOCK remains red, PASS remains green, etc. */
+
+.overview-main-content
+.showcase-release.block
+.showcase-release-copy h2 {
+  color: #ff7187 !important;
+}
+
+.overview-main-content
+.showcase-release.incomplete
+.showcase-release-copy h2 {
+  color: #f9d77c !important;
+}
+
+.overview-main-content
+.showcase-release.pass
+.showcase-release-copy h2 {
+  color: #48e5b5 !important;
+}
+
+
+/* Release context follows dashboard identity */
+
+.overview-main-content
+.showcase-release-context b {
+  color: #dce5ff !important;
+}
+
+.overview-main-content
+.showcase-release-context span {
+  color: #8294bd !important;
+}
+
+
+/* ------------------------------------------------------------
+   3. ASSET CONTEXT
+   Restore mountain image
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-asset {
+  border-color: rgba(91, 96, 210, 0.34) !important;
+
+  background:
+    radial-gradient(
+      circle at 78% 30%,
+      rgba(104, 76, 255, 0.08),
+      transparent 34%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(9, 24, 50, 0.97) 0%,
+      rgba(10, 22, 48, 0.87) 46%,
+      rgba(16, 17, 49, 0.56) 100%
+    ),
+    url("/appsecgate-mountains.png")
+      center 50% / cover no-repeat !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(125, 118, 255, 0.035),
+    0 10px 30px rgba(3, 7, 20, 0.10);
+}
+
+
+/* Preserve image visibility through asset content */
+
+.overview-main-content .showcase-asset-main {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 23, 48, 0.96) 0%,
+      rgba(9, 21, 47, 0.76) 62%,
+      rgba(13, 16, 45, 0.18) 100%
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   4. CONTEXTUAL RISK DISTRIBUTION
+   Match Architecture panel
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-risk-panel {
+  border-color: rgba(91, 96, 210, 0.34) !important;
+
+  background:
+    radial-gradient(
+      circle at 12% 30%,
+      rgba(70, 111, 255, 0.075),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 80%,
+      rgba(111, 70, 255, 0.06),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+}
+
+
+/* Donut center follows the new panel surface.
+   Risk segments remain semantic colors. */
+
+.overview-main-content .showcase-donut > div {
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      #102044 0%,
+      #0a1732 68%,
+      #09142b 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(111, 119, 255, 0.12),
+    0 0 18px rgba(76, 81, 220, 0.08);
+}
+
+
+/* ------------------------------------------------------------
+   5. KPI CARDS
+   Same family, subtle variation only
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-kpi {
+  background:
+    radial-gradient(
+      circle at 94% 5%,
+      rgba(105, 77, 255, 0.075),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   6. SECTION LABELS
+   Blue/Violet product identity
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-section-title small,
+.overview-main-content
+.showcase-panel-header > div:first-child > small,
+.overview-main-content
+.showcase-integrity-title small,
+.overview-main-content
+.architecture-header > div:first-child > small,
+.overview-main-content
+.showcase-kpi-body > small,
+.overview-main-content
+.showcase-asset-main > small {
+  color: #7d86ff !important;
+}
+
+
+/* ------------------------------------------------------------
+   7. PANEL TITLE / SECONDARY TEXT CONSISTENCY
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-section-title h3,
+.overview-main-content
+.showcase-panel-header h3 {
+  color: #cbd6ef !important;
+}
+
+.overview-main-content
+.showcase-kpi-body p {
+  color: #7889aa !important;
+}
+
+
+/* ------------------------------------------------------------
+   8. ASSET PILL
+   Replace old cyan-heavy identity
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-asset-pill {
+  color: #c2c8ff !important;
+
+  border: 1px solid
+    rgba(104, 101, 225, 0.20);
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(50, 71, 142, 0.30),
+      rgba(77, 54, 160, 0.25)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   9. FINDINGS TABLE
+   Same visual family
+   ------------------------------------------------------------ */
+
+.overview-main-content .showcase-findings-head {
+  border-color:
+    rgba(91, 96, 210, 0.20) !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(37, 68, 126, 0.34),
+      rgba(69, 55, 145, 0.24)
+    ) !important;
+}
+
+.overview-main-content .showcase-finding {
+  border-color:
+    rgba(92, 104, 177, 0.19) !important;
+}
+
+
+/* ------------------------------------------------------------
+   10. ASSESSMENT INTEGRITY
+   ------------------------------------------------------------ */
+
+.overview-main-content
+.showcase-integrity-list > div {
+  border-color:
+    rgba(92, 104, 177, 0.19) !important;
+}
+
+.overview-main-content
+.showcase-scanners > div {
+  border-color:
+    rgba(94, 99, 205, 0.31) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12, 29, 58, 0.96),
+      rgba(15, 21, 52, 0.96)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   11. SYSTEM ARCHITECTURE
+   Keep it as the visual reference
+   ------------------------------------------------------------ */
+
+.overview-main-content .architecture-pipeline {
+  background:
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(94, 78, 255, 0.065),
+      transparent 36%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 48%,
+      #0b1228 100%
+    ) !important;
+}
+
+/* ============================================================
+   SYSTEM ARCHITECTURE — LARGER NODE ICONS
+   Keep node size/layout unchanged
+   ============================================================ */
+
+.overview-main-content
+.architecture-pipeline
+.architecture-node-icon > span {
+  font-size: 21px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+
+  transform: scale(1.12);
+  transform-origin: center;
+
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 12px rgba(105, 101, 255, 0.22);
+}
+
+/* Security Inputs </> needs a little more width visually */
+.overview-main-content
+.architecture-pipeline
+.architecture-node-icon.input > span {
+  font-size: 19px !important;
+  transform: scale(1.16);
+}
+
+/* Final decision check */
+.overview-main-content
+.architecture-pipeline
+.architecture-node-icon.decision > span {
+  font-size: 23px !important;
+  transform: scale(1.08);
+}
+
+/* ============================================================
+   ASSETS & INPUTS — OVERVIEW PANEL COLOR SYSTEM
+   Match Overview navy / blue-violet visual family.
+   Colors only — no layout changes.
+   ============================================================ */
+
+/* Main Asset Inventory + Assessment Target panels */
+.assets-main-content .asset-inventory,
+.assets-main-content .assessment-launcher {
+  border-color: rgba(91, 96, 210, 0.34) !important;
+
+  background:
+    radial-gradient(
+      circle at 90% 8%,
+      rgba(104, 79, 255, 0.07),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(133, 126, 255, 0.035),
+    0 10px 30px rgba(2, 6, 18, 0.11) !important;
+}
+
+/* Selected Asset card */
+.assets-main-content .selected-asset-card {
+  border-color: rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    radial-gradient(
+      circle at 92% 8%,
+      rgba(105, 77, 255, 0.065),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(11, 27, 57, 0.96) 0%,
+      rgba(10, 22, 48, 0.96) 52%,
+      rgba(11, 18, 40, 0.96) 100%
+    ) !important;
+}
+
+/* Configured Security Inputs container */
+.assets-main-content .assessment-readiness {
+  border-color: rgba(91, 96, 210, 0.28) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(11, 27, 57, 0.92),
+      rgba(15, 21, 52, 0.92)
+    ) !important;
+}
+
+/* Individual Source / IaC / DAST / Container cells */
+.assets-main-content .readiness-item {
+  border-color: rgba(92, 104, 177, 0.19) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12, 29, 58, 0.72),
+      rgba(15, 21, 52, 0.72)
+    ) !important;
+}
+
+/* Asset table shell */
+.assets-main-content .asset-table {
+  border-color: rgba(91, 96, 210, 0.25) !important;
+  background: rgba(8, 22, 47, 0.48) !important;
+}
+
+/* Asset table header */
+.assets-main-content .asset-table-header {
+  border-color: rgba(91, 96, 210, 0.20) !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(37, 68, 126, 0.34),
+      rgba(69, 55, 145, 0.24)
+    ) !important;
+}
+
+/* Search field */
+.assets-main-content .asset-search input {
+  border-color: rgba(91, 96, 210, 0.30) !important;
+  background: rgba(7, 20, 43, 0.72) !important;
+}
+
+/* Keep the Overview blue/violet identity for section labels */
+.assets-main-content .assessment-launcher > .eyebrow,
+.assets-main-content .assessment-readiness-heading > div > span {
+  color: #7d86ff !important;
+}
+
+
+/* ============================================================
+   ADD ASSESSMENT INPUT — OVERVIEW COLOR SYSTEM
+   Navy / Blue-Violet identity — COLORS ONLY
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. MAIN MODAL
+   ------------------------------------------------------------ */
+
+.assets-main-content .asset-modal-panel {
+  border-color: rgba(91, 96, 210, 0.38) !important;
+
+  background:
+    radial-gradient(
+      circle at 88% 5%,
+      rgba(103, 78, 255, 0.08),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1730 0%,
+      #0a142b 52%,
+      #0b1228 100%
+    ) !important;
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.46),
+    inset 0 1px 0 rgba(133, 126, 255, 0.04) !important;
+}
+
+
+/* ------------------------------------------------------------
+   2. SOURCE CODE MAIN CARD
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.security-input-source {
+  border-color: rgba(91, 96, 210, 0.28) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(12, 28, 58, 0.92),
+      rgba(15, 21, 52, 0.92)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   3. GIT REPOSITORY CARD
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.repository-import-box {
+  border-color: rgba(91, 96, 210, 0.26) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(10, 25, 52, 0.90),
+      rgba(13, 20, 46, 0.90)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   4. IaC / DAST / CONTAINER CARDS
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.security-input-iac,
+
+.assets-main-content
+.asset-modal-panel
+.dast-input-container,
+
+.assets-main-content
+.asset-modal-panel
+.security-input-container:not(.dast-input-container):not(.security-input-source) {
+  border-color: rgba(91, 96, 210, 0.30) !important;
+
+  background:
+    radial-gradient(
+      circle at 90% 5%,
+      rgba(100, 76, 255, 0.055),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(11, 27, 57, 0.94),
+      rgba(15, 21, 52, 0.94)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   5. UPLOAD / DROP ZONES
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.source-upload-zone,
+
+.assets-main-content
+.asset-modal-panel
+.source-upload-dropzone,
+
+.assets-main-content
+.asset-modal-panel
+.container-archive-upload {
+  border-color: rgba(104, 116, 205, 0.38) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(7, 18, 40, 0.72),
+      rgba(11, 17, 39, 0.78)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   6. INPUTS / SELECTS
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+input,
+
+.assets-main-content
+.asset-modal-panel
+select {
+  border-color: rgba(91, 105, 169, 0.42) !important;
+  background: rgba(7, 17, 36, 0.82) !important;
+}
+
+
+/* ------------------------------------------------------------
+   7. DAST MODE SWITCH
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.dast-mode-switch {
+  border-color: rgba(91, 96, 210, 0.24) !important;
+  background: rgba(7, 17, 38, 0.64) !important;
+}
+
+.assets-main-content
+.asset-modal-panel
+.dast-mode-switch button {
+  background: transparent !important;
+}
+
+.assets-main-content
+.asset-modal-panel
+.dast-mode-switch button.active {
+  border-color: rgba(111, 105, 255, 0.42) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(54, 66, 151, 0.62),
+      rgba(76, 57, 174, 0.46)
+    ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   8. SECTION IDENTITY LABELS
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.eyebrow,
+
+.assets-main-content
+.asset-modal-panel
+.security-input-label {
+  color: #7d86ff !important;
+}
+
+
+/* ------------------------------------------------------------
+   9. DIVIDERS
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.source-acquisition-divider,
+
+.assets-main-content
+.asset-modal-panel
+.container-input-divider {
+  border-color: rgba(91, 96, 210, 0.18) !important;
+}
+
+
+/* ------------------------------------------------------------
+   10. CLOSE BUTTON
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.asset-modal-close {
+  border-color: rgba(91, 96, 210, 0.34) !important;
+  background: rgba(10, 22, 48, 0.82) !important;
+}
+
+
+/* ------------------------------------------------------------
+   11. FOOTER SEPARATOR
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.asset-modal-panel
+.asset-form-actions {
+  border-color: rgba(91, 96, 210, 0.20) !important;
+}

@@ -692,11 +692,32 @@ export default function Home() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">A</span>
-          <div>
-            <b>AppSecGate</b>
-            <small>INTELLIGENCE SECURITY GATE</small>
+        <div className="brand brand-horizon">
+          <div
+            className="horizon-brand-mark"
+            aria-hidden="true"
+          >
+            <span className="horizon-arc" />
+          </div>
+
+          <div className="brand-copy horizon-brand-copy">
+            <b className="horizon-wordmark">
+              <span className="horizon-appsec">
+                AppSec
+              </span>
+              <span className="horizon-gate">
+                Gate
+              </span>
+            </b>
+
+            <small className="horizon-tagline">
+              INTELLIGENCE SECURITY GATE
+            </small>
+
+            <span
+              className="horizon-accent"
+              aria-hidden="true"
+            />
           </div>
         </div>
 
@@ -720,9 +741,28 @@ export default function Home() {
           ))}
         </nav>
 
-        <small className="side-note">
-          Security assessment &amp; release decision platform
-        </small>
+        <div className="side-note">
+          <span className="side-note-product">
+            Security assessment &amp; release decision
+            platform
+          </span>
+
+          <div className="sidebar-built-by">
+            <div
+              className="sidebar-built-divider"
+              aria-hidden="true"
+            >
+              <span />
+              <i>
+                <b />
+              </i>
+              <span />
+            </div>
+
+            <small>BUILT BY</small>
+            <strong>Amr Abdelaziz</strong>
+          </div>
+        </div>
       </aside>
 
       <main
@@ -1364,6 +1404,92 @@ export default function Home() {
                   )}
                 </div>
               </article>
+            </section>
+
+            <section className="architecture-pipeline">
+              <div className="architecture-header">
+                <div>
+                  <small>SYSTEM ARCHITECTURE</small>
+                  <h3>AppSecGate Security Pipeline</h3>
+                  <p>
+                    From security inputs to an explainable release decision.
+                  </p>
+                </div>
+
+                <span className="architecture-live">
+                  <i />
+                  CONTINUOUS SECURITY FLOW
+                </span>
+              </div>
+
+              <div className="architecture-flow">
+                <div className="architecture-rail" aria-hidden="true">
+                  <span className="architecture-signal signal-a" />
+                  <span className="architecture-signal signal-b" />
+                </div>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon input">
+                    <span>&lt;/&gt;</span>
+                  </div>
+                  <b>Security Inputs</b>
+                  <small>Source · IaC · Image · API</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon scan">
+                    <span>⌁</span>
+                  </div>
+                  <b>Security Scanners</b>
+                  <small>SAST · SCA · DAST · Secrets</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon normalize">
+                    <span>◇</span>
+                  </div>
+                  <b>Normalize</b>
+                  <small>Unified finding model</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon correlate">
+                    <span>◎</span>
+                  </div>
+                  <b>Correlate</b>
+                  <small>Deduplicate · Context</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon intelligence">
+                    <span>✦</span>
+                  </div>
+                  <b>Risk Intelligence</b>
+                  <small>Exposure · Severity · Asset</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon policy">
+                    <span>◆</span>
+                  </div>
+                  <b>Policy Gate</b>
+                  <small>Controls · Evidence · Rules</small>
+                </article>
+
+                <article className="architecture-node">
+                  <div className="architecture-node-icon decision">
+                    <span>✓</span>
+                  </div>
+                  <b>Release Decision</b>
+                  <small>PASS · REVIEW · BLOCK</small>
+                </article>
+              </div>
+
+              <div className="architecture-stage-labels" aria-hidden="true">
+                <span>SCAN</span>
+                <span>ANALYZE</span>
+                <span>DECIDE</span>
+              </div>
             </section>
 
             <footer className="showcase-footer">
