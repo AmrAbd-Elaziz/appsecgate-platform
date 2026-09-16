@@ -71,6 +71,46 @@ export default function SecurityControls({
       null
     );
 
+  function openControlDetail(
+    record: ControlIntelligenceRecord
+  ) {
+    setSelectedRecord(record);
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("view", "controls");
+    url.searchParams.set(
+      "control",
+      record.control.id
+    );
+
+    window.history.pushState(
+      {
+        view: "controls",
+        control: record.control.id,
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  function closeControlDetail() {
+    setSelectedRecord(null);
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.delete("control");
+
+    window.history.replaceState(
+      {
+        ...window.history.state,
+        control: null,
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
   useEffect(() => {
     let cancelled = false;
 
@@ -116,6 +156,45 @@ export default function SecurityControls({
   }, [assessment?.id]);
 
   useEffect(() => {
+    function syncControlFromUrl() {
+      const params = new URLSearchParams(
+        window.location.search
+      );
+
+      const controlId =
+        params.get("control");
+
+      if (!controlId) {
+        setSelectedRecord(null);
+        return;
+      }
+
+      const matchingRecord = records.find(
+        (record) =>
+          record.control.id === controlId
+      );
+
+      setSelectedRecord(
+        matchingRecord ?? null
+      );
+    }
+
+    syncControlFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncControlFromUrl
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncControlFromUrl
+      );
+    };
+  }, [records]);
+
+  useEffect(() => {
     if (!selectedRecord) {
       return;
     }
@@ -124,7 +203,7 @@ export default function SecurityControls({
       event: KeyboardEvent
     ) {
       if (event.key === "Escape") {
-        setSelectedRecord(null);
+        closeControlDetail();
       }
     }
 
@@ -420,7 +499,7 @@ export default function SecurityControls({
                     <tr
                       key={`${record.asset.id}:${record.finding.id}`}
                       onClick={() =>
-                        setSelectedRecord(
+                        openControlDetail(
                           record
                         )
                       }
@@ -515,7 +594,7 @@ export default function SecurityControls({
               event.target ===
               event.currentTarget
             ) {
-              setSelectedRecord(null);
+              closeControlDetail();
             }
           }}
         >
@@ -552,9 +631,7 @@ export default function SecurityControls({
               <button
                 type="button"
                 className="controls-v2-close"
-                onClick={() =>
-                  setSelectedRecord(null)
-                }
+                onClick={closeControlDetail}
                 aria-label="Close"
               >
                 ×

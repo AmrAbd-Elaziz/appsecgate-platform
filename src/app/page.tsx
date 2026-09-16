@@ -105,10 +105,20 @@ export default function Home() {
     return navigation.some(([candidate]) => candidate === value);
   }
 
-  function setView(nextView: View) {
+  function setView(
+    nextView: View,
+    context?: {
+      findingId?: string | null;
+      assessmentId?: string | null;
+    }
+  ) {
     setViewState(nextView);
 
     const url = new URL(window.location.href);
+
+    // Modal state belongs only to its owning page.
+    url.searchParams.delete("control");
+    url.searchParams.delete("evidence");
 
     if (nextView === "overview") {
       url.searchParams.delete("view");
@@ -116,36 +126,132 @@ export default function Home() {
       url.searchParams.set("view", nextView);
     }
 
+    if (context?.findingId) {
+      url.searchParams.set(
+        "finding",
+        context.findingId
+      );
+    } else {
+      url.searchParams.delete("finding");
+    }
+
+    if (context?.assessmentId) {
+      url.searchParams.set(
+        "assessment",
+        context.assessmentId
+      );
+    } else {
+      url.searchParams.delete("assessment");
+    }
+
     window.history.pushState(
-      { view: nextView },
+      {
+        view: nextView,
+        finding: context?.findingId ?? null,
+        assessment:
+          context?.assessmentId ?? null,
+      },
       "",
       `${url.pathname}${url.search}${url.hash}`
     );
   }
 
   useEffect(() => {
-    function syncViewFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const requestedView = params.get("view");
+    let cancelled = false;
 
-      setViewState(
-        isValidView(requestedView)
-          ? requestedView
-          : "overview"
+    async function syncNavigationFromUrl() {
+      const params = new URLSearchParams(
+        window.location.search
       );
+
+      const requestedView =
+        params.get("view");
+
+      const findingId =
+        params.get("finding");
+
+      const assessmentId =
+        params.get("assessment");
+
+      const nextView = isValidView(
+        requestedView
+      )
+        ? requestedView
+        : "overview";
+
+      setViewState(nextView);
+
+      if (
+        findingId &&
+        assessmentId &&
+        (
+          nextView === "controls" ||
+          nextView === "evidence"
+        )
+      ) {
+        try {
+          const response = await fetch(
+            `/api/assessments/${assessmentId}`,
+            {
+              cache: "no-store",
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              "Unable to restore assessment context."
+            );
+          }
+
+          const payload =
+            await response.json();
+
+          if (cancelled) {
+            return;
+          }
+
+          const contextualAssessment =
+            (payload.data ??
+              payload) as PersistedAssessment;
+
+          setFocusedFindingId(
+            findingId
+          );
+
+          setFocusedAssessment(
+            contextualAssessment
+          );
+
+          return;
+        } catch (error) {
+          console.error(
+            "Navigation context restore failed:",
+            error
+          );
+        }
+      }
+
+      setFocusedFindingId(null);
+      setFocusedAssessment(null);
     }
 
-    syncViewFromUrl();
+    function handlePopState() {
+      void syncNavigationFromUrl();
+    }
+
+    void syncNavigationFromUrl();
 
     window.addEventListener(
       "popstate",
-      syncViewFromUrl
+      handlePopState
     );
 
     return () => {
+      cancelled = true;
+
       window.removeEventListener(
         "popstate",
-        syncViewFromUrl
+        handlePopState
       );
     };
   }, []);
@@ -250,7 +356,10 @@ export default function Home() {
       setFocusedAssessment(
         contextualAssessment
       );
-      setView(targetView);
+      setView(targetView, {
+        findingId,
+        assessmentId,
+      });
     } catch (error) {
       console.error(
         "Finding context navigation failed:",
@@ -776,7 +885,11 @@ export default function Home() {
               setView("findings");
             }}
             onViewEvidence={() =>
-              setView("evidence")
+              setView("evidence", {
+                findingId: focusedFindingId,
+                assessmentId:
+                  focusedAssessment?.id ?? null,
+              })
             }
           />
         ) : view === "evidence" ? (
@@ -795,7 +908,11 @@ export default function Home() {
               focusedFindingId
             }
             onGoToControls={() =>
-              setView("controls")
+              setView("controls", {
+                findingId: focusedFindingId,
+                assessmentId:
+                  focusedAssessment?.id ?? null,
+              })
             }
             onViewReports={() =>
               setView("reports")

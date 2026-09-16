@@ -33,6 +33,86 @@ export default function EvidenceVault({
     null
   );
 
+  function openEvidenceDetail(
+    record: EvidenceRecord
+  ) {
+    setSelectedEvidence(record);
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("view", "evidence");
+    url.searchParams.set(
+      "evidence",
+      record.id
+    );
+
+    window.history.pushState(
+      {
+        view: "evidence",
+        evidence: record.id,
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  function closeEvidenceDetail() {
+    setSelectedEvidence(null);
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.delete("evidence");
+
+    window.history.replaceState(
+      {
+        ...window.history.state,
+        evidence: null,
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  useEffect(() => {
+    function syncEvidenceFromUrl() {
+      const params = new URLSearchParams(
+        window.location.search
+      );
+
+      const evidenceId =
+        params.get("evidence");
+
+      if (!evidenceId) {
+        setSelectedEvidence(null);
+        return;
+      }
+
+      const matchingRecord =
+        (assessment?.evidence ?? []).find(
+          (record) =>
+            record.id === evidenceId
+        );
+
+      setSelectedEvidence(
+        matchingRecord ?? null
+      );
+    }
+
+    syncEvidenceFromUrl();
+
+    window.addEventListener(
+      "popstate",
+      syncEvidenceFromUrl
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        syncEvidenceFromUrl
+      );
+    };
+  }, [assessment?.id]);
+
   useEffect(() => {
     if (!selectedEvidence) {
       return;
@@ -42,7 +122,7 @@ export default function EvidenceVault({
       event: KeyboardEvent
     ) => {
       if (event.key === "Escape") {
-        setSelectedEvidence(null);
+        closeEvidenceDetail();
       }
     };
 
@@ -216,7 +296,7 @@ export default function EvidenceVault({
               role="button"
               tabIndex={0}
               onClick={() =>
-                setSelectedEvidence(record)
+                openEvidenceDetail(record)
               }
               onKeyDown={(event) => {
                 if (
@@ -224,7 +304,7 @@ export default function EvidenceVault({
                   event.key === " "
                 ) {
                   event.preventDefault();
-                  setSelectedEvidence(record);
+                  openEvidenceDetail(record);
                 }
               }}
             >
@@ -361,7 +441,7 @@ export default function EvidenceVault({
                   event.target ===
                   event.currentTarget
                 ) {
-                  setSelectedEvidence(null);
+                  closeEvidenceDetail();
                 }
               }}
             >
@@ -406,9 +486,7 @@ export default function EvidenceVault({
                       type="button"
                       className="evidence-detail-close"
                       aria-label="Close evidence detail"
-                      onClick={() =>
-                        setSelectedEvidence(null)
-                      }
+                      onClick={closeEvidenceDetail}
                     >
                       ×
                     </button>

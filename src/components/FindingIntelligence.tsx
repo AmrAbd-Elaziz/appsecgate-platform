@@ -119,14 +119,18 @@ export default function FindingIntelligence({
   }
 
   function closeFindingDetail() {
+    setSelectedRecord(null);
+
     const url = new URL(window.location.href);
 
-    if (url.searchParams.has("finding")) {
-      window.history.back();
-      return;
-    }
+    url.searchParams.set("view", "findings");
+    url.searchParams.delete("finding");
 
-    setSelectedRecord(null);
+    window.history.replaceState(
+      { view: "findings" },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
   }
 
   useEffect(() => {
