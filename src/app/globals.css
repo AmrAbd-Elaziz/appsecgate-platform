@@ -13597,3 +13597,1660 @@ h3 { margin: 0; font-size: 14px; }
   color: #b9c9ea;
   font-weight: 600;
 }
+/* ============================================================
+   ASSESSMENT RUNS — MATCH FINDING INTELLIGENCE HEADER
+   ============================================================ */
+
+.assessments-main-content .assessment-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+
+  width: 100%;
+  max-width: none;
+
+  margin: 0 0 24px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+.assessments-main-content
+.assessment-page-header::before,
+.assessments-main-content
+.assessment-page-header::after {
+  display: none;
+}
+
+.assessments-main-content
+.assessment-page-header > div:first-child {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.assessments-main-content
+.assessment-page-header .eyebrow {
+  margin: 0 0 8px;
+
+  color: #718cff;
+
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.assessments-main-content
+.assessment-page-header h1 {
+  margin: 0;
+
+  color: #f2f5ff;
+
+  font-size: clamp(29px, 2.3vw, 36px);
+  font-weight: 800;
+
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.assessments-main-content
+.assessment-page-header .page-description {
+  max-width: 720px;
+
+  margin: 9px 0 0;
+
+  color: #7f94b6;
+
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+
+/* LATEST RUN — same visual language as
+   Finding Intelligence Assessment Context */
+
+.assessments-main-content
+.assessment-page-header .run-status-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 205px;
+
+  padding: 12px 15px 12px 17px;
+
+  border: 1px solid rgba(112, 139, 196, 0.18);
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 31, 52, 0.90),
+      rgba(15, 25, 42, 0.90)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.025);
+}
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 11px;
+  bottom: 11px;
+
+  width: 2px;
+
+  border-radius: 2px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #7288ff,
+      #4ac6ff
+    );
+}
+
+.assessments-main-content
+.assessment-page-header
+.status-indicator {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+
+  border-radius: 50%;
+
+  background: #63d8b0;
+
+  box-shadow:
+    0 0 0 3px rgba(99,216,176,0.08);
+}
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card small {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #7792c7;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card b {
+  display: block;
+
+  color: #e7edff;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+/* No-run state also uses the same clean header */
+
+.assessments-main-content
+.page-header:not(.assessment-page-header) {
+  width: 100%;
+  max-width: none;
+
+  margin: 0 0 24px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+
+/* Responsive */
+
+@media (max-width: 820px) {
+  .assessments-main-content
+  .assessment-page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .assessments-main-content
+  .assessment-page-header
+  .run-status-card {
+    width: 100%;
+  }
+}
+
+
+
+/* ============================================================
+   ASSESSMENT RUNS — EXACT FINDINGS HEADER TYPOGRAPHY
+   ============================================================ */
+
+.assessments-main-content .assessment-page-header {
+  align-items: flex-start !important;
+  margin-bottom: 34px !important;
+}
+
+
+/* Eyebrow — same visual typography as Finding Intelligence */
+
+.assessments-main-content
+.assessment-page-header .eyebrow {
+  margin: 0 0 14px !important;
+
+  color: #7792ff !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+
+  line-height: 1.2 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+}
+
+
+/* Main title — match Finding Intelligence */
+
+.assessments-main-content
+.assessment-page-header h1 {
+  margin: 0 !important;
+
+  color: #f2f5ff !important;
+
+  font-family: inherit !important;
+  font-size: 54px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.05 !important;
+  letter-spacing: -0.04em !important;
+}
+
+
+/* Description — match Finding Intelligence */
+
+.assessments-main-content
+.assessment-page-header .page-description {
+  max-width: 820px !important;
+
+  margin: 14px 0 0 !important;
+
+  color: #82a2d7 !important;
+
+  font-family: inherit !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+}
+
+
+/* Keep latest-run context aligned without affecting title */
+
+.assessments-main-content
+.assessment-page-header .run-status-card {
+  margin-top: 5px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .assessments-main-content
+  .assessment-page-header h1 {
+    font-size: 46px !important;
+  }
+
+  .assessments-main-content
+  .assessment-page-header .page-description {
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .assessments-main-content
+  .assessment-page-header h1 {
+    font-size: 36px !important;
+  }
+
+  .assessments-main-content
+  .assessment-page-header .eyebrow {
+    font-size: 11px !important;
+  }
+
+  .assessments-main-content
+  .assessment-page-header .page-description {
+    font-size: 14px !important;
+  }
+}
+
+
+
+/* ============================================================
+   ASSETS & INPUTS — MATCH FINDING INTELLIGENCE HEADER
+   Header typography only
+   ============================================================ */
+
+.assets-main-content .assets-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 28px !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 0 0 34px !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+/* Remove any old decorative hero/header layers */
+
+.assets-main-content
+.assets-header::before,
+.assets-main-content
+.assets-header::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* Main text container */
+
+.assets-main-content
+.assets-header > div:first-child {
+  min-width: 0;
+  max-width: 820px;
+}
+
+
+/* ------------------------------------------------------------
+   Eyebrow
+   Same style as NORMALIZED SECURITY INTELLIGENCE
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header .eyebrow {
+  margin: 0 0 14px !important;
+
+  color: #7792ff !important;
+
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+
+  line-height: 1.2 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+}
+
+
+/* ------------------------------------------------------------
+   Main title
+   Same typography as Finding Intelligence
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #f2f5ff !important;
+
+  font-family: inherit !important;
+  font-size: 54px !important;
+  font-weight: 700 !important;
+
+  line-height: 1.05 !important;
+  letter-spacing: -0.04em !important;
+}
+
+
+/* ------------------------------------------------------------
+   Description
+   Same typography / spacing as Finding Intelligence
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header .page-description {
+  max-width: 820px !important;
+
+  margin: 14px 0 0 !important;
+
+  color: #82a2d7 !important;
+
+  font-family: inherit !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+}
+
+
+/* ------------------------------------------------------------
+   Don't let buttons / actions alter header typography
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header > :not(:first-child) {
+  flex-shrink: 0;
+}
+
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+
+  .assets-main-content
+  .assets-header {
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+
+  .assets-main-content
+  .assets-header h1 {
+    font-size: 46px !important;
+  }
+
+  .assets-main-content
+  .assets-header .page-description {
+    font-size: 15px !important;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .assets-main-content
+  .assets-header {
+    margin-bottom: 26px !important;
+  }
+
+  .assets-main-content
+  .assets-header h1 {
+    font-size: 36px !important;
+  }
+
+  .assets-main-content
+  .assets-header .eyebrow {
+    font-size: 11px !important;
+  }
+
+  .assets-main-content
+  .assets-header .page-description {
+    font-size: 14px !important;
+  }
+}
+
+
+
+/* ============================================================
+   ASSESSMENT RUNS — COMPACT EXECUTION HERO
+   ============================================================ */
+
+.assessments-main-content .assessment-run-hero {
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+
+  width: 100%;
+  min-height: 112px;
+
+  margin: 0 0 12px;
+  padding: 22px 24px;
+
+  border: 1px solid #273958;
+  border-radius: 12px;
+
+  background:
+    radial-gradient(
+      circle at 92% 20%,
+      rgba(102, 91, 255, 0.09),
+      transparent 28%
+    ),
+    linear-gradient(
+      120deg,
+      #111c2f 0%,
+      #121c30 58%,
+      #141c32 100%
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.025),
+    0 12px 30px rgba(0,0,0,0.10);
+}
+
+
+/* subtle top accent */
+
+.assessments-main-content
+.assessment-run-hero::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 24px;
+
+  width: 42px;
+  height: 2px;
+
+  border-radius: 0 0 2px 2px;
+
+  background: #7187ff;
+}
+
+
+/* left content */
+
+.assessments-main-content
+.assessment-run-hero > div:first-child {
+  min-width: 0;
+}
+
+
+/* ASSESSMENT RUN */
+
+.assessments-main-content
+.assessment-run-hero .eyebrow {
+  margin: 0 0 8px;
+
+  color: #7897d4;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  line-height: 1.2;
+  letter-spacing: 0.13em;
+}
+
+
+/* Run ID */
+
+.assessments-main-content
+.assessment-run-hero h2 {
+  margin: 0;
+
+  color: #f0f4ff;
+
+  font-size: clamp(21px, 1.65vw, 27px);
+  font-weight: 750;
+
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+
+/* asset context */
+
+.assessments-main-content
+.assessment-run-hero > div:first-child > p:last-child {
+  margin: 7px 0 0;
+
+  color: #7f9aca;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   RELEASE DECISION
+   ============================================================ */
+
+.assessments-main-content
+.assessment-run-hero .run-decision {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  min-width: 190px;
+  min-height: 64px;
+
+  padding: 10px 0 10px 24px;
+
+  border-left: 1px solid #293a57;
+
+  text-align: left;
+}
+
+
+.assessments-main-content
+.assessment-run-hero .run-decision small {
+  display: block;
+
+  margin: 0 0 7px;
+
+  color: #7892c2;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  line-height: 1;
+  letter-spacing: 0.1em;
+}
+
+
+.assessments-main-content
+.assessment-run-hero .run-decision b {
+  display: block;
+
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 800;
+
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+
+/* status indicator line */
+
+.assessments-main-content
+.assessment-run-hero .run-decision::before {
+  content: "";
+
+  position: absolute;
+
+  left: -1px;
+  top: 18px;
+
+  width: 2px;
+  height: 28px;
+
+  border-radius: 2px;
+
+  background: #ff667f;
+}
+
+
+/* PASS */
+
+.assessments-main-content
+.assessment-run-hero
+.run-decision:has(b:first-of-type) {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   Bring KPI row closer to hero
+   ============================================================ */
+
+.assessments-main-content
+.assessment-kpis {
+  margin-top: 0;
+}
+
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+  .assessments-main-content
+  .assessment-run-hero {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 20px;
+  }
+
+  .assessments-main-content
+  .assessment-run-hero .run-decision {
+    width: 100%;
+    min-height: auto;
+
+    padding: 13px 0 0;
+
+    border-top: 1px solid #293a57;
+    border-left: 0;
+  }
+
+  .assessments-main-content
+  .assessment-run-hero .run-decision::before {
+    top: -1px;
+    left: 0;
+
+    width: 32px;
+    height: 2px;
+  }
+}
+
+
+
+/* ============================================================
+   ASSESSMENT RUNS — FINAL EXACT FINDINGS HEADER ALIGNMENT
+   ============================================================ */
+
+/* Same vertical start as Finding Intelligence */
+
+.assessments-main-content {
+  padding-top: 34px !important;
+}
+
+
+/* Same header geometry */
+
+.assessments-main-content .assessment-page-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+
+  gap: 32px !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 0 0 28px !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+.assessments-main-content
+.assessment-page-header > div:first-child {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+
+/* Same eyebrow as Finding Intelligence */
+
+.assessments-main-content
+.assessment-page-header .eyebrow {
+  margin: 0 0 8px !important;
+
+  color: #7690cf !important;
+
+  font-family: inherit !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+
+  line-height: normal !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+
+
+/* EXACT Finding Intelligence title */
+
+.assessments-main-content
+.assessment-page-header h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #f2f5ff !important;
+
+  font-family: inherit !important;
+  font-size: clamp(30px, 2.25vw, 42px) !important;
+  font-weight: 700 !important;
+
+  line-height: 1.02 !important;
+  letter-spacing: -.035em !important;
+}
+
+
+/* EXACT Finding Intelligence description */
+
+.assessments-main-content
+.assessment-page-header .page-description {
+  max-width: 650px !important;
+
+  margin: 11px 0 0 !important;
+
+  color: #8195b8 !important;
+
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+
+  line-height: 1.55 !important;
+  letter-spacing: normal !important;
+}
+
+
+/* ============================================================
+   LATEST RUN — same dimensions as Findings assessment context
+   ============================================================ */
+
+.assessments-main-content
+.assessment-page-header .run-status-card {
+  position: relative !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  flex: 0 0 auto !important;
+
+  min-width: 205px !important;
+
+  margin: 0 !important;
+  padding: 15px 17px !important;
+
+  border: 1px solid #31415f !important;
+  border-radius: 10px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(21, 31, 48, .96),
+      rgba(13, 21, 34, .96)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 10px 30px rgba(0,0,0,.10) !important;
+}
+
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card::before {
+  content: "" !important;
+
+  position: absolute !important;
+
+  top: 13px !important;
+  bottom: 13px !important;
+  left: 0 !important;
+
+  width: 2px !important;
+
+  border-radius: 999px !important;
+
+  background: #6178d8 !important;
+}
+
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card small {
+  display: block !important;
+
+  margin: 0 0 7px !important;
+
+  color: #7188bd !important;
+
+  font-size: 8px !important;
+  font-weight: 800 !important;
+
+  letter-spacing: .12em !important;
+}
+
+
+.assessments-main-content
+.assessment-page-header
+.run-status-card b {
+  display: block !important;
+
+  color: #e8eefc !important;
+
+  font-size: 12px !important;
+  font-weight: 800 !important;
+
+  line-height: normal !important;
+}
+
+
+/* keep status dot compact */
+
+.assessments-main-content
+.assessment-page-header
+.status-indicator {
+  width: 7px !important;
+  height: 7px !important;
+
+  flex: 0 0 7px !important;
+
+  margin-right: 10px !important;
+}
+
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .assessments-main-content
+  .assessment-page-header {
+    flex-direction: column !important;
+  }
+
+  .assessments-main-content
+  .assessment-page-header .run-status-card {
+    width: 100% !important;
+  }
+}
+
+
+
+/* ============================================================
+   ASSETS & INPUTS — FINAL EXACT FINDINGS HEADER ALIGNMENT
+   ============================================================ */
+
+/* Same page start as Finding Intelligence */
+
+.assets-main-content {
+  padding-top: 34px !important;
+}
+
+
+/* Same header geometry */
+
+.assets-main-content .assets-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+
+  gap: 32px !important;
+
+  width: 100% !important;
+  max-width: none !important;
+
+  margin: 0 0 28px !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+.assets-main-content
+.assets-header::before,
+.assets-main-content
+.assets-header::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+.assets-main-content
+.assets-header > div:first-child {
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXACT Finding Intelligence eyebrow
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header .eyebrow {
+  margin: 0 0 8px !important;
+
+  color: #7690cf !important;
+
+  font-family: inherit !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+
+  line-height: normal !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXACT Finding Intelligence title
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #f2f5ff !important;
+
+  font-family: inherit !important;
+  font-size: clamp(30px, 2.25vw, 42px) !important;
+  font-weight: 700 !important;
+
+  line-height: 1.02 !important;
+  letter-spacing: -.035em !important;
+}
+
+
+/* ------------------------------------------------------------
+   EXACT Finding Intelligence description
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header .page-description {
+  max-width: 650px !important;
+
+  margin: 11px 0 0 !important;
+
+  color: #8195b8 !important;
+
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+
+  line-height: 1.55 !important;
+  letter-spacing: normal !important;
+}
+
+
+/* ------------------------------------------------------------
+   Keep Add Asset compact and aligned with header
+   ------------------------------------------------------------ */
+
+.assets-main-content
+.assets-header > :not(:first-child) {
+  flex: 0 0 auto !important;
+  margin-top: 0 !important;
+}
+
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+
+  .assets-main-content
+  .assets-header {
+    flex-direction: column !important;
+  }
+
+  .assets-main-content
+  .assets-header > :not(:first-child) {
+    margin-top: 0 !important;
+  }
+}
+
+
+
+/* ============================================================
+   ASSET INVENTORY — REMOVE INDEX COLUMN
+   ============================================================ */
+
+/*
+   Asset inventory now contains four columns:
+   ASSET | TYPE | ENVIRONMENT | CRITICALITY
+*/
+
+.assets-main-content
+.asset-inventory
+.asset-table-header,
+.assets-main-content
+.asset-inventory
+.asset-row {
+  grid-template-columns:
+    minmax(260px, 1.65fr)
+    minmax(130px, .85fr)
+    minmax(150px, .85fr)
+    minmax(120px, .70fr) !important;
+}
+
+
+/* Give the first column natural left spacing */
+
+.assets-main-content
+.asset-inventory
+.asset-table-header {
+  padding-left: 14px !important;
+}
+
+.assets-main-content
+.asset-inventory
+.asset-row {
+  padding-left: 14px !important;
+}
+
+
+
+/* ============================================================
+   OVERVIEW — PRIORITIZED FINDINGS WITHOUT INDEX COLUMN
+   FINDING | RISK | SCORE | STATUS
+   ============================================================ */
+
+.overview-main-content .showcase-findings-head,
+.overview-main-content .showcase-finding {
+  grid-template-columns:
+    minmax(0, 1fr)
+    92px
+    92px
+    110px !important;
+}
+
+
+
+/* ============================================================
+   OVERVIEW — FINAL COMPACT DESKTOP WORKSPACE
+   Keeps current visual design, reduces vertical footprint only.
+   ============================================================ */
+
+@media (min-width: 1200px) {
+
+  /* Page */
+  .overview-main-content.wide-workspace-page {
+    padding-top: 22px !important;
+    padding-bottom: 16px !important;
+  }
+
+  /* ----------------------------------------------------------
+     Header
+     ---------------------------------------------------------- */
+
+  .overview-main-content .showcase-header {
+    min-height: 0 !important;
+    margin-bottom: 12px !important;
+    gap: 20px !important;
+  }
+
+  .overview-main-content .showcase-product-title {
+    margin: 0 !important;
+    font-size: clamp(28px, 2vw, 36px) !important;
+    line-height: 1.05 !important;
+  }
+
+  .overview-main-content .showcase-product-subtitle {
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  .overview-main-content .showcase-last-assessment {
+    min-height: 0 !important;
+    padding: 5px 0 !important;
+  }
+
+  /* ----------------------------------------------------------
+     Release decision banner
+     ---------------------------------------------------------- */
+
+  .overview-main-content .showcase-release {
+    min-height: 104px !important;
+    margin-bottom: 12px !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .overview-main-content .showcase-release-shield {
+    transform: scale(.82);
+    transform-origin: center;
+  }
+
+  .overview-main-content .showcase-release-copy h2 {
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+    font-size: 27px !important;
+    line-height: 1 !important;
+  }
+
+  .overview-main-content .showcase-release-context {
+    line-height: 1.25 !important;
+  }
+
+  /* ----------------------------------------------------------
+     KPI row
+     ---------------------------------------------------------- */
+
+  .overview-main-content .showcase-kpis {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .overview-main-content .showcase-kpi {
+    min-height: 104px !important;
+    padding: 14px !important;
+  }
+
+  .overview-main-content .showcase-kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .overview-main-content .showcase-kpi-value {
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .overview-main-content .showcase-kpi-value b {
+    font-size: 25px !important;
+    line-height: 1 !important;
+  }
+
+  .overview-main-content .showcase-kpi p {
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+    line-height: 1.25 !important;
+  }
+
+  /* ----------------------------------------------------------
+     Risk distribution + Asset context
+     ---------------------------------------------------------- */
+
+  .overview-main-content .showcase-context-grid {
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .overview-main-content .showcase-risk-panel,
+  .overview-main-content .showcase-asset {
+    min-height: 150px !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .overview-main-content .showcase-risk-content {
+    margin-top: 8px !important;
+    gap: 18px !important;
+  }
+
+  .overview-main-content .showcase-donut {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+  }
+
+  .overview-main-content .showcase-donut > div {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .overview-main-content .showcase-risk-legend {
+    gap: 4px !important;
+  }
+
+  .overview-main-content .showcase-risk-legend > div {
+    min-height: 18px !important;
+  }
+
+  .overview-main-content .showcase-asset-main {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .overview-main-content .showcase-asset-main h3 {
+    margin-top: 4px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .overview-main-content .showcase-asset-facts {
+    margin-top: 12px !important;
+    gap: 8px !important;
+  }
+
+  /* ----------------------------------------------------------
+     Prioritized findings + Assessment integrity
+     ---------------------------------------------------------- */
+
+  .overview-main-content .showcase-bottom-grid {
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+    align-items: start !important;
+  }
+
+  .overview-main-content .showcase-bottom-grid > .panel {
+    min-height: 0 !important;
+  }
+
+  .overview-main-content .showcase-findings,
+  .overview-main-content .showcase-integrity {
+    min-height: 245px !important;
+  }
+
+  .overview-main-content .showcase-panel-header {
+    min-height: 44px !important;
+    padding-top: 11px !important;
+    padding-bottom: 9px !important;
+  }
+
+  .overview-main-content .showcase-findings-head,
+  .overview-main-content .showcase-finding {
+    min-height: 30px !important;
+  }
+
+  .overview-main-content .showcase-integrity-list > div {
+    min-height: 27px !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+
+  .overview-main-content .showcase-scanner-label {
+    margin-top: 8px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .overview-main-content .showcase-scanners {
+    gap: 5px !important;
+  }
+
+  .overview-main-content .showcase-scanners > div {
+    min-height: 42px !important;
+    padding: 6px 8px !important;
+  }
+
+  /* Footer should not create unnecessary page height */
+  .overview-main-content .showcase-footer {
+    min-height: 0 !important;
+    margin-top: 6px !important;
+    padding-top: 6px !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+
+
+/* ============================================================
+   APPSECGATE — FIXED COLLAPSIBLE SIDEBAR
+   Sidebar remains fixed while page content scrolls.
+   ============================================================ */
+
+:root {
+  --sidebar-expanded: 208px;
+  --sidebar-collapsed: 64px;
+}
+
+
+/* ---------- Application shell ---------- */
+
+.app-shell {
+  display: block !important;
+  min-height: 100dvh;
+}
+
+
+/* ---------- Fixed sidebar ---------- */
+
+.app-shell .sidebar {
+  position: fixed !important;
+  z-index: 100;
+
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  width: var(--sidebar-expanded) !important;
+  height: 100dvh;
+  min-height: 0 !important;
+
+  flex: none !important;
+
+  padding: 28px 14px;
+
+  overflow: hidden;
+
+  transition:
+    width 180ms ease,
+    padding 180ms ease;
+}
+
+
+/* ---------- Main workspace ---------- */
+
+.app-shell .main-content {
+  margin-left: var(--sidebar-expanded) !important;
+  margin-right: 0 !important;
+
+  transition:
+    margin-left 180ms ease,
+    width 180ms ease;
+}
+
+
+/* Wide pages */
+
+.app-shell
+.main-content.wide-workspace-page {
+  width: calc(100% - var(--sidebar-expanded)) !important;
+}
+
+
+/* Security Controls is intentionally not a wide-workspace-page */
+
+.app-shell
+.controls-main-content {
+  width: calc(100% - var(--sidebar-expanded)) !important;
+  max-width: none !important;
+}
+
+
+/* ---------- Brand / toggle ---------- */
+
+.app-shell .brand {
+  min-height: 28px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.app-shell .sidebar-toggle {
+  flex: 0 0 25px;
+
+  padding: 0;
+  border: 0;
+
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: inherit;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.app-shell .sidebar-toggle:hover {
+  transform: scale(1.06);
+
+  box-shadow:
+    0 0 0 3px rgba(116, 131, 255, .12);
+}
+
+.app-shell .sidebar-toggle:focus-visible {
+  outline: 2px solid #8290ff;
+  outline-offset: 3px;
+}
+
+.app-shell .brand-copy {
+  min-width: 0;
+  overflow: hidden;
+
+  opacity: 1;
+
+  transition:
+    opacity 120ms ease,
+    width 180ms ease;
+}
+
+
+/* ---------- Navigation ---------- */
+
+.app-shell .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.app-shell .nav-icon {
+  flex: 0 0 12px;
+
+  display: inline-grid;
+  place-items: center;
+
+  width: 12px;
+
+  font-size: 11px;
+}
+
+.app-shell .nav-label {
+  min-width: 0;
+
+  opacity: 1;
+
+  transition: opacity 100ms ease;
+}
+
+
+/* ============================================================
+   COLLAPSED STATE
+   ============================================================ */
+
+.app-shell.sidebar-collapsed .sidebar {
+  width: var(--sidebar-collapsed) !important;
+
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+
+/* Main workspace expands */
+
+.app-shell.sidebar-collapsed
+.main-content {
+  margin-left: var(--sidebar-collapsed) !important;
+}
+
+.app-shell.sidebar-collapsed
+.main-content.wide-workspace-page,
+.app-shell.sidebar-collapsed
+.controls-main-content {
+  width: calc(100% - var(--sidebar-collapsed)) !important;
+}
+
+
+/* Brand */
+
+.app-shell.sidebar-collapsed .brand {
+  justify-content: center;
+
+  margin-bottom: 24px;
+}
+
+.app-shell.sidebar-collapsed .brand-copy {
+  display: none;
+}
+
+
+/* Workspace hidden while collapsed */
+
+.app-shell.sidebar-collapsed .workspace {
+  display: none;
+}
+
+
+/* Navigation becomes icon rail */
+
+.app-shell.sidebar-collapsed .sidebar nav {
+  gap: 6px;
+
+  width: 100%;
+}
+
+.app-shell.sidebar-collapsed .nav-item {
+  width: 40px;
+  height: 40px;
+
+  margin: 0 auto;
+  padding: 0;
+
+  justify-content: center;
+
+  border-radius: 8px;
+}
+
+.app-shell.sidebar-collapsed .nav-icon {
+  flex-basis: auto;
+
+  width: auto;
+
+  font-size: 15px;
+}
+
+.app-shell.sidebar-collapsed .nav-label {
+  display: none;
+}
+
+
+/* Hide footer note in compact rail */
+
+.app-shell.sidebar-collapsed .side-note {
+  display: none;
+}
+
+
+/* ---------- Mobile safety ---------- */
+
+@media (max-width: 720px) {
+
+  :root {
+    --sidebar-expanded: 190px;
+    --sidebar-collapsed: 58px;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .app-shell.sidebar-collapsed .nav-item {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+
+
+/* ============================================================
+   GLOBAL SIDEBAR — FIXED DURING PAGE SCROLL
+   ============================================================ */
+
+/*
+   Sidebar stays visible while page content scrolls.
+   No collapse / expand behavior.
+*/
+
+.sidebar {
+  position: sticky !important;
+  top: 0 !important;
+
+  height: 100vh !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+
+  align-self: flex-start !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  flex-shrink: 0 !important;
+
+  z-index: 50;
+}
+
+/* Keep the main workspace independent from sidebar height */
+.app-shell {
+  align-items: flex-start !important;
+  min-height: 100vh;
+}
+
+/* Prevent sidebar from being moved by page content */
+.main-content {
+  min-width: 0;
+}
+
+/* Evidence Vault — technical component identity */
+.evidence-main-content .evidence-component-context {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.evidence-main-content .evidence-component-context strong {
+  color: #b9c9ea;
+  font-weight: 600;
+}

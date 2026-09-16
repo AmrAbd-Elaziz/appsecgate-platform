@@ -586,7 +586,7 @@ export default function Home() {
           <span className="brand-mark">A</span>
           <div>
             <b>AppSecGate</b>
-            <small>AI SECURITY GATE</small>
+            <small>INTELLIGENCE SECURITY GATE</small>
           </div>
         </div>
 
@@ -1077,7 +1077,6 @@ export default function Home() {
                 </div>
 
                 <div className="showcase-findings-head">
-                  <span>#</span>
                   <span>FINDING</span>
                   <span>RISK</span>
                   <span>SCORE</span>
@@ -1093,16 +1092,12 @@ export default function Home() {
                         a.riskScore
                     )
                     .slice(0, 5)
-                    .map((finding, index) => (
+                    .map((finding) => (
                       <div
                         className="showcase-finding"
                         key={finding.id}
                       >
-                        <span className="showcase-index">
-                          {index + 1}
-                        </span>
-
-                        <div className="showcase-finding-name">
+<div className="showcase-finding-name">
                           <span
                             className={`risk-dot ${finding.severity.toLowerCase()}`}
                           />

@@ -2637,7 +2637,6 @@ export default function AssetsInputs({
             <>
               <div className="asset-table">
                 <div className="asset-table-header">
-                  <span>#</span>
                   <span>ASSET</span>
                   <span>TYPE</span>
                   <span>ENVIRONMENT</span>
@@ -2650,13 +2649,7 @@ export default function AssetsInputs({
                       const selected =
                         selectedAssetId ===
                         asset.id;
-
-                      const rowNumber =
-                        assetPageStart +
-                        index +
-                        1;
-
-                      return (
+return (
                         <button
                           type="button"
                           className={
@@ -2671,16 +2664,7 @@ export default function AssetsInputs({
                             )
                           }
                         >
-                          <span className="asset-row-number">
-                            {String(
-                              rowNumber
-                            ).padStart(
-                              2,
-                              "0"
-                            )}
-                          </span>
-
-                          <span className="asset-identity">
+<span className="asset-identity">
                             <span
                               className={
                                 selected
