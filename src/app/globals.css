@@ -6090,7 +6090,7 @@ h3 { margin: 0; font-size: 14px; }
       rgba(7, 18, 40, 0.45) 58%,
       rgba(5, 15, 35, 0.72) 100%
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 52% / cover no-repeat;
 }
 
@@ -6525,7 +6525,7 @@ h3 { margin: 0; font-size: 14px; }
       rgba(8, 25, 47, 0.97),
       rgba(7, 28, 53, 0.83)
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 48% / cover no-repeat;
 }
 
@@ -6997,7 +6997,7 @@ h3 { margin: 0; font-size: 14px; }
       rgba(7, 18, 40, 0.25) 58%,
       rgba(5, 15, 35, 0.58) 100%
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 52% / cover no-repeat;
 }
 
@@ -7010,7 +7010,7 @@ h3 { margin: 0; font-size: 14px; }
       rgba(7, 28, 53, 0.76) 48%,
       rgba(5, 19, 38, 0.48) 100%
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 50% / cover no-repeat;
 }
 
@@ -24307,7 +24307,7 @@ select option {
       rgba(18, 18, 55, 0.66) 58%,
       rgba(9, 13, 35, 0.76) 100%
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 52% / cover no-repeat !important;
 
   box-shadow:
@@ -24371,7 +24371,7 @@ select option {
       rgba(10, 22, 48, 0.87) 46%,
       rgba(16, 17, 49, 0.56) 100%
     ),
-    url("/appsecgate-mountains.png")
+    url("/appsecgate-platform/appsecgate-mountains.png")
       center 50% / cover no-repeat !important;
 
   box-shadow:
