@@ -619,7 +619,9 @@ export default function Home() {
         className={`main-content ${
           view === "overview"
             ? "overview-main-content"
-            : ""
+            : view === "assets"
+              ? "assets-main-content"
+              : ""
         }`}
       >
         {view === "overview" ? (

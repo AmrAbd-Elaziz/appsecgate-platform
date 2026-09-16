@@ -35,6 +35,14 @@ export default function AssetsInputs({
   const [showForm, setShowForm] =
     useState(false);
 
+  const [assetSearch, setAssetSearch] =
+    useState("");
+
+  const [assetPage, setAssetPage] =
+    useState(1);
+
+  const ASSETS_PER_PAGE = 6;
+
   const [loadingAssets, setLoadingAssets] =
     useState(true);
 
@@ -287,6 +295,65 @@ export default function AssetsInputs({
     };
   }, []);
 
+  const normalizedAssetSearch =
+    assetSearch.trim().toLowerCase();
+
+  const filteredAssets =
+    normalizedAssetSearch
+      ? assets.filter((asset) => {
+          const searchable = [
+            asset.name,
+            `ASG-AST-${String(
+              asset.id
+            ).padStart(4, "0")}`,
+            asset.type,
+            asset.environment,
+            asset.criticality,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          return searchable.includes(
+            normalizedAssetSearch
+          );
+        })
+      : assets;
+
+  const totalAssetPages = Math.max(
+    1,
+    Math.ceil(
+      filteredAssets.length /
+        ASSETS_PER_PAGE
+    )
+  );
+
+  const safeAssetPage = Math.min(
+    assetPage,
+    totalAssetPages
+  );
+
+  const assetPageStart =
+    (safeAssetPage - 1) *
+    ASSETS_PER_PAGE;
+
+  const paginatedAssets =
+    filteredAssets.slice(
+      assetPageStart,
+      assetPageStart +
+        ASSETS_PER_PAGE
+    );
+
+  const assetShowingStart =
+    filteredAssets.length === 0
+      ? 0
+      : assetPageStart + 1;
+
+  const assetShowingEnd = Math.min(
+    assetPageStart +
+      ASSETS_PER_PAGE,
+    filteredAssets.length
+  );
+
   const selectedAsset =
     assets.find(
       (asset) =>
@@ -300,7 +367,12 @@ export default function AssetsInputs({
     selectedProfile
       ? (
           (selectedProfile.sourcePath ? 1 : 0) +
-          (selectedProfile.iacPath ? 1 : 0) +
+          (
+            selectedProfile.iacPath ||
+            selectedProfile.sourcePath
+              ? 1
+              : 0
+          ) +
           (
             selectedProfile.dastUrl ||
             selectedProfile.dastOpenApiPath
@@ -341,6 +413,67 @@ export default function AssetsInputs({
             ? 1
             : 0
         );
+
+  const requiredSecurityScans = [
+    {
+      name: "Semgrep",
+      category: "SAST",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.sourcePath
+        ),
+    },
+    {
+      name: "Gitleaks",
+      category: "Secrets",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.sourcePath
+        ),
+    },
+    {
+      name: "Trivy FS",
+      category: "SCA",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.sourcePath
+        ),
+    },
+    {
+      name: "Checkov",
+      category: "IaC",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.iacPath ||
+          selectedProfile?.sourcePath
+        ),
+    },
+    {
+      name: "OWASP ZAP",
+      category: "DAST",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.dastUrl ||
+          selectedProfile?.dastOpenApiPath
+        ),
+    },
+    {
+      name: "Trivy Container",
+      category: "Container",
+      required:
+        !selectedAsset?.scanProfile ||
+        Boolean(
+          selectedProfile?.containerImage ||
+          selectedProfile?.containerArchivePath
+        ),
+    },
+  ];
+
 
   const assessmentMode =
     !selectedProfile
@@ -1122,6 +1255,7 @@ export default function AssetsInputs({
 
       resetForm();
       setShowForm(false);
+      removeAddAssetFromUrl();
     } catch (error) {
       setAssetError(
         error instanceof Error
@@ -1131,6 +1265,76 @@ export default function AssetsInputs({
     } finally {
       setCreatingAsset(false);
     }
+  }
+
+  function openAddAssetModal() {
+    if (typeof window === "undefined") {
+      setShowForm(true);
+      return;
+    }
+
+    setAssetError("");
+    setShowForm(true);
+
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.get("addAsset") === "1") {
+      return;
+    }
+
+    url.searchParams.set("addAsset", "1");
+
+    window.history.pushState(
+      {
+        ...window.history.state,
+        appsecgateModal: "addAsset",
+      },
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
+  }
+
+  function closeAddAssetModal() {
+    resetForm();
+    setAssetError("");
+    setShowForm(false);
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+
+    if (url.searchParams.get("addAsset") !== "1") {
+      return;
+    }
+
+    /*
+     * Opening the modal creates a history entry,
+     * so closing it should return to the previous
+     * entry. popstate then synchronizes showForm.
+     */
+    window.history.back();
+  }
+
+  function removeAddAssetFromUrl() {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+
+    if (!url.searchParams.has("addAsset")) {
+      return;
+    }
+
+    url.searchParams.delete("addAsset");
+
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
   }
 
   function handleRunAssessment() {
@@ -1143,6 +1347,81 @@ export default function AssetsInputs({
 
     onRunAssessment(selectedAsset);
   }
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const syncModalWithUrl = () => {
+      const url = new URL(window.location.href);
+
+      const shouldOpen =
+        url.searchParams.get("addAsset") === "1";
+
+      setShowForm(shouldOpen);
+
+      if (!shouldOpen) {
+        resetForm();
+        setAssetError("");
+      }
+    };
+
+    const handlePopState = () => {
+      syncModalWithUrl();
+    };
+
+    const handleKeyDown = (
+      event: KeyboardEvent
+    ) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      const url = new URL(window.location.href);
+
+      if (
+        url.searchParams.get("addAsset") !== "1"
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      closeAddAssetModal();
+    };
+
+    /*
+     * Also supports refresh while
+     * ?addAsset=1 is present.
+     */
+    syncModalWithUrl();
+
+    window.addEventListener(
+      "popstate",
+      handlePopState
+    );
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown,
+      true
+    );
+
+    return () => {
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
+
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+        true
+      );
+    };
+  }, []);
 
   return (
     <>
@@ -1170,11 +1449,11 @@ export default function AssetsInputs({
           className="primary-button"
           type="button"
           onClick={() => {
-            setAssetError("");
-
-            setShowForm(
-              (current) => !current
-            );
+            if (showForm) {
+              closeAddAssetModal();
+            } else {
+              openAddAssetModal();
+            }
           }}
         >
           {showForm
@@ -1191,16 +1470,39 @@ export default function AssetsInputs({
       )}
 
       {showForm && (
-        <section
-          className="panel asset-form-panel"
+        <div
+          className="asset-modal-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeAddAssetModal();
+            }
+          }}
         >
-          <div className="section-heading">
-            <div>
+          <section
+            className="panel asset-form-panel asset-modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-asset-modal-title"
+          >
+            <button
+              type="button"
+              className="asset-modal-close"
+              aria-label="Close add asset"
+              onClick={() => {
+                closeAddAssetModal();
+              }}
+            >
+              ×
+            </button>
+
+            <div className="section-heading">
+              <div>
               <p className="eyebrow">
                 NEW ASSET
               </p>
 
-              <h3>
+              <h3 id="add-asset-modal-title">
                 Add assessment input
               </h3>
 
@@ -2230,9 +2532,7 @@ export default function AssetsInputs({
                   validatingContainer
                 }
                 onClick={() => {
-                  resetForm();
-                  setAssetError("");
-                  setShowForm(false);
+                  closeAddAssetModal();
                 }}
               >
                 Cancel
@@ -2263,7 +2563,8 @@ export default function AssetsInputs({
               </button>
             </div>
           </form>
-        </section>
+          </section>
+        </div>
       )}
 
       <section className="assets-layout">
@@ -2283,10 +2584,41 @@ export default function AssetsInputs({
                   : "s"}
               </span>
             </div>
+          </div>
 
-            <span>
-              Select one asset for assessment
-            </span>
+          <div className="asset-inventory-toolbar">
+            <label className="asset-search">
+              <span className="asset-search-icon">
+                ⌕
+              </span>
+
+              <input
+                type="search"
+                value={assetSearch}
+                placeholder="Search assets..."
+                aria-label="Search assets"
+                onChange={(event) => {
+                  setAssetSearch(
+                    event.target.value
+                  );
+                  setAssetPage(1);
+                }}
+              />
+
+              {assetSearch ? (
+                <button
+                  type="button"
+                  className="asset-search-clear"
+                  aria-label="Clear asset search"
+                  onClick={() => {
+                    setAssetSearch("");
+                    setAssetPage(1);
+                  }}
+                >
+                  ×
+                </button>
+              ) : null}
+            </label>
           </div>
 
           {loadingAssets ? (
@@ -2297,86 +2629,198 @@ export default function AssetsInputs({
             <div className="asset-empty-state">
               No assets configured yet.
             </div>
+          ) : filteredAssets.length === 0 ? (
+            <div className="asset-empty-state">
+              No assets match your search.
+            </div>
           ) : (
-            <div className="asset-table">
-              <div className="asset-table-header">
-                <span>ASSET</span>
-                <span>TYPE</span>
-                <span>ENVIRONMENT</span>
-                <span>CRITICALITY</span>
+            <>
+              <div className="asset-table">
+                <div className="asset-table-header">
+                  <span>#</span>
+                  <span>ASSET</span>
+                  <span>TYPE</span>
+                  <span>ENVIRONMENT</span>
+                  <span>CRITICALITY</span>
+                </div>
+
+                <div className="asset-table-scroll">
+                  {paginatedAssets.map(
+                    (asset, index) => {
+                      const selected =
+                        selectedAssetId ===
+                        asset.id;
+
+                      const rowNumber =
+                        assetPageStart +
+                        index +
+                        1;
+
+                      return (
+                        <button
+                          type="button"
+                          className={
+                            selected
+                              ? "asset-row selected"
+                              : "asset-row"
+                          }
+                          key={asset.id}
+                          onClick={() =>
+                            setSelectedAssetId(
+                              asset.id
+                            )
+                          }
+                        >
+                          <span className="asset-row-number">
+                            {String(
+                              rowNumber
+                            ).padStart(
+                              2,
+                              "0"
+                            )}
+                          </span>
+
+                          <span className="asset-identity">
+                            <span
+                              className={
+                                selected
+                                  ? "asset-selector selected"
+                                  : "asset-selector"
+                              }
+                            />
+
+                            <span>
+                              <b>
+                                {asset.name}
+                              </b>
+
+                              <small>
+                                ASG-AST-
+                                {String(
+                                  asset.id
+                                ).padStart(
+                                  4,
+                                  "0"
+                                )}
+                              </small>
+                            </span>
+                          </span>
+
+                          <span>
+                            {asset.type}
+                          </span>
+
+                          <span>
+                            <span className="neutral-tag">
+                              {asset.environment}
+                            </span>
+                          </span>
+
+                          <span>
+                            <span
+                              className={
+                                `criticality-tag ` +
+                                asset.criticality
+                                  .toLowerCase()
+                              }
+                            >
+                              {asset.criticality}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
               </div>
 
-              {assets.map((asset) => {
-                const selected =
-                  selectedAssetId ===
-                  asset.id;
+              <div className="asset-table-footer">
+                <span>
+                  Showing{" "}
+                  <b>
+                    {assetShowingStart}–
+                    {assetShowingEnd}
+                  </b>{" "}
+                  of{" "}
+                  <b>
+                    {filteredAssets.length}
+                  </b>
+                </span>
 
-                return (
+                <nav
+                  className="asset-pagination"
+                  aria-label="Asset inventory pages"
+                >
                   <button
                     type="button"
-                    className={
-                      selected
-                        ? "asset-row selected"
-                        : "asset-row"
+                    aria-label="Previous asset page"
+                    disabled={
+                      safeAssetPage <= 1
                     }
-                    key={asset.id}
                     onClick={() =>
-                      setSelectedAssetId(
-                        asset.id
+                      setAssetPage(
+                        Math.max(
+                          1,
+                          safeAssetPage - 1
+                        )
                       )
                     }
                   >
-                    <span className="asset-identity">
-                      <span
-                        className={
-                          selected
-                            ? "asset-selector selected"
-                            : "asset-selector"
-                        }
-                      />
-
-                      <span>
-                        <b>
-                          {asset.name}
-                        </b>
-
-                        <small>
-                          ASG-AST-
-                          {String(
-                            asset.id
-                          ).padStart(
-                            4,
-                            "0"
-                          )}
-                        </small>
-                      </span>
-                    </span>
-
-                    <span>
-                      {asset.type}
-                    </span>
-
-                    <span>
-                      <span className="neutral-tag">
-                        {asset.environment}
-                      </span>
-                    </span>
-
-                    <span>
-                      <span
-                        className={
-                          `criticality-tag ` +
-                          asset.criticality
-                            .toLowerCase()
-                        }
-                      >
-                        {asset.criticality}
-                      </span>
-                    </span>
+                    ‹
                   </button>
-                );
-              })}
-            </div>
+
+                  {Array.from(
+                    {
+                      length:
+                        totalAssetPages,
+                    },
+                    (_, index) =>
+                      index + 1
+                  ).map((page) => (
+                    <button
+                      type="button"
+                      key={page}
+                      className={
+                        page ===
+                        safeAssetPage
+                          ? "active"
+                          : ""
+                      }
+                      aria-current={
+                        page ===
+                        safeAssetPage
+                          ? "page"
+                          : undefined
+                      }
+                      onClick={() =>
+                        setAssetPage(page)
+                      }
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    aria-label="Next asset page"
+                    disabled={
+                      safeAssetPage >=
+                      totalAssetPages
+                    }
+                    onClick={() =>
+                      setAssetPage(
+                        Math.min(
+                          totalAssetPages,
+                          safeAssetPage + 1
+                        )
+                      )
+                    }
+                  >
+                    ›
+                  </button>
+                </nav>
+              </div>
+            </>
           )}
         </article>
 
@@ -2421,117 +2865,234 @@ export default function AssetsInputs({
                   {" · "}
                   {selectedAsset.environment}
                 </span>
+
+                <div className="target-facts">
+                  <div>
+                    <span>
+                      Criticality
+                    </span>
+
+                    <b>
+                      {
+                        selectedAsset.criticality
+                      }
+                    </b>
+                  </div>
+
+                  <div>
+                    <span>
+                      Assessment mode
+                    </span>
+
+                    <b>
+                      {assessmentMode}
+                    </b>
+                  </div>
+
+                  <div>
+                    <span>
+                      Required scans
+                    </span>
+
+                    <b>
+                      {requiredScannerCount}/6
+                    </b>
+                  </div>
+                </div>
+
+                <div
+                  className="target-scanner-strip"
+                  aria-label="Applicable security scanners"
+                >
+                  {requiredSecurityScans.map(
+                    (scanner) => (
+                      <div
+                        key={scanner.name}
+                        className={
+                          scanner.required
+                            ? "target-scanner active"
+                            : "target-scanner"
+                        }
+                        title={
+                          scanner.required
+                            ? `${scanner.name} — applicable`
+                            : `${scanner.name} — not applicable`
+                        }
+                      >
+                        <span className="target-scanner-dot" />
+
+                        <b>
+                          {scanner.name}
+                        </b>
+
+                        <small>
+                          {scanner.category}
+                        </small>
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
 
-              <div className="assessment-summary">
-                <div>
-                  <span>
-                    Criticality
-                  </span>
+              <div className="assessment-readiness">
+                <div className="assessment-readiness-heading">
+                  <div>
+                    <span>
+                      CONFIGURED SECURITY INPUTS
+                    </span>
 
-                  <b>
-                    {
-                      selectedAsset.criticality
-                    }
-                  </b>
-                </div>
-
-                <div>
-                  <span>
-                    Assessment mode
-                  </span>
-
-                  <b>
-                    {assessmentMode}
-                  </b>
-                </div>
-
-                <div>
-                  <span>
-                    Required scanners
-                  </span>
-
-                  <b>
-                    {requiredScannerCount}/6
-                  </b>
-                </div>
-              </div>
-
-              <div className="scan-profile-card">
-                <div className="scan-profile-card-header">
-                  <span>
-                    SECURITY SCAN PROFILE
-                  </span>
+                    <small>
+                      Configured security inputs
+                    </small>
+                  </div>
 
                   <b>
                     {configuredTargets}/4
                   </b>
                 </div>
 
-                <div className="scan-profile-values">
-                  <div>
-                    <span>
-                      Source
-                    </span>
+                <div className="readiness-grid">
+                  <div
+                    className={
+                      selectedProfile
+                        ?.sourcePath
+                        ? "readiness-item configured"
+                        : "readiness-item"
+                    }
+                  >
+                    <div className="readiness-item-head">
+                      <span>
+                        Source
+                      </span>
 
-                    <code>
+                      <i />
+                    </div>
+
+                    <b>
                       {selectedProfile
-                        ?.sourcePath ||
-                        "Not configured"}
-                    </code>
+                        ?.sourcePath
+                        ? "Configured"
+                        : "Not configured"}
+                    </b>
+
+                    <small>
+                      Code security
+                    </small>
                   </div>
 
-                  <div>
-                    <span>IaC</span>
+                  <div
+                    className={
+                      selectedProfile
+                        ?.iacPath ||
+                      selectedProfile
+                        ?.sourcePath
+                        ? "readiness-item configured"
+                        : "readiness-item"
+                    }
+                  >
+                    <div className="readiness-item-head">
+                      <span>
+                        IaC
+                      </span>
 
-                    <code>
+                      <i />
+                    </div>
+
+                    <b>
                       {selectedProfile
                         ?.iacPath ||
-                        selectedProfile
-                          ?.sourcePath ||
-                        "Not configured"}
-                    </code>
+                      selectedProfile
+                        ?.sourcePath
+                        ? "Configured"
+                        : "Not configured"}
+                    </b>
+
+                    <small>
+                      Infrastructure security
+                    </small>
                   </div>
 
-                  <div>
-                    <span>DAST</span>
-
-                    <code>
-                      {selectedProfile
+                  <div
+                    className={
+                      selectedProfile
                         ?.dastUrl ||
-                        selectedProfile
-                          ?.dastOpenApiPath ||
-                        "Not configured"}
-                    </code>
+                      selectedProfile
+                        ?.dastOpenApiPath
+                        ? "readiness-item configured"
+                        : "readiness-item"
+                    }
+                  >
+                    <div className="readiness-item-head">
+                      <span>
+                        DAST
+                      </span>
+
+                      <i />
+                    </div>
+
+                    <b>
+                      {selectedProfile
+                        ?.dastUrl
+                        ? "Web target"
+                        : selectedProfile
+                            ?.dastOpenApiPath
+                          ? "OpenAPI"
+                          : "Not configured"}
+                    </b>
+
+                    <small>
+                      Dynamic testing
+                    </small>
                   </div>
 
-                  <div>
-                    <span>
-                      Container
-                    </span>
-
-                    <code>
-                      {selectedProfile
+                  <div
+                    className={
+                      selectedProfile
                         ?.containerImage ||
-                        selectedProfile
-                          ?.containerArchivePath ||
-                        "Not configured"}
-                    </code>
+                      selectedProfile
+                        ?.containerArchivePath
+                        ? "readiness-item configured"
+                        : "readiness-item"
+                    }
+                  >
+                    <div className="readiness-item-head">
+                      <span>
+                        Container
+                      </span>
+
+                      <i />
+                    </div>
+
+                    <b>
+                      {selectedProfile
+                        ?.containerImage
+                        ? "Image configured"
+                        : selectedProfile
+                            ?.containerArchivePath
+                          ? "TAR configured"
+                          : "Not configured"}
+                    </b>
+
+                    <small>
+                      Image security
+                    </small>
                   </div>
                 </div>
               </div>
 
-              <p className="muted">
-                AppSecGate resolves persisted
-                scanner targets server-side,
-                collects evidence, correlates
-                security signals, and calculates
-                the release decision.
+              <p className="assessment-target-note">
+                AppSecGate executes the scanners
+                applicable to this asset&apos;s
+                configured security inputs and
+                calculates the release decision.
               </p>
 
               {assessmentRunError && (
                 <div className="assessment-run-error">
-                  <b>Assessment failed</b>
+                  <b>
+                    Assessment failed
+                  </b>
+
                   <span>
                     {assessmentRunError}
                   </span>
