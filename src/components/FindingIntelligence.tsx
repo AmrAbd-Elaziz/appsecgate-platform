@@ -141,8 +141,15 @@ export default function FindingIntelligence({
       setError("");
 
       try {
+        const findingsUrl =
+          assessment?.id
+            ? `/api/findings?assessmentId=${encodeURIComponent(
+                assessment.id
+              )}`
+            : "/api/findings";
+
         const response = await fetch(
-          "/api/findings",
+          findingsUrl,
           {
             cache: "no-store",
           }
@@ -329,7 +336,7 @@ export default function FindingIntelligence({
             String(record.asset.id) ===
               assetId;
 
-          return (
+  return (
             matchesSearch &&
             matchesSeverity &&
             matchesStatus &&
@@ -344,6 +351,45 @@ export default function FindingIntelligence({
       status,
       assetId,
     ]);
+
+
+  const FINDINGS_PER_PAGE = 10;
+
+  const [findingPage, setFindingPage] =
+    useState(1);
+
+  const totalFindingPages = Math.max(
+    1,
+    Math.ceil(
+      filteredRecords.length /
+        FINDINGS_PER_PAGE
+    )
+  );
+
+  const safeFindingPage = Math.min(
+    findingPage,
+    totalFindingPages
+  );
+
+  const findingPageStart =
+    (safeFindingPage - 1) *
+    FINDINGS_PER_PAGE;
+
+  const paginatedRecords =
+    filteredRecords.slice(
+      findingPageStart,
+      findingPageStart +
+        FINDINGS_PER_PAGE
+    );
+
+  useEffect(() => {
+    setFindingPage(1);
+  }, [
+    search,
+    severity,
+    status,
+    assetId,
+  ]);
 
   const openCount =
     records.filter(
@@ -439,18 +485,15 @@ export default function FindingIntelligence({
 
         <div className="findings-run-context">
           <small>
-            INTELLIGENCE SCOPE
+            ASSESSMENT CONTEXT
           </small>
 
           <b>
-            {records.length} FINDINGS
+            {assessment?.id ?? "—"}
           </b>
 
           <span>
-            {assets.length} asset
-            {assets.length === 1
-              ? ""
-              : "s"}
+            {assessment?.asset?.name ?? "—"}
           </span>
         </div>
       </header>
@@ -603,33 +646,7 @@ export default function FindingIntelligence({
             </select>
           </label>
 
-          <label>
-            <span>ASSET</span>
 
-            <select
-              value={assetId}
-              onChange={(event) =>
-                setAssetId(
-                  event.target.value
-                )
-              }
-            >
-              <option value="ALL">
-                All assets
-              </option>
-
-              {assets.map(
-                ([id, name]) => (
-                  <option
-                    key={id}
-                    value={String(id)}
-                  >
-                    {name}
-                  </option>
-                )
-              )}
-            </select>
-          </label>
         </div>
 
         {loading ? (
@@ -643,10 +660,12 @@ export default function FindingIntelligence({
         ) : filteredRecords.length ===
           0 ? (
           <div className="finding-table-state">
-            No findings match the
-            current filters.
+            {records.length === 0
+              ? "No findings were generated for this assessment."
+              : "No findings match the current filters."}
           </div>
         ) : (
+          <>
           <div className="finding-table-scroll">
             <table className="finding-intelligence-table">
               <thead>
@@ -662,7 +681,7 @@ export default function FindingIntelligence({
               </thead>
 
               <tbody>
-                {filteredRecords.map(
+                {paginatedRecords.map(
                   (record) => {
                     const finding =
                       record.finding;
@@ -761,10 +780,98 @@ export default function FindingIntelligence({
                       </tr>
                     );
                   }
-                )}
+                  )}
               </tbody>
             </table>
           </div>
+
+            {totalFindingPages > 1 && (
+              <div className="finding-pagination">
+                <div className="finding-pagination-summary">
+                  Showing{" "}
+                  <b>
+                    {findingPageStart + 1}
+                  </b>
+                  {" – "}
+                  <b>
+                    {Math.min(
+                      findingPageStart +
+                        FINDINGS_PER_PAGE,
+                      filteredRecords.length
+                    )}
+                  </b>
+                  {" of "}
+                  <b>
+                    {filteredRecords.length}
+                  </b>
+                </div>
+
+                <div className="finding-pagination-controls">
+                  <button
+                    type="button"
+                    className="finding-page-nav"
+                    disabled={
+                      safeFindingPage === 1
+                    }
+                    onClick={() =>
+                      setFindingPage(
+                        Math.max(
+                          1,
+                          safeFindingPage - 1
+                        )
+                      )
+                    }
+                  >
+                    ←
+                  </button>
+
+                  {Array.from(
+                    {
+                      length:
+                        totalFindingPages,
+                    },
+                    (_, index) =>
+                      index + 1
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={`finding-page-number ${
+                        page ===
+                        safeFindingPage
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setFindingPage(page)
+                      }
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="finding-page-nav"
+                    disabled={
+                      safeFindingPage ===
+                      totalFindingPages
+                    }
+                    onClick={() =>
+                      setFindingPage(
+                        Math.min(
+                          totalFindingPages,
+                          safeFindingPage + 1
+                        )
+                      )
+                    }
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </section>
 

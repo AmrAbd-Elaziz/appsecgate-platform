@@ -11,10 +11,125 @@ import {
   listFindingLifecycles,
 } from "../../../lib/server/store";
 
-export async function GET() {
+export async function GET(
+  request: Request
+) {
   const assessments = await listAssessments();
   const lifecycles =
     await listFindingLifecycles();
+
+  const { searchParams } = new URL(request.url);
+  const assessmentId =
+    searchParams.get("assessmentId");
+
+  /*
+   * Assessment-scoped mode:
+   * Finding Intelligence follows the currently displayed
+   * assessment run instead of mixing findings from older
+   * assets/runs.
+   */
+  if (assessmentId) {
+    const assessment = assessments.find(
+      (item) => item.id === assessmentId
+    );
+
+    if (!assessment) {
+      return NextResponse.json(
+        {
+          error: "Assessment not found.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const lifecycleByFindingId = new Map(
+      lifecycles
+        .filter(
+          (lifecycle) =>
+            lifecycle.assetId ===
+            assessment.assetId
+        )
+        .map((lifecycle) => [
+          lifecycle.findingId,
+          lifecycle,
+        ])
+    );
+
+    const data: FindingIntelligenceRecord[] =
+      assessment.findings
+        .map((finding) => {
+          const lifecycle =
+            lifecycleByFindingId.get(
+              finding.id
+            );
+
+          if (!lifecycle) {
+            return null;
+          }
+
+          return {
+            finding,
+            lifecycle,
+            asset: assessment.asset,
+            assessmentId: assessment.id,
+            completedAt:
+              assessment.completedAt ??
+              assessment.startedAt,
+          };
+        })
+        .filter(
+          (
+            record
+          ): record is FindingIntelligenceRecord =>
+            record !== null
+        )
+        .sort((a, b) => {
+          if (
+            a.lifecycle.status !==
+            b.lifecycle.status
+          ) {
+            return a.lifecycle.status ===
+              "Open"
+              ? -1
+              : 1;
+          }
+
+          return (
+            b.lifecycle.lastSeenAt.localeCompare(
+              a.lifecycle.lastSeenAt
+            )
+          );
+        });
+
+    return NextResponse.json({
+      data,
+      count: data.length,
+
+      summary: {
+        open: data.filter(
+          (record) =>
+            record.lifecycle.status ===
+            "Open"
+        ).length,
+
+        closed: data.filter(
+          (record) =>
+            record.lifecycle.status ===
+            "Closed"
+        ).length,
+
+        critical: data.filter(
+          (record) =>
+            record.finding.severity ===
+            "CRITICAL"
+        ).length,
+
+        assets: data.length > 0 ? 1 : 0,
+      },
+    });
+  }
 
   /*
    * Build an index containing the newest known

@@ -3622,7 +3622,7 @@ h3 { margin: 0; font-size: 14px; }
 ======================================== */
 
 .finding-open-number {
-  color: #ff9aab;
+  color: #a78bfa;
 }
 
 .finding-closed-number {
@@ -11598,5 +11598,784 @@ h3 { margin: 0; font-size: 14px; }
 
   .assessments-main-content .scanner-list {
     margin-bottom: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — WIDE PAGE LAYOUT
+   Width only. Keep current component/functionality unchanged.
+   ========================================================= */
+
+.findings-main-content {
+  width: min(1380px, calc(100% - 208px)) !important;
+  max-width: none !important;
+
+  padding-left: 48px !important;
+  padding-right: 48px !important;
+}
+
+.findings-main-content .page-header,
+.findings-main-content .finding-kpis,
+.findings-main-content .findings-panel,
+.findings-main-content .findings-table-panel {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Let tables use the available horizontal space */
+.findings-main-content table {
+  width: 100% !important;
+}
+
+/* Keep long finding names from forcing page overflow */
+.findings-main-content th,
+.findings-main-content td {
+  min-width: 0;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1400px) {
+  .findings-main-content {
+    width: calc(100% - 208px) !important;
+
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .findings-main-content {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .findings-main-content {
+    width: calc(100% - 175px) !important;
+
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — SCROLLABLE FINDINGS TABLE
+   ========================================================= */
+
+/*
+ * Keep the filters and panel header visible.
+ * Only the findings rows scroll vertically.
+ */
+.findings-main-content .finding-table-scroll {
+  max-height: 500px;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Sticky column headings while scrolling findings */
+.findings-main-content .finding-intelligence-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #0b121c;
+  box-shadow: 0 1px 0 #27344c;
+}
+
+/* Row number column */
+.findings-main-content .finding-row-number-head,
+.findings-main-content .finding-row-number {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  text-align: center;
+}
+
+.findings-main-content .finding-row-number {
+  color: #647b9f;
+  font-size: 8px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle scrollbar matching AppSecGate */
+.findings-main-content .finding-table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #34435e #0b121c;
+}
+
+.findings-main-content .finding-table-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.findings-main-content .finding-table-scroll::-webkit-scrollbar-track {
+  background: #0b121c;
+}
+
+.findings-main-content .finding-table-scroll::-webkit-scrollbar-thumb {
+  background: #34435e;
+  border: 2px solid #0b121c;
+  border-radius: 999px;
+}
+
+.findings-main-content .finding-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4b6081;
+}
+
+@media (max-height: 800px) {
+  .findings-main-content .finding-table-scroll {
+    max-height: 420px;
+  }
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — PAGINATION
+   ========================================================= */
+
+.findings-main-content .finding-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  min-height: 54px;
+  padding: 9px 16px;
+
+  border-top: 1px solid #253149;
+  background:
+    linear-gradient(
+      180deg,
+      #101824 0%,
+      #0d141f 100%
+    );
+}
+
+.findings-main-content
+.finding-pagination-summary {
+  color: #7186a7;
+  font-size: 9px;
+}
+
+.findings-main-content
+.finding-pagination-summary b {
+  color: #c7d3e6;
+  font-weight: 800;
+}
+
+.findings-main-content
+.finding-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.findings-main-content
+.finding-page-number,
+.findings-main-content
+.finding-page-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 31px;
+  height: 31px;
+
+  padding: 0;
+  border: 1px solid #293650;
+  border-radius: 7px;
+
+  background: #111a28;
+  color: #8da2c2;
+
+  font: inherit;
+  font-size: 9px;
+  font-weight: 800;
+
+  cursor: pointer;
+  transition:
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease,
+    transform .15s ease;
+}
+
+.findings-main-content
+.finding-page-number:hover,
+.findings-main-content
+.finding-page-nav:hover:not(:disabled) {
+  border-color: #5069a7;
+  background: #172238;
+  color: #e3eaff;
+  transform: translateY(-1px);
+}
+
+.findings-main-content
+.finding-page-number.active {
+  border-color: #6178d8;
+  background:
+    linear-gradient(
+      135deg,
+      #4256b4,
+      #5268ce
+    );
+  color: #fff;
+  box-shadow:
+    0 0 0 1px rgba(111, 133, 255, .12),
+    0 5px 15px rgba(44, 61, 139, .22);
+}
+
+.findings-main-content
+.finding-page-nav:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+/*
+ * Pagination means we no longer need an extremely
+ * tall internal table area.
+ */
+.findings-main-content .finding-table-scroll {
+  max-height: 470px;
+}
+
+@media (max-width: 700px) {
+  .findings-main-content
+  .finding-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — OPEN STATE PURPLE
+   ========================================================= */
+
+/* Open KPI number */
+.findings-main-content .finding-open-number {
+  color: #a78bfa !important;
+}
+
+/* Open lifecycle badge */
+.findings-main-content .finding-lifecycle-open,
+.finding-detail-modal .finding-lifecycle-open {
+  color: #c4b5fd !important;
+  background: rgba(124, 92, 255, 0.18) !important;
+  border-color: rgba(167, 139, 250, 0.38) !important;
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — ASSESSMENT SCOPED FILTERS
+   ========================================================= */
+
+.findings-main-content .finding-filters {
+  grid-template-columns:
+    minmax(360px, 2.4fr)
+    minmax(170px, .8fr)
+    minmax(170px, .8fr) !important;
+}
+
+@media (max-width: 900px) {
+  .findings-main-content .finding-filters {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — FILTER ROW FINAL
+   Search expands, Status stays at far right
+   ========================================================= */
+
+.findings-main-content .finding-filter-grid {
+  display: grid !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    220px
+    220px !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.findings-main-content .finding-search-field {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.findings-main-content .finding-search-field input {
+  width: 100% !important;
+}
+
+@media (max-width: 900px) {
+  .findings-main-content .finding-filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* =========================================================
+   FINDING INTELLIGENCE — MODERN WORKSPACE FINAL
+   Assessment Runs design language
+   ========================================================= */
+
+/* ---------- Page ---------- */
+
+.findings-main-content {
+  padding-top: 34px !important;
+}
+
+.findings-main-content .findings-page-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 32px !important;
+  margin-bottom: 28px !important;
+}
+
+.findings-main-content .findings-page-header > div:first-child {
+  min-width: 0;
+}
+
+.findings-main-content .findings-page-header .eyebrow {
+  margin-bottom: 8px !important;
+  color: #7690cf !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .14em !important;
+}
+
+.findings-main-content .findings-page-header h1 {
+  margin: 0 !important;
+  font-size: clamp(30px, 2.25vw, 42px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.035em !important;
+}
+
+.findings-main-content .findings-page-header .page-description {
+  margin-top: 11px !important;
+  max-width: 650px !important;
+  color: #8195b8 !important;
+  line-height: 1.55 !important;
+}
+
+
+/* ---------- Assessment context ---------- */
+
+.findings-main-content .findings-run-context {
+  position: relative;
+  flex: 0 0 auto;
+
+  min-width: 205px !important;
+  padding: 15px 17px !important;
+
+  border: 1px solid #31415f !important;
+  border-radius: 10px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(21, 31, 48, .96),
+      rgba(13, 21, 34, .96)
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 10px 30px rgba(0,0,0,.10);
+}
+
+.findings-main-content .findings-run-context::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  bottom: 13px;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: #6178d8;
+}
+
+.findings-main-content .findings-run-context small {
+  display: block !important;
+  margin-bottom: 7px !important;
+  color: #7188bd !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+  letter-spacing: .12em !important;
+}
+
+.findings-main-content .findings-run-context b {
+  display: block !important;
+  max-width: 220px;
+  overflow: hidden;
+  color: #e8eefc !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.findings-main-content .findings-run-context span {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #8097c4 !important;
+  font-size: 9px !important;
+}
+
+
+/* ---------- KPI row ---------- */
+
+.findings-main-content .finding-kpis {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-bottom: 16px !important;
+}
+
+.findings-main-content .finding-kpis article {
+  position: relative;
+  min-height: 106px !important;
+  padding: 17px 18px 15px !important;
+
+  border: 1px solid #293751 !important;
+  border-radius: 10px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      #131d2c 0%,
+      #101824 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 8px 24px rgba(0,0,0,.08);
+
+  overflow: hidden;
+  transition:
+    border-color .18s ease,
+    transform .18s ease,
+    background .18s ease;
+}
+
+.findings-main-content .finding-kpis article::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  opacity: .65;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(113, 139, 220, .42),
+      transparent
+    );
+}
+
+.findings-main-content .finding-kpis article:hover {
+  transform: translateY(-2px);
+  border-color: #3a4c70 !important;
+  background:
+    linear-gradient(
+      145deg,
+      #162235,
+      #111a28
+    ) !important;
+}
+
+.findings-main-content .finding-kpis small {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: #7f93b5 !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+}
+
+.findings-main-content .finding-kpis b {
+  display: block !important;
+  margin-bottom: 7px !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+}
+
+.findings-main-content .finding-kpis span {
+  display: block !important;
+  color: #7489ab !important;
+  font-size: 8px !important;
+}
+
+
+/* Keep semantic KPI colors */
+
+.findings-main-content .finding-open-number {
+  color: #a78bfa !important;
+}
+
+.findings-main-content .finding-closed-number {
+  color: #55d6a5 !important;
+}
+
+.findings-main-content .finding-critical-number {
+  color: #ff7088 !important;
+}
+
+
+/* ---------- Main intelligence workspace ---------- */
+
+.findings-main-content .finding-table-panel {
+  overflow: hidden !important;
+
+  border: 1px solid #2a3853 !important;
+  border-radius: 12px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #121c2a 0%,
+      #101824 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 16px 40px rgba(0,0,0,.10);
+}
+
+
+/* ---------- Workspace header ---------- */
+
+.findings-main-content .finding-table-toolbar {
+  min-height: 72px !important;
+  padding: 17px 20px !important;
+
+  border-bottom: 1px solid #293751 !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(22, 33, 51, .92),
+      rgba(16, 24, 36, .72)
+    ) !important;
+}
+
+.findings-main-content .finding-table-toolbar h3 {
+  margin: 0 0 5px !important;
+  color: #edf2ff !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.findings-main-content .finding-table-toolbar .panel-subtitle {
+  color: #778caf !important;
+  font-size: 9px !important;
+}
+
+.findings-main-content .finding-result-count {
+  padding: 5px 9px !important;
+  border: 1px solid #2b3a57;
+  border-radius: 6px;
+  background: #0e1724;
+  color: #8da3cc !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+}
+
+
+/* ---------- Filters ---------- */
+
+.findings-main-content .finding-filter-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    220px
+    220px !important;
+
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 15px 20px 17px !important;
+
+  border-bottom: 1px solid #293751 !important;
+  background: #0f1825 !important;
+}
+
+.findings-main-content .finding-filter-grid label {
+  min-width: 0;
+}
+
+.findings-main-content .finding-filter-grid label > span {
+  display: block;
+  margin-bottom: 6px !important;
+
+  color: #7186aa !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em !important;
+}
+
+.findings-main-content .finding-filter-grid input,
+.findings-main-content .finding-filter-grid select {
+  width: 100% !important;
+  height: 39px !important;
+  padding: 0 12px !important;
+
+  border: 1px solid #2d3b57 !important;
+  border-radius: 7px !important;
+
+  background: #0d1623 !important;
+  color: #c9d5ea !important;
+
+  outline: none !important;
+
+  transition:
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+
+.findings-main-content .finding-filter-grid input:focus,
+.findings-main-content .finding-filter-grid select:focus {
+  border-color: #5369c4 !important;
+  background: #101a29 !important;
+  box-shadow:
+    0 0 0 3px rgba(92, 111, 211, .10) !important;
+}
+
+.findings-main-content .finding-search-field {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+
+/* ---------- Empty / loading state ---------- */
+
+.findings-main-content .finding-table-state {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  min-height: 150px !important;
+  padding: 34px !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(67, 87, 143, .06),
+      transparent 48%
+    );
+
+  color: #7187ad !important;
+  font-size: 10px !important;
+}
+
+
+/* ---------- Table ---------- */
+
+.findings-main-content .finding-table-scroll {
+  max-height: 470px !important;
+  background: #101824;
+}
+
+.findings-main-content .finding-intelligence-table {
+  width: 100%;
+}
+
+.findings-main-content
+.finding-intelligence-table thead th {
+  height: 35px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  background: #0b131f !important;
+  color: #7186aa !important;
+
+  font-size: 8px !important;
+  font-weight: 800 !important;
+  letter-spacing: .07em !important;
+}
+
+.findings-main-content
+.finding-intelligence-table tbody tr {
+  transition:
+    background .14s ease,
+    box-shadow .14s ease;
+}
+
+.findings-main-content
+.finding-intelligence-table tbody tr:hover {
+  background: #162236 !important;
+  box-shadow:
+    inset 2px 0 0 #6178d8;
+}
+
+
+/* ---------- Pagination ---------- */
+
+.findings-main-content .finding-pagination {
+  min-height: 54px !important;
+  padding: 10px 16px !important;
+
+  border-top: 1px solid #293751 !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #101927,
+      #0d1521
+    ) !important;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1050px) {
+  .findings-main-content .finding-kpis {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .findings-main-content .finding-filter-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      180px
+      180px !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .findings-main-content .findings-page-header {
+    flex-direction: column !important;
+  }
+
+  .findings-main-content .findings-run-context {
+    width: 100% !important;
+  }
+
+  .findings-main-content .finding-filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .findings-main-content .finding-kpis {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Finding Intelligence — final header alignment */
+@media (min-width: 801px) {
+  .findings-main-content .findings-run-context {
+    margin-top: 8px !important;
   }
 }
